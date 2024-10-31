@@ -9,20 +9,14 @@ const signToken = (id) => {
 
 export const signup = async (req, res) => {
   try {
-    const { name, email, password, age, gender, genderPreference } = req.body;
-    if (!name || !email || !password || !age || !gender || !genderPreference) {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
       });
     }
 
-    if (age < 18) {
-      return res.status(400).json({
-        success: false,
-        message: "You must be at leat 18 Years old",
-      });
-    }
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
@@ -33,9 +27,6 @@ export const signup = async (req, res) => {
       name,
       email,
       password,
-      age,
-      gender,
-      genderPreference,
     });
     const token = signToken(newUser._id);
 

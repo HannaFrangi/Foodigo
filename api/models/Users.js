@@ -16,25 +16,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  age: {
-    type: Number,
-    required: true,
-  },
-  gender: {
-    type: String,
-    required: true,
-    enum: ["male", "female"],
-  },
-  genderPreference: {
-    type: String,
-    required: true,
-    enum: ["male", "female"],
-  },
-  bio: { type: String, default: "" },
-  image: { type: String, default: "" },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  matches: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  // bio: { type: String, default: "" },
+  ProfilePicURL: { type: String, default: "" },
+  // likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 });
 
 userSchema.pre("save", async function (next) {
