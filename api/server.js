@@ -4,8 +4,6 @@ import cookieParser from "cookie-parser";
 // routes
 import authRoutes from "./routes/authRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
-import matchesRoutes from "./routes/matchesRoutes.js";
-import messagesRoutes from "./routes/messagesRoutes.js";
 import { connectDB } from "./config/db.js";
 
 dotenv.config(); // Corrected to dotenv.config()
@@ -22,8 +20,6 @@ app.use(cookieParser()); //so we can send the cookie in the res.cookie in authCo
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
-app.use("/api/matches", matchesRoutes);
-app.use("/api/messages", messagesRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server started at port ${PORT}`);
