@@ -19,6 +19,20 @@ const userSchema = new mongoose.Schema({
   // bio: { type: String, default: "" },
   ProfilePicURL: { type: String, default: "" },
   // likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+
+  // Added Favorites
+  recipeFavorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
+
+  //Added CreatedAt
+  createdAt: { type: Date, default: Date.now },
+
+  groceryList: [
+    {
+      ingredientName: { type: String, required: true },
+      quantity: { type: String, default: "" },
+      isPurchased: { type: Boolean, default: false },
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {

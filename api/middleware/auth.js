@@ -3,25 +3,34 @@ import User from "../models/Users.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
-    const token = req.coookies.jwt;
+    // 1. Get the token from cookies
+    const token = req.cookies.jwt;
     if (!token) {
       return res.status(401).json({
-        succes: false,
-        message: "Not authorized . No token provided",
+        success: false,
+        message: "Not authorized. No token provided",
       });
     }
-    //check the token if valid
-    const decoded = jwt.verify(token.process.env.JWT_SECRET);
 
+    // 2. Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded) {
       return res.status(401).json({
         success: false,
-        message: "Not authorized . Invalid token",
+        message: "Not authorized. Invalid token",
       });
     }
-    //iza wesel la hon ye3ne the user is auth..
-    const currentUser = await User.findById(decoded.id);
 
+    // 3. Find the user
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized. User not found",
+      });
+    }
+
+    // 4. Assign user to the request object
     req.user = currentUser;
     next();
   } catch (error) {

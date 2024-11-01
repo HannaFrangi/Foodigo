@@ -20,9 +20,19 @@ export const signup = async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at leat 6 characters",
+        message: "Password must be at least 6 characters",
       });
     }
+
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already in use",
+      });
+    }
+
     const newUser = await User.create({
       name,
       email,
@@ -31,10 +41,10 @@ export const signup = async (req, res) => {
     const token = signToken(newUser._id);
 
     res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000, //7 days in milliseconds
-      httpOnly: true, // prevents xss attacks
-      sameSite: "strict", //prevents CSRF attacks
-      secure: process.env.NODE_ENV === "production", //so in the development it isn't secure but in the production it is
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      httpOnly: true, // prevents XSS attacks
+      sameSite: "strict", // prevents CSRF attacks
+      secure: process.env.NODE_ENV === "production", // secure only in production
     });
     res.status(201).json({
       success: true,
@@ -45,6 +55,7 @@ export const signup = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
