@@ -1,33 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { gsap } from "gsap";
 import { Avatar, Dropdown } from "antd";
-
 import {
-  Search,
-  Menu,
-  X,
   Home,
   BookOpen,
   Heart,
   UtensilsCrossed,
   ChefHat,
-  User,
   LogOut,
   Settings,
   PlusCircle,
+  Menu as MenuIcon,
+  X,
 } from "lucide-react";
+import logo from "/src/assets/logo.png";
 
-// UserMenu Component using Ant Design
+// Keeping original user menu with material styling
 const UserAvatar = ({ user }) => {
   if (!user) {
     return (
       <Link
-        to="/auth/login"
-        className="flex items-center space-x-2 px-4 py-2 rounded-md text-gray-700 hover:bg-[#5d6544]/10 hover:text-[#5d6544] transition-colors duration-200"
+        to="/auth"
+        className="flex items-center space-x-2 px-6 py-2 rounded-full bg-white border-2 border-[#5d6544] text-[#5d6544] hover:bg-[#5d6544] hover:text-white transition-all duration-200 shadow-sm hover:shadow-md"
       >
-        <Avatar icon={<User className="h-5 w-5" />} />
-        <span>Sign In</span>
+        <Avatar icon={<ChefHat className="h-5 w-5" />} />
+        <span className="font-medium">Sign In</span>
       </Link>
     );
   }
@@ -36,7 +33,10 @@ const UserAvatar = ({ user }) => {
     {
       key: "profile",
       label: (
-        <Link to="/profile" className="flex items-center space-x-2">
+        <Link
+          to="/profile"
+          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md transition-colors"
+        >
           <Settings className="h-4 w-4" />
           <span>Profile Settings</span>
         </Link>
@@ -45,7 +45,10 @@ const UserAvatar = ({ user }) => {
     {
       key: "new-recipe",
       label: (
-        <Link to="/recipes/new" className="flex items-center space-x-2">
+        <Link
+          to="/recipes/new"
+          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md transition-colors"
+        >
           <PlusCircle className="h-4 w-4" />
           <span>Add Recipe</span>
         </Link>
@@ -54,7 +57,7 @@ const UserAvatar = ({ user }) => {
     {
       key: "signout",
       label: (
-        <div className="flex items-center space-x-2 text-red-500">
+        <div className="flex items-center space-x-2 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors">
           <LogOut className="h-4 w-4" />
           <span>Sign Out</span>
         </div>
@@ -67,20 +70,20 @@ const UserAvatar = ({ user }) => {
       menu={{ items: menuItems }}
       placement="bottomRight"
       trigger={["click"]}
-      overlayClassName="w-48"
+      overlayClassName="w-48 mt-1 p-1 bg-white rounded-xl shadow-lg border border-gray-100"
     >
-      <div className="flex items-center space-x-2 cursor-pointer">
+      <div className="flex items-center space-x-2 cursor-pointer p-1 rounded-full hover:bg-gray-50 transition-colors">
         <div className="flex items-center">
           {user.imageUrl ? (
             <Avatar
               src={user.imageUrl}
-              className="border-2 border-[#5d6544]"
+              className="border-2 border-[#5d6544] shadow-sm"
               size="large"
             />
           ) : (
             <Avatar
               size="large"
-              className="bg-[#5d6544] flex items-center justify-center"
+              className="bg-[#5d6544] flex items-center justify-center shadow-sm"
             >
               {user.name.charAt(0).toUpperCase()}
             </Avatar>
@@ -95,6 +98,25 @@ const UserAvatar = ({ user }) => {
   );
 };
 
+const NavLink = ({ to, icon: Icon, label, isActive }) => (
+  <Link
+    to={to}
+    className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-200
+      ${
+        isActive
+          ? "bg-[#5d6544]/10 text-[#5d6544] font-medium"
+          : "text-gray-600 hover:bg-gray-100"
+      }`}
+  >
+    <Icon
+      className={`h-5 w-5 transition-colors ${
+        isActive ? "text-[#5d6544]" : "text-gray-500"
+      }`}
+    />
+    <span>{label}</span>
+  </Link>
+);
+
 const Navbar = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -108,86 +130,96 @@ const Navbar = ({ user }) => {
   ];
 
   useEffect(() => {
-    gsap.from(navRef.current, {
-      y: -100,
-      opacity: 0,
-      duration: 0.6,
-      ease: "power3.out",
-    });
+    const handleScroll = () => {
+      const nav = navRef.current;
+      if (nav) {
+        if (window.scrollY > 20) {
+          nav.classList.add("shadow-md");
+          nav.style.backdropFilter = "blur(10px)";
+          nav.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+        } else {
+          nav.classList.remove("shadow-md");
+          nav.style.backdropFilter = "none";
+          nav.style.backgroundColor = "white";
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <nav ref={navRef} className="bg-white shadow-md">
+    <nav
+      ref={navRef}
+      className="sticky top-0 z-50 bg-white transition-all duration-300"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <div className="bg-[#5d6544] p-2 rounded-full">
-                <ChefHat className="h-8 w-8 text-white" />
-              </div>
+              <Avatar
+                size={80}
+                style={{ backgroundColor: "transparent" }}
+                className="transition-transform hover:scale-105"
+              >
+                <img src={logo} alt="Foodigo" />
+              </Avatar>
               <span className="ml-2 text-xl font-bold text-[#5d6544]">
                 FOODIGO
               </span>
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map(({ path, label, icon: Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium
-                  ${
-                    location.pathname === path
-                      ? "text-[#5d6544] bg-[#5d6544]/10"
-                      : "text-gray-700 hover:text-[#5d6544] hover:bg-[#5d6544]/10"
-                  } transition-colors duration-200`}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{label}</span>
-              </Link>
+          <div className="hidden md:flex items-center space-x-2">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                icon={item.icon}
+                label={item.label}
+                isActive={location.pathname === item.path}
+              />
             ))}
-            <UserAvatar user={user} />
+            <div className="ml-4">
+              <UserAvatar user={user} />
+            </div>
           </div>
 
           <div className="md:hidden flex items-center space-x-4">
             <UserAvatar user={user} />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-[#5d6544] focus:outline-none"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <MenuIcon className="h-6 w-6" />
               )}
             </button>
           </div>
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {navItems.map(({ path, label, icon: Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium
-                  ${
-                    location.pathname === path
-                      ? "text-[#5d6544] bg-[#5d6544]/10"
-                      : "text-gray-700 hover:text-[#5d6544] hover:bg-[#5d6544]/10"
-                  } transition-colors duration-200`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </div>
+      {/* Mobile menu */}
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        } overflow-hidden`}
+      >
+        <div className="px-2 pt-2 pb-3 space-y-1">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              icon={item.icon}
+              label={item.label}
+              isActive={location.pathname === item.path}
+            />
+          ))}
         </div>
-      )}
+      </div>
     </nav>
   );
 };
@@ -196,25 +228,23 @@ const PageLayout = ({ children }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
   const mainContentRef = useRef(null);
-  const heroRef = useRef(null);
-
-  const [user, setUser] = useState(false);
+  // const [user, setUser] = useState(false);
+  const [user, setUser] = useState({
+    name: "Majd Chbat",
+    email: "MajdChbat@gmail.com",
+    imageUrl:
+      "https://media.licdn.com/dms/image/v2/D4D03AQHludua8pSwVA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1708593323172?e=2147483647&v=beta&t=zcf9XPUOz4WaA3thYabfB3oRLFb-DPKJT2My4kI8Y-M",
+  });
 
   useEffect(() => {
-    gsap.from(mainContentRef.current, {
-      opacity: 0,
-      y: 20,
-      duration: 0.5,
-      ease: "power2.out",
-    });
+    if (mainContentRef.current) {
+      mainContentRef.current.style.opacity = "0";
+      mainContentRef.current.style.transform = "translateY(20px)";
 
-    if (location.pathname === "/" && heroRef.current) {
-      gsap.from(heroRef.current.children, {
-        opacity: 0,
-        y: 30,
-        duration: 0.8,
-        stagger: 0.2,
-        ease: "power3.out",
+      requestAnimationFrame(() => {
+        mainContentRef.current.style.transition = "all 0.5s ease-out";
+        mainContentRef.current.style.opacity = "1";
+        mainContentRef.current.style.transform = "translateY(0)";
       });
     }
   }, [location.pathname]);
@@ -222,26 +252,13 @@ const PageLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {!isAuthPage && <Navbar user={user} />}
-
-      {location.pathname === "/" && !isAuthPage && (
-        <div ref={heroRef}>
-          <searchHero />
-        </div>
-      )}
-
       <main
         ref={mainContentRef}
         className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
           !isAuthPage ? "py-8" : ""
         }`}
       >
-        <div
-          className={`${
-            !isAuthPage ? "bg-white rounded-lg shadow-sm p-6" : ""
-          }`}
-        >
-          {children}
-        </div>
+        {children}
       </main>
     </div>
   );

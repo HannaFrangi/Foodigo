@@ -1,5 +1,5 @@
 import { useLenis } from "@studio-freight/react-lenis";
-import { useStore } from "../store/store";
+import { useStore } from "../store/useStore";
 
 export const UseToggleStyles = () => {
   const showMenu = useStore((state) => state.showMenu);

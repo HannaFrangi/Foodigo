@@ -29,8 +29,8 @@ module.exports = {
         sandia: "#ff7470",
       },
       backgroundImage: {
-        chef: "url('/src/Images/foodima.png')",
-        chef2: "url('/src/Images/mobilechef.jpg')",
+        chef: "url('/src/assets/chef.png')",
+        chef2: "url('/src/assets/mobilechef.jpg')",
       },
       // background: {
       //   'dark': "#1B1B1B"

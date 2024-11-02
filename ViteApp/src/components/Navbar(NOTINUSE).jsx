@@ -2,8 +2,9 @@ import React, { useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { FaHome, FaInfoCircle, FaSignInAlt, FaUserPlus } from "react-icons/fa";
 import { gsap } from "gsap";
-import { useStore } from "../store/store";
+import { useStore } from "../store/useStore";
 import { UseToggleStyles } from "../hooks/useToggleStyles";
+import { Avatar } from "@mui/material";
 
 const Navbar = () => {
   const isMenuOpen = useStore((state) => state.isMenuOpen);
@@ -19,11 +20,9 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-x-4 w-36 group">
             <div className="relative transform transition-transform duration-300 group-hover:scale-105">
               <div className="absolute inset-0 bg-red-500/10 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300" />
-              <img
+              <Avatar
                 src="/src/assets/logo.png"
                 alt="foodigo logo"
-                width={90}
-                height={90}
                 className="relative z-10"
               />
             </div>
