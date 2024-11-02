@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { gsap } from "gsap";
+import { Avatar, Dropdown } from "antd";
+
 import {
   Search,
   Menu,
@@ -16,101 +18,80 @@ import {
   PlusCircle,
 } from "lucide-react";
 
-// Avatar Component
+// UserMenu Component using Ant Design
 const UserAvatar = ({ user }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
-  const avatarRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target) &&
-        avatarRef.current &&
-        !avatarRef.current.contains(event.target)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const getUserInitial = (name) => name?.charAt(0).toUpperCase() || "?";
-
   if (!user) {
     return (
       <Link
         to="/auth/login"
-        className="flex items-center space-x-2 px-4 py-2 rounded-md text-gray-700 hover:bg-orange-50 hover:text-orange-500 transition-colors duration-200"
+        className="flex items-center space-x-2 px-4 py-2 rounded-md text-gray-700 hover:bg-[#5d6544]/10 hover:text-[#5d6544] transition-colors duration-200"
       >
-        <User className="h-5 w-5" />
+        <Avatar icon={<User className="h-5 w-5" />} />
         <span>Sign In</span>
       </Link>
     );
   }
 
+  const menuItems = [
+    {
+      key: "profile",
+      label: (
+        <Link to="/profile" className="flex items-center space-x-2">
+          <Settings className="h-4 w-4" />
+          <span>Profile Settings</span>
+        </Link>
+      ),
+    },
+    {
+      key: "new-recipe",
+      label: (
+        <Link to="/recipes/new" className="flex items-center space-x-2">
+          <PlusCircle className="h-4 w-4" />
+          <span>Add Recipe</span>
+        </Link>
+      ),
+    },
+    {
+      key: "signout",
+      label: (
+        <div className="flex items-center space-x-2 text-red-500">
+          <LogOut className="h-4 w-4" />
+          <span>Sign Out</span>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="relative">
-      <button
-        ref={avatarRef}
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 focus:outline-none"
-      >
-        <div className="relative">
+    <Dropdown
+      menu={{ items: menuItems }}
+      placement="bottomRight"
+      trigger={["click"]}
+      overlayClassName="w-48"
+    >
+      <div className="flex items-center space-x-2 cursor-pointer">
+        <div className="flex items-center">
           {user.imageUrl ? (
-            <img
+            <Avatar
               src={user.imageUrl}
-              alt="User avatar"
-              className="h-8 w-8 rounded-full object-cover border-2 border-orange-500"
+              className="border-2 border-[#5d6544]"
+              size="large"
             />
           ) : (
-            <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white font-semibold">
-              {getUserInitial(user.name)}
-            </div>
+            <Avatar
+              size="large"
+              className="bg-[#5d6544] flex items-center justify-center"
+            >
+              {user.name.charAt(0).toUpperCase()}
+            </Avatar>
           )}
-          <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-white"></div>
-        </div>
-      </button>
-
-      {isOpen && (
-        <div
-          ref={menuRef}
-          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-        >
-          <div className="py-1">
-            <div className="px-4 py-2 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-xs text-gray-500">{user.email}</p>
-            </div>
-            <Link
-              to="/profile"
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
-            >
-              <Settings className="h-4 w-4" />
-              <span>Profile Settings</span>
-            </Link>
-            <Link
-              to="/recipes/new"
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500"
-            >
-              <PlusCircle className="h-4 w-4" />
-              <span>Add Recipe</span>
-            </Link>
-            <button
-              onClick={() => {
-                /* Implement logout functionality */
-              }}
-              className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-500 w-full"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-            </button>
+          <div className="hidden md:block ml-2">
+            <p className="text-sm font-medium text-gray-900">{user.name}</p>
+            <p className="text-xs text-gray-500">{user.email}</p>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+    </Dropdown>
   );
 };
 
@@ -140,10 +121,12 @@ const Navbar = ({ user }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <ChefHat className="h-8 w-8 text-orange-500" />
-              <span className="text-xl font-bold text-gray-900">
-                RecipeFinder
+            <Link to="/" className="flex items-center">
+              <div className="bg-[#5d6544] p-2 rounded-full">
+                <ChefHat className="h-8 w-8 text-white" />
+              </div>
+              <span className="ml-2 text-xl font-bold text-[#5d6544]">
+                FOODIGO
               </span>
             </Link>
           </div>
@@ -156,8 +139,8 @@ const Navbar = ({ user }) => {
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium
                   ${
                     location.pathname === path
-                      ? "text-orange-500 bg-orange-50"
-                      : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                      ? "text-[#5d6544] bg-[#5d6544]/10"
+                      : "text-gray-700 hover:text-[#5d6544] hover:bg-[#5d6544]/10"
                   } transition-colors duration-200`}
               >
                 <Icon className="h-4 w-4" />
@@ -171,7 +154,7 @@ const Navbar = ({ user }) => {
             <UserAvatar user={user} />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-orange-500 focus:outline-none"
+              className="text-gray-700 hover:text-[#5d6544] focus:outline-none"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -193,8 +176,8 @@ const Navbar = ({ user }) => {
                 className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium
                   ${
                     location.pathname === path
-                      ? "text-orange-500 bg-orange-50"
-                      : "text-gray-700 hover:text-orange-500 hover:bg-orange-50"
+                      ? "text-[#5d6544] bg-[#5d6544]/10"
+                      : "text-gray-700 hover:text-[#5d6544] hover:bg-[#5d6544]/10"
                   } transition-colors duration-200`}
                 onClick={() => setIsMenuOpen(false)}
               >
@@ -215,11 +198,7 @@ const PageLayout = ({ children }) => {
   const mainContentRef = useRef(null);
   const heroRef = useRef(null);
 
-  const user = {
-    name: "John Doe",
-    email: "john@example.com",
-    imageUrl: "https://i.pravatar.cc/250?u=mail@ashallendesign.co.uk ",
-  };
+  const [user, setUser] = useState(false);
 
   useEffect(() => {
     gsap.from(mainContentRef.current, {
@@ -245,17 +224,24 @@ const PageLayout = ({ children }) => {
       {!isAuthPage && <Navbar user={user} />}
 
       {location.pathname === "/" && !isAuthPage && (
-        <div
-          ref={heroRef}
-          className="bg-gradient-to-r from-orange-400 to-orange-500 p-8 text-white text-center"
-        >
-          <h1 className="text-4xl font-bold">Welcome to RecipeFinder</h1>
-          <p className="mt-2 text-lg">Find, cook, and share amazing recipes</p>
+        <div ref={heroRef}>
+          <searchHero />
         </div>
       )}
 
-      <main ref={mainContentRef} className="py-8">
-        {children}
+      <main
+        ref={mainContentRef}
+        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
+          !isAuthPage ? "py-8" : ""
+        }`}
+      >
+        <div
+          className={`${
+            !isAuthPage ? "bg-white rounded-lg shadow-sm p-6" : ""
+          }`}
+        >
+          {children}
+        </div>
       </main>
     </div>
   );
