@@ -1,12 +1,14 @@
 import React from "react";
 import SearchRecipe from "../components/SearchRecipe/SearchRecipe";
 import { Hero } from "./Home/Hero";
+import LatestRecipe from "../components/LatestRecipe/LatestRecipe";
 
 const Homepage = () => {
   return (
     <>
-      <Hero />
+      <LatestRecipe />
       <SearchRecipe />
+      <Hero /> {/* Main COmponent */}
     </>
   );
 };

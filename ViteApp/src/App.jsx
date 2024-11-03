@@ -6,6 +6,8 @@ import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
 import PageLayout from "./layout/PageLayout";
 import Homepage from "./pages/Homepage";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import Error from "./pages/404/NotFound";
 
 function App() {
   const lenis = useLenis(({ scroll }) => {
@@ -20,6 +22,8 @@ function App() {
             <Route path="/" element={<Homepage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/recipe" element={<RecipePage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>
       </ReactLenis>

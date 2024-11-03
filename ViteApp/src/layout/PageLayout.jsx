@@ -124,9 +124,9 @@ const Navbar = ({ user }) => {
 
   const navItems = [
     { path: "/", label: "Home", icon: Home },
-    { path: "/recipes", label: "Recipes", icon: BookOpen },
+    { path: "/recipe", label: "Recipes", icon: BookOpen },
     { path: "/favorites", label: "Favorites", icon: Heart },
-    { path: "/categories", label: "Categories", icon: UtensilsCrossed },
+    // { path: "/categories", label: "Categories", icon: UtensilsCrossed },
   ];
 
   useEffect(() => {
@@ -227,6 +227,7 @@ const Navbar = ({ user }) => {
 const PageLayout = ({ children }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
+  const isErrorPage = location.pathname.startsWith("/*");
   const mainContentRef = useRef(null);
   // const [user, setUser] = useState(false);
   const [user, setUser] = useState({
