@@ -23,8 +23,9 @@ const RecipeSchema = new mongoose.Schema({
   recipeOrigin: { type: String, default: "NA", required: true },
   recipeInstructions: { type: String, default: "", required: true },
   recipeBio: { type: String, default: "" },
-  reviews: [ReviewSchema], // Embedding reviews in the RecipeSchema
+  reviews: [ReviewSchema],
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Recipe = mongoose.model("Recipe", RecipeSchema);
