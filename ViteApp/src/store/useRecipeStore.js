@@ -18,29 +18,44 @@ export const useRecipeStore = create((set) => ({
   searchRecipes: async (query) => {
     set({ isLoading: true, error: null, hasSearched: true, Searching: true });
 
-    // Simulate API call with sample data
     const sampleRecipes = [
       {
         id: 1,
         strMeal: "Mediterranean Salad",
         strCategory: "Vegetarian",
-        strMealThumb: "/api/placeholder/300/200",
+        strMealThumb:
+          "https://cdn.loveandlemons.com/wp-content/uploads/2019/07/salad.jpg",
       },
       {
         id: 2,
-        strMeal: "Grilled Salmon",
+        strMeal: "Grilled Salmon Salad",
         strCategory: "Seafood",
-        strMealThumb: "/api/placeholder/300/200",
+        strMealThumb:
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyi0ndisrU17sVM0cWvkv8x0eLBKNWC54Jww&s",
       },
       {
         id: 3,
         strMeal: "Avocado Toast",
         strCategory: "Breakfast",
-        strMealThumb: "/api/placeholder/300/200",
+        strMealThumb:
+          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+      },
+      {
+        id: 4,
+        strMeal: "Avocado Toast",
+        strCategory: "Breakfast",
+        strMealThumb:
+          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+      },
+      {
+        id: 5,
+        strMeal: "Avocado Toast",
+        strCategory: "Breakfast",
+        strMealThumb:
+          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
       },
     ];
 
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const filteredRecipes = query.toLowerCase()

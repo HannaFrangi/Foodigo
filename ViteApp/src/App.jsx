@@ -1,6 +1,7 @@
 import React from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
@@ -17,6 +18,7 @@ function App() {
   return (
     <>
       <ReactLenis root>
+        <Toaster />
         <PageLayout>
           <Routes>
             <Route path="/" element={<Homepage />} />

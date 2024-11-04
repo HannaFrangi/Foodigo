@@ -1,115 +1,200 @@
-import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, Users, ChefHat } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
+import { ChefHat, Clock, Users } from "lucide-react";
+import RecipeCard from "../RecipeCard/RecipeCard";
 
 const LatestRecipe = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
-  const recipes = [
+  const sampleRecipes = [
     {
       id: 1,
-      title: "Creamy Garlic Pasta",
-      chef: "Chef Maria",
-      time: "30 min",
-      servings: 4,
-      difficulty: "Easy",
-      image: "/images/recipe1.jpg", // Replace with actual image path
+      strMeal: "Mediterranean Salad",
+      strCategory: "Vegetarian",
+      strMealThumb:
+        "https://cdn.loveandlemons.com/wp-content/uploads/2019/07/salad.jpg",
     },
-    // ...other recipes
+    {
+      id: 2,
+      strMeal: "Grilled Salmon Salad",
+      strCategory: "Seafood",
+      strMealThumb:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyi0ndisrU17sVM0cWvkv8x0eLBKNWC54Jww&s",
+    },
+    {
+      id: 3,
+      strMeal: "Avocado Toast",
+      strCategory: "Breakfast",
+      strMealThumb:
+        "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+    },
+    {
+      id: 4,
+      strMeal: "XXXXXX",
+      strCategory: "Breakfast",
+      strMealThumb:
+        "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+    },
+    {
+      id: 5,
+      strMeal: "Majd Chbat",
+      strCategory: "LF",
+      strMealThumb:
+        "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+    },
+    {
+      id: 6,
+      strMeal: "XXXXXX",
+      strCategory: "XXXXXXXXXXXXXXXXXXXX",
+      strMealThumb:
+        "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
+    },
   ];
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === recipes.length - 1 ? 0 : prevIndex + 1
-    );
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const getCardsPerPage = () => {
+    if (isMobile) return 1;
+    if (isTablet) return 2;
+    return 3;
   };
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? recipes.length - 1 : prevIndex - 1
-    );
+  const cardsPerPage = getCardsPerPage();
+  const totalPages = Math.ceil(sampleRecipes.length / cardsPerPage);
+
+  const autoPlay = true;
+  const autoPlayInterval = 5000;
+
+  useEffect(() => {
+    let timer;
+    if (autoPlay && !isAnimating) {
+      timer = setInterval(() => {
+        handleNext();
+      }, autoPlayInterval);
+    }
+    return () => clearInterval(timer);
+  }, [currentPage, isAnimating]);
+
+  const handleNext = () => {
+    setIsAnimating(true);
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+    setTimeout(() => setIsAnimating(false), 500);
   };
+
+  const handlePrev = () => {
+    setIsAnimating(true);
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    setTimeout(() => setIsAnimating(false), 500);
+  };
+
+  const recipePages = sampleRecipes.reduce((acc, recipe, index) => {
+    const pageIndex = Math.floor(index / cardsPerPage);
+    if (!acc[pageIndex]) {
+      acc[pageIndex] = [];
+    }
+    acc[pageIndex].push(recipe);
+    return acc;
+  }, []);
 
   return (
-    <div className="w-full py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Latest Recipes</h2>
-          <div className="flex space-x-2">
-            <button
-              onClick={prevSlide}
-              className="p-2 rounded-full bg-[#5d6544]/10 hover:bg-[#5d6544]/20 text-[#5d6544]"
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="p-2 rounded-full bg-[#5d6544]/10 hover:bg-[#5d6544]/20 text-[#5d6544]"
-            >
-              <ChevronRight className="h-6 w-6" />
-            </button>
+    <div className="w-full py-6 md:py-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+        <div className="flex justify-between items-center mb-6 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+            Latest Recipes
+          </h2>
+          <div className="hidden md:flex space-x-3">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={`transition-all duration-300 h-3 rounded-full ${
+                  index === currentPage
+                    ? "w-8 bg-olive"
+                    : "w-3 bg-gray-300 hover:bg-olive"
+                }`}
+              />
+            ))}
           </div>
         </div>
 
-        <div className="relative overflow-hidden">
-          <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-          >
-            <div className="flex flex-nowrap min-w-full gap-6">
-              {recipes.map((recipe, index) => (
-                <Card
-                  key={recipe.id}
-                  className={`flex-shrink-0 w-full md:w-[calc(33.333%-1rem)] shadow-md hover:shadow-lg transition-shadow duration-300
-                    ${
-                      index === currentIndex
-                        ? "border-[#5d6544]/20"
-                        : "border-gray-200"
-                    }`}
-                >
-                  <img
-                    src={recipe.image}
-                    alt={recipe.title}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
-                  <CardHeader className="pb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {recipe.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{recipe.chef}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-4 w-4" />
-                        <span>{recipe.time}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-4 w-4" />
-                        <span>{recipe.servings} servings</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <ChefHat className="h-4 w-4" />
-                        <span>{recipe.difficulty}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+        <div className="relative px-0 md:px-4">
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${currentPage * 100}%)` }}
+            >
+              {recipePages.map((page, pageIndex) => (
+                <div key={pageIndex} className="flex gap-4 md:gap-6 min-w-full">
+                  {page.map((sampleRecipes) => (
+                    <RecipeCard recipe={sampleRecipes} />
+                  ))}
+                </div>
               ))}
             </div>
           </div>
+
+          {/* Navigation Buttons */}
+          <button
+            onClick={handlePrev}
+            className="absolute -left-3 md:-left-12 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white/80 shadow-lg hover:bg-white transition-all transform hover:scale-110 focus:outline-none"
+          >
+            <svg
+              className="w-5 h-5 md:w-6 md:h-6 text-gray-800"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          <button
+            onClick={handleNext}
+            className="absolute -right-3 md:-right-12 top-1/2 -translate-y-1/2 p-2 md:p-3 rounded-full bg-white/80 shadow-lg hover:bg-white transition-all transform hover:scale-110 focus:outline-none"
+          >
+            <svg
+              className="w-5 h-5 md:w-6 md:h-6 text-gray-800"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
         </div>
 
+        {/* Mobile Pagination Dots */}
         <div className="flex justify-center space-x-2 mt-4 md:hidden">
-          {recipes.map((_, index) => (
+          {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? "w-4 bg-[#5d6544]"
-                  : "w-2 bg-[#5d6544]/20"
+              onClick={() => setCurrentPage(index)}
+              className={`transition-all duration-300 h-2 rounded-full ${
+                index === currentPage ? "w-6 bg-olive" : "w-2 bg-gray-300"
               }`}
-              onClick={() => setCurrentIndex(index)}
             />
           ))}
         </div>

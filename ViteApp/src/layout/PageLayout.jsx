@@ -229,13 +229,13 @@ const PageLayout = ({ children }) => {
   const isAuthPage = location.pathname.startsWith("/auth");
   const isErrorPage = location.pathname.startsWith("/*");
   const mainContentRef = useRef(null);
-  // const [user, setUser] = useState(false);
-  const [user, setUser] = useState({
-    name: "Majd Chbat",
-    email: "MajdChbat@gmail.com",
-    imageUrl:
-      "https://media.licdn.com/dms/image/v2/D4D03AQHludua8pSwVA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1708593323172?e=2147483647&v=beta&t=zcf9XPUOz4WaA3thYabfB3oRLFb-DPKJT2My4kI8Y-M",
-  });
+  const [user, setUser] = useState(false);
+  // const [user, setUser] = useState({
+  //   name: "Majd Chbat",
+  //   email: "MajdChbat@gmail.com",
+  //   imageUrl:
+  //     "https://media.licdn.com/dms/image/v2/D4D03AQHludua8pSwVA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1708593323172?e=2147483647&v=beta&t=zcf9XPUOz4WaA3thYabfB3oRLFb-DPKJT2My4kI8Y-M",
+  // });
 
   useEffect(() => {
     if (mainContentRef.current) {

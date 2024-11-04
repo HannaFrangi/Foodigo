@@ -1,8 +1,34 @@
 # Foodigo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TODO :
 
-Currently, two official plugins are available:
+# Add Scroll to top ( react-scroll-to-top)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Create Recipe Page
+
+# Create Favorites Page
+
+# Badna F0oter @majdChbat ????? W about us ?????
+
+### Setup .env file
+
+```bash
+PORT=5000
+MONGO_URI=XXXXX
+
+JWT_SECRET=XXXXXXXXXXXXXXX
+
+NODE_ENV=development
+
+
+```
+
+### l baaden
+
+- Set `NODE_ENV=production` and build the app 👇
+
+```shell
+npm run build
+```
+
+# Hex Code : 5d6544

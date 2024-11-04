@@ -27,6 +27,7 @@ module.exports = {
         dark: "#1B1B1B",
         "gray-text": "#ABABAA",
         sandia: "#ff7470",
+        olive: "#5d6544",
       },
       backgroundImage: {
         chef: "url('/src/assets/chef.png')",

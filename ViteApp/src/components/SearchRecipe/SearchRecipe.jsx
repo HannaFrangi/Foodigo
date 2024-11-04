@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Search, Sparkles, ChefHat, Loader } from "lucide-react";
+import { Search, Sparkles, ChefHat } from "lucide-react";
 import { useRecipeStore } from "../../store/useRecipeStore";
 import RecipeResults from "../../components/RecipeCard/RecipeResults";
-import { Spinner } from "@radix-ui/themes";
-import { Spin } from "antd";
 import { CircularProgress } from "@mui/material";
+import { Input } from "antd";
 
 const SearchHeroSection = () => {
   const { searchQuery, setSearchQuery, searchRecipes, hasSearched, Searching } =
@@ -51,7 +50,7 @@ const SearchHeroSection = () => {
 
             <form onSubmit={handleSearch} className="mt-8 max-w-xl mx-auto">
               <div className="relative">
-                <input
+                <Input
                   type="text"
                   className="relative z-10 block w-full pl-10 pr-3 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#606848] focus:ring-2 focus:ring-[#606848] focus:ring-opacity-50 transition-all duration-300"
                   placeholder='Try something like "salad" or "beef"'
@@ -73,7 +72,7 @@ const SearchHeroSection = () => {
                 {Searching ? (
                   <CircularProgress
                     variant="indeterminate"
-                    size={30}
+                    size={20}
                     sx={(theme) => ({ color: "white" })}
                   />
                 ) : (
