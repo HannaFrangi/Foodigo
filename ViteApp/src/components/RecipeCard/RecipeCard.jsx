@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const getTagColors = (category) => {
   switch (category) {
@@ -16,16 +17,18 @@ const getTagColors = (category) => {
 
 export const RecipeCard = ({ recipe, index, onLike }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const navigate = useNavigate();
 
   const handleLike = (e) => {
     e.stopPropagation(); // Prevent card click when liking
-    setIsLiked(!isLiked);
-    toast.success("Added To Favorites");
+    const newIsLiked = !isLiked; // Toggle the liked state
+    setIsLiked(newIsLiked);
+    toast.success(newIsLiked ? "Added To Favorites" : "Removed From Favorites");
+
     if (onLike) {
-      onLike(recipe.idMeal, !isLiked);
+      onLike(recipe.idMeal, newIsLiked);
     }
   };
-
   return (
     <>
       <div

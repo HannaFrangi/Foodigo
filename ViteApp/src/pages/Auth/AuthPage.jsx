@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Eye, EyeOff, LogIn, UtensilsCrossed, UserPlus } from "lucide-react";
 import { gsap } from "gsap";
+import { Avatar } from "antd";
 
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -63,15 +64,12 @@ const AuthPage = () => {
     <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 relative">
         {/* Decorative food-themed elements */}
-        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full p-8">
-          <div className="relative">
-            <div className="absolute inset-0 animate-spin-slow">
-              <div className="h-2 w-2 bg-red-900/20 rounded-full absolute top-0 left-1/2 transform -translate-x-1/2" />
-              <div className="h-2 w-2 bg-red-900/20 rounded-full absolute top-1/2 right-0 transform translate-y-1/2" />
-              <div className="h-2 w-2 bg-red-900/20 rounded-full absolute bottom-0 left-1/2 transform -translate-x-1/2" />
-              <div className="h-2 w-2 bg-red-900/20 rounded-full absolute top-1/2 left-0 transform -translate-y-1/2" />
-            </div>
-            <UtensilsCrossed className="w-12 h-12 text-red-900" />
+        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full ">
+          {" "}
+          {/* Adjusted padding */}
+          <div>
+            <Avatar src="/src/assets/logo.png" size={150} />{" "}
+            {/* Increased size */}
           </div>
         </div>
 
@@ -93,8 +91,8 @@ const AuthPage = () => {
             onClick={() => !isLogin && toggleMode()}
             className={`pb-2 px-4 text-lg transition-all duration-300 ${
               isLogin
-                ? "text-red-900 border-b-2 border-red-900"
-                : "text-zinc-400 hover:text-red-900"
+                ? "text-olive border-b-2 border-olive"
+                : "text-zinc-400 hover:text-olive"
             }`}
           >
             Sign In
@@ -102,9 +100,7 @@ const AuthPage = () => {
           <button
             onClick={() => isLogin && toggleMode()}
             className={`pb-2 px-4 text-lg transition-all duration-300 ${
-              !isLogin
-                ? "text-red-900 border-b-2 border-red-900"
-                : "text-zinc-400 hover:text-red-900"
+              !isLogin ? "olive border-b-2 olive" : "text-zinc-400 hover:olive"
             }`}
           >
             Create Account
@@ -124,7 +120,7 @@ const AuthPage = () => {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-red-900 focus:outline-none transition-all duration-300"
+                className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300"
                 placeholder="Full Name"
               />
             </div>
@@ -137,7 +133,7 @@ const AuthPage = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-red-900 focus:outline-none transition-all duration-300"
+              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300"
               placeholder="Email"
             />
           </div>
@@ -149,13 +145,13 @@ const AuthPage = () => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-red-900 focus:outline-none transition-all duration-300 pr-12"
+              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300 pr-12"
               placeholder="Password"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 bottom-5 text-zinc-400 hover:text-red-900 transition-colors duration-200"
+              className="absolute right-0 bottom-5 text-zinc-400 hover:text-olivetransition-colors duration-200"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -171,13 +167,13 @@ const AuthPage = () => {
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  className="form-checkbox h-4 w-4 text-red-900 rounded border-zinc-300 focus:ring-red-900"
+                  className="form-checkbox h-4 w-4 text-olive rounded border-zinc-300 focus:ring-olive"
                 />
                 <span className="text-zinc-600">Remember me</span>
               </label>
               <button
                 type="button"
-                className="text-zinc-600 hover:text-red-900 transition-colors duration-200"
+                className="text-zinc-600 hover:text-olive transition-colors duration-200"
               >
                 Forgot password?
               </button>
@@ -193,7 +189,7 @@ const AuthPage = () => {
               onMouseLeave={onMouseLeave}
               type="submit"
               disabled={isLoading}
-              className="relative w-full bg-red-900 text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-red-900/10"
+              className="relative w-full bg-olive text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-olive disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive"
             >
               {isLogin ? (
                 <LogIn className="w-5 h-5" />
@@ -214,11 +210,11 @@ const AuthPage = () => {
           {!isLogin && (
             <p className="text-center text-sm text-zinc-500 mt-4">
               By creating an account, you agree to our{" "}
-              <button className="text-red-900 hover:text-red-800">
+              <button className="text-red-900 hover:text-red-900 underline bold">
                 Terms of Service
               </button>{" "}
               and{" "}
-              <button className="text-red-900 hover:text-red-800">
+              <button className="text-red-900 hover:text-red-900 underline bold">
                 Privacy Policy
               </button>
             </p>

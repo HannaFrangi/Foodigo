@@ -10,6 +10,8 @@ import Homepage from "./pages/Homepage";
 import ProfilePage from "./pages/Profile/ProfilePage";
 import Error from "./pages/404/NotFound";
 
+import Favorites from "./pages/Favorites/Favorites";
+
 function App() {
   const lenis = useLenis(({ scroll }) => {
     // called every scroll
@@ -25,6 +27,7 @@ function App() {
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/recipe" element={<RecipePage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>
