@@ -20,11 +20,14 @@ const RecipeSchema = new mongoose.Schema({
   ],
   recipeImage: { type: String, required: true },
   recipeVideoTutorial: { type: String, default: "", required: false },
-  recipeOrigin: { type: String, default: "NA", required: true },
+  area: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Area",
+  },
   recipeInstructions: { type: String, default: "", required: true },
-  recipeBio: { type: String, default: "" },
   reviews: [ReviewSchema],
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  // userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
   createdAt: { type: Date, default: Date.now },
 });
 

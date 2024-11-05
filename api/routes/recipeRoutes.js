@@ -11,21 +11,27 @@ import {
   getLatestRecipe,
   getRandomRecipe,
   getRecipesByName,
+  getRecipesByCategory,
+  getRecipesByArea,
+  getRecipesByAreaName,
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/", protectRoute, createRecipe); // Create a recipe
-router.get("/latest", getLatestRecipe); // Get the latest recipes
+router.post("/", protectRoute, createRecipe);
+router.get("/latest", getLatestRecipe);
 router.get("/search", getRecipesByName);
-router.get("/random", getRandomRecipe); // Get a random recipe
-router.get("/:id", getRecipeById); // Get a single recipe by ID
-router.get("/", getAllRecipes); // Get all recipes
-router.put("/:id", protectRoute, updateRecipe); // Update a recipe by ID
-router.delete("/:id", protectRoute, deleteRecipe); // Delete a recipe by ID
-router.post("/:id/review", protectRoute, addReview); // Add a review to a recipe
-router.delete("/:id/review", protectRoute, deleteReview); // Delete a review from a recipe
-router.put("/:id/review", protectRoute, editReview); // Edit a review for a recipe
+router.get("/category/:categoryId", getRecipesByCategory);
+router.get("/random", getRandomRecipe);
+router.get("/:id", getRecipeById);
+router.get("/", getAllRecipes);
+router.get("/area/:areaId", getRecipesByArea);
+router.get("/area/name/:areaName", getRecipesByAreaName);
+router.put("/:id", protectRoute, updateRecipe);
+router.delete("/:id", protectRoute, deleteRecipe);
+router.post("/:id/review", protectRoute, addReview);
+router.delete("/:id/review", protectRoute, deleteReview);
+router.put("/:id/review", protectRoute, editReview);
 
 export default router;

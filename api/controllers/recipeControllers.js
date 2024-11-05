@@ -1,6 +1,6 @@
+import Area from "../models/Area.js";
 import Recipe from "../models/Recipe.js";
 
-// Create a new recipe
 export const createRecipe = async (req, res) => {
   try {
     const newRecipe = await Recipe.create({
@@ -14,7 +14,6 @@ export const createRecipe = async (req, res) => {
   }
 };
 
-// Get a single recipe by ID
 export const getRecipeById = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -39,7 +38,6 @@ export const getRecipeById = async (req, res) => {
   }
 };
 
-// Search for recipes by name
 export const getRecipesByName = async (req, res) => {
   const searchTerm = req.query.recipeTitle;
 
@@ -78,7 +76,6 @@ export const getRecipesByName = async (req, res) => {
   }
 };
 
-// get all Recipes
 export const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find();
@@ -89,7 +86,6 @@ export const getAllRecipes = async (req, res) => {
   }
 };
 
-// Update a recipe by ID
 export const updateRecipe = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -116,7 +112,6 @@ export const updateRecipe = async (req, res) => {
   }
 };
 
-// Delete a recipe by ID
 export const deleteRecipe = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -139,7 +134,6 @@ export const deleteRecipe = async (req, res) => {
   }
 };
 
-// Add a review to a recipe
 export const addReview = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -171,7 +165,6 @@ export const addReview = async (req, res) => {
   }
 };
 
-// Edit a review for a recipe
 export const editReview = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -198,7 +191,6 @@ export const editReview = async (req, res) => {
   }
 };
 
-// Delete a review from a recipe
 export const deleteReview = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id);
@@ -224,7 +216,6 @@ export const deleteReview = async (req, res) => {
   }
 };
 
-// Add a Get Latest Recipe function
 export const getLatestRecipe = async (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
   try {
@@ -245,7 +236,6 @@ export const getLatestRecipe = async (req, res) => {
   }
 };
 
-// Get a random recipe
 export const getRandomRecipe = async (req, res) => {
   try {
     const count = await Recipe.countDocuments();
@@ -268,6 +258,135 @@ export const getRandomRecipe = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve a random recipe due to server error",
+    });
+  }
+};
+
+export const getRecipesByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const recipes = await Recipe.find({ categories: categoryId }).populate(
+      "categories"
+    );
+
+    if (!recipes.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No recipes found for this category",
+      });
+    }
+
+    res.status(200).json({ success: true, data: recipes });
+  } catch (error) {
+    console.error("Error fetching recipes by category:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getRecipesByArea = async (req, res) => {
+  try {
+    const { areaId } = req.params;
+
+    // Validate if areaId is provided
+    if (!areaId) {
+      return res.status(400).json({
+        success: false,
+        message: "Area ID is required",
+      });
+    }
+
+    // First check if the area exists
+    const area = await Area.findById(areaId);
+    if (!area) {
+      return res.status(404).json({
+        success: false,
+        message: "Area not found",
+      });
+    }
+
+    // Find all recipes for this area with populated categories
+    const recipes = await Recipe.find({ area: areaId })
+      .populate("area")
+      .populate("categories")
+      .select("-reviews") // Exclude reviews for better performance
+      .sort({ createdAt: -1 }); // Sort by newest first
+
+    // Return appropriate response based on whether recipes were found
+    if (recipes.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No recipes found for this area",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Recipes retrieved successfully",
+      count: recipes.length,
+      data: recipes,
+    });
+  } catch (error) {
+    console.error("Error in getRecipesByArea:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+export const getRecipesByAreaName = async (req, res) => {
+  try {
+    const { areaName } = req.params;
+
+    // Validate if areaName is provided
+    if (!areaName) {
+      return res.status(400).json({
+        success: false,
+        message: "Area name is required",
+      });
+    }
+
+    // First find the area by name
+    const area = await Area.findOne({
+      name: { $regex: new RegExp(areaName, "i") }, // Case-insensitive search
+    });
+
+    if (!area) {
+      return res.status(404).json({
+        success: false,
+        message: "Area not found",
+      });
+    }
+
+    // Find all recipes for this area with populated categories
+    const recipes = await Recipe.find({ area: area._id })
+      .populate("area")
+      .populate("categories")
+      .select("-reviews")
+      .sort({ createdAt: -1 });
+
+    if (recipes.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No recipes found for this area",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Recipes retrieved successfully",
+      count: recipes.length,
+      data: recipes,
+    });
+  } catch (error) {
+    console.error("Error in getRecipesByAreaName:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
     });
   }
 };
