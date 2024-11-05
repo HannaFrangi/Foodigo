@@ -7,8 +7,7 @@ import Area from "../models/Area.js";
 
 dotenv.config();
 
-const mongoDBUri =
-  "mongodb+srv://majdchbat:tSvXdHgpIdEbb45G@cluster0.knx1g.mongodb.net/foodigo_db?retryWrites=true&w=majority&appName=Cluster0";
+const mongoDBUri = "";
 
 // Connect to MongoDB
 mongoose

@@ -23,9 +23,7 @@ mongoose.connection.on("error", (err) => {
 const importCategories = async () => {
   try {
     // Fetch categories from TheMealDB API
-    const response = await axios.get(
-      "https://www.themealdb.com/api/json/v1/1/list.php?a=list"
-    );
+    const response = await axios.get("");
     const areas = response.data.meals; // Corrected to reference 'meals'
 
     // Loop through each area and insert into the database

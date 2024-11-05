@@ -3,8 +3,7 @@ import axios from "axios";
 import Category from "../models/Category.js";
 
 // MongoDB connection
-const mongoURI =
-  "mongodb+srv://majdchbat:tSvXdHgpIdEbb45G@cluster0.knx1g.mongodb.net/foodigo_db?retryWrites=true&w=majority&appName=Cluster0";
+const mongoURI = "";
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
