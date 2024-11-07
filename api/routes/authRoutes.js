@@ -9,11 +9,11 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
 
-//to check if the user is auth..
-router.get("me", protectRoute, (req, res) => {
+// to check if the user is authenticated
+router.get("/me", protectRoute, (req, res) => {
   res.send({
     success: true,
-    user: req.user,
+    user: req.user, // This assumes that req.user is set by the protectRoute middleware
   });
 });
 

@@ -3,6 +3,9 @@ import { Eye, EyeOff, LogIn, UtensilsCrossed, UserPlus } from "lucide-react";
 import { gsap } from "gsap";
 import { Avatar } from "antd";
 
+import LogInForm from "../../components/Forms/LoginForm.jsx";
+import SignUpForm from "../../components/Forms/SignUpForm.jsx";
+
 const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -15,7 +18,20 @@ const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Email:", email);
+    console.log("Password:", password);
     setIsLoading(true);
+
+    if (name.trim() === "") {
+      console.log("Logging in with email:", email);
+    } else {
+      console.log("Signing up with name:", name, "and email:", email);
+    }
+
+    setEmail("");
+    setPassword("");
+    setName("");
+
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsLoading(false);
   };
@@ -26,7 +42,7 @@ const AuthPage = () => {
       opacity: 0,
       duration: 0.2,
       onComplete: () => {
-        setIsLogin(!isLogin);
+        setIsLogin(!isLogin); // Toggle between login and signup
         gsap.to(formRef.current, {
           opacity: 1,
           duration: 0.2,
@@ -65,11 +81,8 @@ const AuthPage = () => {
       <div className="max-w-md w-full space-y-8 relative">
         {/* Decorative food-themed elements */}
         <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full ">
-          {" "}
-          {/* Adjusted padding */}
           <div>
-            <Avatar src="/src/assets/logo.png" size={150} />{" "}
-            {/* Increased size */}
+            <Avatar src="/src/assets/logo.png" size={150} />
           </div>
         </div>
 
@@ -106,120 +119,39 @@ const AuthPage = () => {
             Create Account
           </button>
         </div>
-
-        <form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className="mt-8 space-y-6 bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
-        >
-          {/* Name Field (Sign Up only) */}
-          {!isLogin && (
-            <div className="group">
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300"
-                placeholder="Full Name"
-              />
-            </div>
-          )}
-
-          {/* Email Field */}
-          <div className="group">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300"
-              placeholder="Email"
-            />
-          </div>
-
-          {/* Password Field */}
-          <div className="group relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300 pr-12"
-              placeholder="Password"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 bottom-5 text-zinc-400 hover:text-olivetransition-colors duration-200"
-            >
-              {showPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-
-          {/* Remember me and Forgot password (Login only) */}
-          {isLogin && (
-            <div className="flex items-center justify-between pt-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  className="form-checkbox h-4 w-4 text-olive rounded border-zinc-300 focus:ring-olive"
-                />
-                <span className="text-zinc-600">Remember me</span>
-              </label>
-              <button
-                type="button"
-                className="text-zinc-600 hover:text-olive transition-colors duration-200"
-              >
-                Forgot password?
-              </button>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="pt-4">
-            <button
-              ref={buttonRef}
-              onMouseMove={callParallax}
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-              type="submit"
-              disabled={isLoading}
-              className="relative w-full bg-olive text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-olive disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive"
-            >
-              {isLogin ? (
-                <LogIn className="w-5 h-5" />
-              ) : (
-                <UserPlus className="w-5 h-5" />
-              )}
-              <span>
-                {isLoading
-                  ? "Processing..."
-                  : isLogin
-                  ? "Start Cooking"
-                  : "Join Foodigo"}
-              </span>
-            </button>
-          </div>
-
-          {/* Terms of Service (Sign Up only) */}
-          {!isLogin && (
-            <p className="text-center text-sm text-zinc-500 mt-4">
-              By creating an account, you agree to our{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
-                Terms of Service
-              </button>{" "}
-              and{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
-                Privacy Policy
-              </button>
-            </p>
-          )}
-        </form>
+        {isLogin ? (
+          <LogInForm
+            email={email}
+            password={password}
+            onEmailChange={(e) => setEmail(e.target.value)}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            showPassword={showPassword}
+            togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            isLoading={isLoading}
+            handleSubmit={handleSubmit}
+            buttonRef={buttonRef}
+            callParallax={callParallax}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          />
+        ) : (
+          <SignUpForm
+            name={name}
+            email={email}
+            password={password}
+            onNameChange={(e) => setName(e.target.value)}
+            onEmailChange={(e) => setEmail(e.target.value)}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            showPassword={showPassword}
+            togglePasswordVisibility={() => setShowPassword(!showPassword)}
+            isLoading={isLoading}
+            handleSubmit={handleSubmit}
+            buttonRef={buttonRef}
+            callParallax={callParallax}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          />
+        )}
       </div>
     </div>
   );

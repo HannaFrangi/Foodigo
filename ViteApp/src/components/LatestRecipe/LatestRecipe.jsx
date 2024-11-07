@@ -139,7 +139,7 @@ const LatestRecipe = () => {
               {recipePages.map((page, pageIndex) => (
                 <div key={pageIndex} className="flex gap-4 md:gap-6 min-w-full">
                   {page.map((sampleRecipes) => (
-                    <RecipeCard recipe={sampleRecipes} />
+                    <RecipeCard recipe={sampleRecipes} key={sampleRecipes.id} />
                   ))}
                 </div>
               ))}
