@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
-  // Updated to "userSchema"
   name: {
     type: String,
     required: true,
@@ -16,16 +15,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isVerified: { type: Boolean, default: false },
   // bio: { type: String, default: "" },
   ProfilePicURL: { type: String, default: "" },
   // likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-
-  // Added Favorites
   recipeFavorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
-
-  //Added CreatedAt
   createdAt: { type: Date, default: Date.now },
-
   groceryList: [
     {
       ingredientName: { type: String, required: true },
@@ -44,6 +39,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema); // Consistently use "userSchema"
+const User = mongoose.model("User", userSchema);
 
 export default User;

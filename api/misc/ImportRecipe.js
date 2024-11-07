@@ -4,10 +4,12 @@ import dotenv from "dotenv";
 import Recipe from "../models/Recipe.js";
 import Category from "../models/Category.js";
 import Area from "../models/Area.js";
+import Ingredient from "../models/Ingredient.js"; // Import Ingredient model
 
 dotenv.config();
 
-const mongoDBUri = "";
+const mongoDBUri =
+  "mongodb+srv://majdchbat:tSvXdHgpIdEbb45G@cluster0.knx1g.mongodb.net/foodigo_db?retryWrites=true&w=majority&appName=Cluster0";
 
 // Connect to MongoDB
 mongoose
@@ -23,18 +25,39 @@ const createAreaIfNotExists = async (areaName) => {
       await area.save();
       console.log(`Created new area: ${areaName}`);
     }
-    return area._id; // Return the area's ObjectId instead of the whole document
+    return area._id;
   } catch (error) {
     console.error(`Error creating/finding area ${areaName}:`, error.message);
     return null;
   }
 };
 
+// Updated function to use "ingredients" collection
+const createIngredientIfNotExists = async (ingredientName) => {
+  try {
+    let ingredient = await Ingredient.findOne({ name: ingredientName });
+    if (!ingredient) {
+      ingredient = new Ingredient({ name: ingredientName }); // Use Ingredient model
+      await ingredient.save();
+      console.log(`Created new ingredient: ${ingredientName}`);
+    }
+    return ingredient._id;
+  } catch (error) {
+    console.error(
+      `Error creating/finding ingredient ${ingredientName}:`,
+      error.message
+    );
+    return null;
+  }
+};
+
 const fetchAndSaveRecipes = async () => {
   try {
-    // First, fetch all existing categories from your database
     const allCategories = await Category.find({});
     console.log(`Found ${allCategories.length} categories in database`);
+
+    const allIngrediants = await Ingredient.find({});
+    console.log(`Found ${allIngrediants.length} ingredients in database`);
 
     let startId = 52772;
     let endId = 53085;
@@ -59,7 +82,6 @@ const fetchAndSaveRecipes = async () => {
 
         for (const recipe of recipes) {
           try {
-            // Check if recipe already exists
             const existingRecipe = await Recipe.findOne({
               recipeTitle: recipe.strMeal,
             });
@@ -70,29 +92,31 @@ const fetchAndSaveRecipes = async () => {
               continue;
             }
 
-            // Create area if it doesn't exist and get its ObjectId
             const origin = recipe.strArea || "Unknown";
             const areaId = await createAreaIfNotExists(origin);
             if (areaId && !areasAdded.has(origin)) {
               areasAdded.add(origin);
             }
 
-            // Process ingredients
             const recipeIngredients = [];
             for (let i = 1; i <= 20; i++) {
-              const ingredient = recipe[`strIngredient${i}`];
+              const ingredientName = recipe[`strIngredient${i}`];
               const measure = recipe[`strMeasure${i}`];
-              if (ingredient && ingredient.trim()) {
-                recipeIngredients.push({
-                  ingredientName: ingredient.trim(),
-                  quantity: measure ? measure.trim() : "",
-                });
+              if (ingredientName && ingredientName.trim()) {
+                const ingredientId = await createIngredientIfNotExists(
+                  ingredientName.trim()
+                );
+                if (ingredientId) {
+                  recipeIngredients.push({
+                    ingredientName: ingredientId,
+                    quantity: measure ? measure.trim() : "",
+                  });
+                }
               }
             }
 
             const mealCategory = recipe.strCategory || "Unknown";
 
-            // Find matching categories
             const categoryMatches = allCategories.filter(
               (cat) =>
                 cat.name.toLowerCase() === origin.toLowerCase() ||
@@ -101,13 +125,12 @@ const fetchAndSaveRecipes = async () => {
 
             const categoryIds = categoryMatches.map((category) => category._id);
 
-            // Create and save the recipe with the area ObjectId reference
             const newRecipe = new Recipe({
               recipeTitle: recipe.strMeal,
               recipeIngredients: recipeIngredients,
               recipeImage: recipe.strMealThumb,
               recipeVideoTutorial: recipe.strYoutube || "",
-              area: areaId, // Now storing the ObjectId reference
+              area: areaId,
               recipeInstructions: recipe.strInstructions,
               categories: categoryIds,
             });
@@ -130,7 +153,6 @@ const fetchAndSaveRecipes = async () => {
         continue;
       }
 
-      // Add a small delay to avoid hitting rate limits
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 

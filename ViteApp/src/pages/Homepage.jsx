@@ -10,10 +10,9 @@ const Homepage = () => {
   const heroRef = useRef(null);
 
   useEffect(() => {
-    // Creating a GSAP timeline for staggered animations
     const tl = gsap.timeline({ defaults: { duration: 1, ease: "power3.out" } });
 
-    tl.from(latestRef.current, { opacity: 0, y: 100 }) // teb2a zidun w shuf l effect
+    tl.from(latestRef.current, { opacity: 0, y: 100 })
       .from(searchRef.current, { opacity: 0, y: 100 }, "-=0.8")
       .from(heroRef.current, { opacity: 0, y: 100 }, "-=0.8");
   }, []);

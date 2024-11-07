@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Avatar, Dropdown } from "antd";
+import { Avatar, Dropdown, Spin } from "antd";
 import {
   Home,
   BookOpen,
   Heart,
-  UtensilsCrossed,
   ChefHat,
   LogOut,
   Settings,
@@ -15,7 +14,6 @@ import {
 } from "lucide-react";
 import logo from "/src/assets/logo.png";
 
-// Keeping original user menu with material styling
 const UserAvatar = ({ user }) => {
   if (!user) {
     return (
@@ -126,7 +124,6 @@ const Navbar = ({ user }) => {
     { path: "/", label: "Home", icon: Home },
     { path: "/recipe", label: "Recipes", icon: BookOpen },
     { path: "/favorites", label: "Favorites", icon: Heart },
-    // { path: "/categories", label: "Categories", icon: UtensilsCrossed },
   ];
 
   useEffect(() => {
@@ -224,24 +221,20 @@ const Navbar = ({ user }) => {
   );
 };
 
-const PageLayout = ({ children }) => {
+const PageLayout = ({ children, authUser }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
-  const isErrorPage = location.pathname.startsWith("/*");
   const mainContentRef = useRef(null);
-  const [user, setUser] = useState(false);
-  // const [user, setUser] = useState({
-  //   name: "Majd Chbat",
-  //   email: "MajdChbat@gmail.com",
-  //   imageUrl:
-  //     "https://media.licdn.com/dms/image/v2/D4D03AQHludua8pSwVA/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1708593323172?e=2147483647&v=beta&t=zcf9XPUOz4WaA3thYabfB3oRLFb-DPKJT2My4kI8Y-M",
-  // });
+  const [loading, setLoading] = useState(true);
+
+  setTimeout(() => {
+    setLoading(false);
+  }, 1000);
 
   useEffect(() => {
     if (mainContentRef.current) {
       mainContentRef.current.style.opacity = "0";
       mainContentRef.current.style.transform = "translateY(20px)";
-
       requestAnimationFrame(() => {
         mainContentRef.current.style.transition = "all 0.5s ease-out";
         mainContentRef.current.style.opacity = "1";
@@ -250,15 +243,18 @@ const PageLayout = ({ children }) => {
     }
   }, [location.pathname]);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {!isAuthPage && <Navbar user={user} />}
-      <main
-        ref={mainContentRef}
-        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${
-          !isAuthPage ? "py-8" : ""
-        }`}
-      >
+    <div className="min-h-screen flex flex-col">
+      {!isAuthPage && <Navbar user={authUser} />}
+      <main className="flex-1 mt-16 p-4" ref={mainContentRef}>
         {children}
       </main>
     </div>

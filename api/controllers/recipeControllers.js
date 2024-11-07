@@ -1,5 +1,6 @@
 import Area from "../models/Area.js";
 import Recipe from "../models/Recipe.js";
+import Ingredient from "../models/Ingredient.js";
 
 export const createRecipe = async (req, res) => {
   try {
@@ -40,8 +41,6 @@ export const getRecipeById = async (req, res) => {
 
 export const getRecipesByName = async (req, res) => {
   const searchTerm = req.query.recipeTitle;
-
-  console.log("Search Term:", searchTerm);
   if (!searchTerm) {
     return res.status(400).json({
       success: false,
@@ -53,8 +52,6 @@ export const getRecipesByName = async (req, res) => {
     const recipes = await Recipe.find({
       recipeTitle: { $regex: new RegExp(searchTerm, "i") },
     });
-
-    console.log("Found Recipes:", recipes);
 
     if (recipes.length === 0) {
       return res.status(404).json({
@@ -387,6 +384,110 @@ export const getRecipesByAreaName = async (req, res) => {
       success: false,
       message: "Internal server error",
       error: error.message,
+    });
+  }
+};
+
+export const getRecipesByIngredients = async (req, res) => {
+  try {
+    const { ingredients } = req.query;
+
+    if (!ingredients || ingredients.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No ingredients provided for search",
+      });
+    }
+
+    const ingredientNames = ingredients
+      .split(",")
+      .map((ingredient) => ingredient.trim().toLowerCase());
+
+    const ingredientIds = await Ingredient.find({
+      name: {
+        $in: ingredientNames.map((name) => new RegExp(`^${name}$`, "i")),
+      },
+    }).select("_id");
+
+    if (ingredientIds.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No ingredients found with the provided names",
+      });
+    }
+
+    // Convert ingredientIds to an array of ObjectIds
+    const ingredientObjectIds = ingredientIds.map(
+      (ingredient) => ingredient._id
+    );
+
+    // Find recipes that contain any of the ingredients by matching the ingredient ObjectIds
+    const recipes = await Recipe.find({
+      "recipeIngredients.ingredientName": { $in: ingredientObjectIds },
+    }).populate("recipeIngredients.ingredientName"); // Optional: populate ingredient details
+
+    // If no recipes are found that contain the ingredients
+    if (recipes.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No recipes found with the specified ingredients",
+      });
+    }
+
+    // Count the total number of matching recipes
+    const count = recipes.length;
+
+    // Return the recipes along with the count
+    return res.status(200).json({
+      success: true,
+      count: count,
+      data: recipes,
+    });
+  } catch (error) {
+    console.error("Error fetching recipes by ingredients:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve recipes due to server error",
+    });
+  }
+};
+
+export const getRecipesByIngredientsId = async (req, res) => {
+  try {
+    const { ingredientIds } = req.query;
+
+    if (!ingredientIds || ingredientIds.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No ingredient IDs provided for search",
+      });
+    }
+
+    const ingredientObjectIds = ingredientIds.split(",").map((id) => id.trim());
+
+    const recipes = await Recipe.find({
+      "recipeIngredients.ingredientName": { $in: ingredientObjectIds },
+    }).populate("recipeIngredients.ingredientName");
+
+    if (recipes.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No recipes found with the specified ingredient IDs",
+      });
+    }
+
+    const count = recipes.length;
+
+    return res.status(200).json({
+      success: true,
+      count: count,
+      data: recipes,
+    });
+  } catch (error) {
+    console.error("Error fetching recipes by ingredient IDs:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve recipes due to server error",
     });
   }
 };

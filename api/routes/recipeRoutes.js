@@ -14,6 +14,8 @@ import {
   getRecipesByCategory,
   getRecipesByArea,
   getRecipesByAreaName,
+  getRecipesByIngredients,
+  getRecipesByIngredientsId,
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 
@@ -24,6 +26,8 @@ router.get("/latest", getLatestRecipe);
 router.get("/search", getRecipesByName);
 router.get("/category/:categoryId", getRecipesByCategory);
 router.get("/random", getRandomRecipe);
+router.get("/search_ingredient", getRecipesByIngredients);
+router.get("/search_ingredient_id", getRecipesByIngredientsId);
 router.get("/:id", getRecipeById);
 router.get("/", getAllRecipes);
 router.get("/area/:areaId", getRecipesByArea);
