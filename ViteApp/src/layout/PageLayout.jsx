@@ -13,8 +13,10 @@ import {
   X,
 } from "lucide-react";
 import logo from "/src/assets/logo.png";
+import { useAuthStore } from "../store/useAuthStore";
+import { toast } from "react-hot-toast"; // Ensure toast is imported
 
-const UserAvatar = ({ user }) => {
+const UserAvatar = ({ user, handleLogout }) => {
   if (!user) {
     return (
       <Link
@@ -55,7 +57,10 @@ const UserAvatar = ({ user }) => {
     {
       key: "signout",
       label: (
-        <div className="flex items-center space-x-2 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors">
+        <div
+          className="flex items-center space-x-2 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+          onClick={handleLogout}
+        >
           <LogOut className="h-4 w-4" />
           <span>Sign Out</span>
         </div>
@@ -115,7 +120,7 @@ const NavLink = ({ to, icon: Icon, label, isActive }) => (
   </Link>
 );
 
-const Navbar = ({ user }) => {
+const Navbar = ({ user, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navRef = useRef(null);
@@ -179,12 +184,12 @@ const Navbar = ({ user }) => {
               />
             ))}
             <div className="ml-4">
-              <UserAvatar user={user} />
+              <UserAvatar user={user} handleLogout={handleLogout} />
             </div>
           </div>
 
           <div className="md:hidden flex items-center space-x-4">
-            <UserAvatar user={user} />
+            <UserAvatar user={user} handleLogout={handleLogout} />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -226,17 +231,25 @@ const PageLayout = ({ children, authUser }) => {
   const isAuthPage = location.pathname.startsWith("/auth");
   const mainContentRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const { logout } = useAuthStore();
 
-  setTimeout(() => {
-    setLoading(false);
-  }, 1000);
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     if (mainContentRef.current) {
       mainContentRef.current.style.opacity = "0";
       mainContentRef.current.style.transform = "translateY(20px)";
       requestAnimationFrame(() => {
-        mainContentRef.current.style.transition = "all 0.5s ease-out";
+        mainContentRef.current.style.transition =
+          "opacity 0.5s ease, transform 0.5s ease";
         mainContentRef.current.style.opacity = "1";
         mainContentRef.current.style.transform = "translateY(0)";
       });
@@ -252,9 +265,9 @@ const PageLayout = ({ children, authUser }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {!isAuthPage && <Navbar user={authUser} />}
-      <main className="flex-1 mt-16 p-4" ref={mainContentRef}>
+    <div className="flex flex-col min-h-screen">
+      {!isAuthPage && <Navbar user={authUser} handleLogout={handleLogout} />}
+      <main className="flex-grow" ref={mainContentRef}>
         {children}
       </main>
     </div>

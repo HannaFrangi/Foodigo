@@ -168,9 +168,9 @@ const AuthPage = () => {
               className="absolute right-0 bottom-5 text-zinc-400 hover:text-olivetransition-colors duration-200"
             >
               {showPassword ? (
-                <EyeOff className="w-5 h-5" />
+                <EyeOff className="w-5 h-5 -my-1.5" />
               ) : (
-                <Eye className="w-5 h-5" />
+                <Eye className="w-5 h-5 -my-1.5" />
               )}
             </button>
           </div>

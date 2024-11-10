@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
 import PageLayout from "./layout/PageLayout";
@@ -10,6 +10,7 @@ import ProfilePage from "./pages/Profile/ProfilePage";
 import Error from "./pages/404/NotFound";
 import Favorites from "./pages/Favorites/Favorites";
 import { useAuthStore } from "./store/useAuthStore";
+import { useRecipeStore } from "./store/useRecipeStore";
 
 function App() {
   const lenis = useLenis(({ scroll }) => {
@@ -17,12 +18,27 @@ function App() {
   });
 
   const { checkAuth, authUser, loading } = useAuthStore();
+  const { fetchCategories } = useRecipeStore();
 
   useEffect(() => {
     checkAuth();
+    if (authUser && !authUser.isVerified) {
+      toast("Don't forget to verify your account!", {
+        icon: "⚠",
+        style: {
+          borderRadius: "10px",
+          // background: "#333",
+          // color: "#fff",
+          zIndex: 300,
+        },
+      });
+    }
+
+    fetchCategories();
   }, [checkAuth]);
 
-  if (loading) return null;
+  //Majd he le heta ??? idk shu bta3mul bas neyka l dene
+  // if (loading) return null;
 
   return (
     <>

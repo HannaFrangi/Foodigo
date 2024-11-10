@@ -1,8 +1,9 @@
-// recipeStore.js
 import { create } from "zustand";
+import { axiosInstance } from "../lib/axios";
 
 export const useRecipeStore = create((set) => ({
   recipes: [],
+  categories: JSON.parse(localStorage.getItem("categories")) || [], // Check localStorage first
   isLoading: false,
   error: null,
   hasSearched: false,
@@ -13,57 +14,73 @@ export const useRecipeStore = create((set) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   setHasSearched: (hasSearched) => set({ hasSearched }),
-  setIsSearching: (Searching) => set({ isSearching: Searching }),
+  setIsSearching: (Searching) => set({ Searching }),
 
   searchRecipes: async (query) => {
-    set({ isLoading: true, error: null, hasSearched: true, Searching: true });
+    set({ isLoading: true, error: null, hasSearched: false, Searching: true });
 
-    const sampleRecipes = [
-      {
-        id: 1,
-        strMeal: "Mediterranean Salad",
-        strCategory: "Vegetarian",
-        strMealThumb:
-          "https://cdn.loveandlemons.com/wp-content/uploads/2019/07/salad.jpg",
-      },
-      {
-        id: 2,
-        strMeal: "Grilled Salmon Salad",
-        strCategory: "Seafood",
-        strMealThumb:
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyi0ndisrU17sVM0cWvkv8x0eLBKNWC54Jww&s",
-      },
-      {
-        id: 3,
-        strMeal: "Avocado Toast",
-        strCategory: "Breakfast",
-        strMealThumb:
-          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
-      },
-      {
-        id: 4,
-        strMeal: "Avocado Toast",
-        strCategory: "Breakfast",
-        strMealThumb:
-          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
-      },
-      {
-        id: 5,
-        strMeal: "Avocado Toast",
-        strCategory: "Breakfast",
-        strMealThumb:
-          "https://cdn.apartmenttherapy.info/image/upload/f_jpg,q_auto:eco,c_fill,g_auto,w_1500,ar_1:1/k%2FPhoto%2FRecipes%2F2024-04-french-toast%2Ffrench-toast-COMP",
-      },
-    ];
+    try {
+      const response = await axiosInstance.get(`/recipes/search`, {
+        params: { query },
+      });
+      const filteredRecipes = response.data || [];
+      set({
+        recipes: filteredRecipes,
+        isLoading: false,
+        Searching: false,
+        hasSearched: true,
+        searchQuery: query,
+      });
+    } catch (error) {
+      set({
+        error: error.message || "Something went wrong.",
+        isLoading: false,
+        Searching: false,
+        hasSearched: false,
+      });
+    }
+  },
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+  LatestRecipe: async () => {
+    set({ isLoading: true, error: null });
 
-    const filteredRecipes = query.toLowerCase()
-      ? sampleRecipes.filter((recipe) =>
-          recipe.strMeal.toLowerCase().includes(query.toLowerCase())
-        )
-      : sampleRecipes;
+    try {
+      const response = await axiosInstance.get("recipe/latest/");
+      const latestRecipes = response.data || [];
+      set({
+        recipes: latestRecipes,
+        isLoading: false,
+        error: null,
+        hasSearched: false,
+      });
+    } catch (error) {
+      set({
+        error: error.message || "Failed to fetch the latest recipes.",
+        isLoading: false,
+      });
+    }
+  },
 
-    set({ recipes: filteredRecipes, isLoading: false, Searching: false });
+  // Function to fetch categories and store in localStorage
+  fetchCategories: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await axiosInstance.get("category");
+      const categories = response.data || [];
+      // Store categories in localStorage
+      localStorage.setItem("categories", JSON.stringify(categories.data));
+      // console.log(categories.data);
+      set({
+        categories: categories.data,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      set({
+        error: error.message || "Failed to fetch categories.",
+        isLoading: false,
+      });
+    }
   },
 }));

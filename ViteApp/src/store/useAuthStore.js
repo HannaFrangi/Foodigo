@@ -11,11 +11,19 @@ export const useAuthStore = create((set) => ({
     try {
       set({ loading: true });
       const { data } = await axiosInstance.get("/auth/me");
-      set({ authUser: data.user });
-      toast.success("Authenticated successfully");
+
+      // Remove password field if it exists in the user object
+      const user = { ...data.user };
+      delete user.password;
+
+      set({ authUser: user });
+
+      // Update localStorage with the password-free user object
+      localStorage.setItem("user-info", JSON.stringify(user));
     } catch (error) {
       set({ authUser: null });
-      toast.error(error?.response?.data?.message || "Authentication failed");
+      localStorage.removeItem("user-info"); // Clear localStorage if authentication fails
+      console.error(error?.response?.data?.message || "Authentication failed");
     } finally {
       set({ loading: false });
     }
@@ -53,8 +61,13 @@ export const useAuthStore = create((set) => ({
   login: async (loginData) => {
     try {
       const { data } = await axiosInstance.post("/auth/login", loginData);
-      set({ authUser: data.user });
-      localStorage.setItem("user-info", JSON.stringify(data.user));
+      const { user } = data;
+
+      // Security issue wateva dafaq
+      delete user.password;
+
+      set({ authUser: user });
+      localStorage.setItem("user-info", JSON.stringify(user));
       toast.success("Logged in successfully");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
