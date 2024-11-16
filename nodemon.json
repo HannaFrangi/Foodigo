@@ -1,5 +1,0 @@
-{
-  "watch": ["api"],
-  "ignore": [".viteapp"],
-  "ext": "js,json"
-}

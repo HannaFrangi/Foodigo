@@ -25,7 +25,7 @@ const getTagColors = (categoryName) => {
 };
 
 export const RecipeCard = ({ recipe, index, onLike }) => {
-  const [isLiked, setIsLiked] = useState(false);
+  const [isLiked, setIsLiked] = useState(true);
   const [categoryNames, setCategoryNames] = useState([]);
 
   useEffect(() => {

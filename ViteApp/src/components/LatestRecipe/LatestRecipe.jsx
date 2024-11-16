@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import RecipeCard from "../RecipeCard/RecipeCard";
+import RecipeCardSkeleton from "../RecipeCard/RecipeCardSkeleton";
 import { useRecipeStore } from "/src/store/useRecipeStore";
+import { gsap } from "gsap";
 
 const LatestRecipe = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -11,9 +13,24 @@ const LatestRecipe = () => {
   const { LatestRecipe, recipes, fetchCategories, categories } =
     useRecipeStore();
 
+  // Reference for the title
+  const titleRef = useRef(null);
+
   useEffect(() => {
     LatestRecipe();
     fetchCategories();
+  }, [LatestRecipe, fetchCategories]);
+
+  // GSAP text reveal animation
+  useEffect(() => {
+    if (titleRef.current) {
+      gsap.from(titleRef.current, {
+        opacity: 0,
+        y: -30,
+        duration: 1,
+        ease: "power3.out",
+      });
+    }
   }, []);
 
   // Handle responsive layout
@@ -64,14 +81,14 @@ const LatestRecipe = () => {
   }, [currentPage, isAnimating, recipeData.length]);
 
   const handleNext = () => {
-    if (totalPages <= 1) return;
+    if (totalPages <= 1 || isAnimating) return; // Prevent if there's only one page or if already animating
     setIsAnimating(true);
     setCurrentPage((prev) => (prev + 1) % totalPages);
-    setTimeout(() => setIsAnimating(false), 500);
+    setTimeout(() => setIsAnimating(false), 500); // End animation after 500ms
   };
 
   const handlePrev = () => {
-    if (totalPages <= 1) return;
+    if (totalPages <= 1 || isAnimating) return;
     setIsAnimating(true);
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
     setTimeout(() => setIsAnimating(false), 500);
@@ -87,38 +104,78 @@ const LatestRecipe = () => {
     return acc;
   }, []);
 
-  // Loading state
-  if (!recipes || !recipes.data) {
-    return (
-      <div className="w-full py-6 md:py-8 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-lg text-gray-500">Loading recipes...</div>
-          </div>
+  // Render loading skeleton or actual data
+  const renderLoadingState = (
+    <div className="w-full py-6 md:py-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+        <div className="flex justify-center items-center h-64 m-auto space-x-4">
+          <RecipeCardSkeleton />
+          <RecipeCardSkeleton />
+          <RecipeCardSkeleton />
         </div>
       </div>
+    </div>
+  );
+
+  // No recipes state
+  const renderNoRecipesState = (
+    <div className="w-full py-6 md:py-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-gray-500">No recipes available</div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // If recipes are loading or there's no data, show the skeleton or no recipes message
+  if (!recipes || !recipes.data) {
+    return (
+      <>
+        <div className="w-full py-6 md:py-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
+              <h2
+                ref={titleRef}
+                className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
+              >
+                Latest Recipes
+              </h2>
+            </div>
+            {renderLoadingState}
+          </div>
+        </div>
+      </>
     );
   }
 
-  // No recipes state
+  // If there are no recipes
   if (recipeData.length === 0) {
     return (
       <div className="w-full py-6 md:py-8 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-lg text-gray-500">No recipes available</div>
+          <div className="flex justify-between items-center mb-6 md:mb-8">
+            <h2
+              ref={titleRef}
+              className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
+            >
+              Latest Recipes
+            </h2>
           </div>
+          {renderNoRecipesState}
         </div>
       </div>
     );
   }
 
-  console.log(recipeData);
   return (
     <div className="w-full py-6 md:py-8 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-between items-center mb-6 md:mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+          <h2
+            ref={titleRef}
+            className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
+          >
             Latest Recipes
           </h2>
           <div className="hidden md:flex space-x-3">
@@ -195,14 +252,16 @@ const LatestRecipe = () => {
           )}
         </div>
 
-        {/* Mobile Pagination Dots */}
-        <div className="flex justify-center space-x-2 mt-4 md:hidden">
+        {/* Pagination dots */}
+        <div className="md:hidden flex justify-center mt-4 space-x-2">
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentPage(index)}
               className={`transition-all duration-300 h-2 rounded-full ${
-                index === currentPage ? "w-6 bg-olive" : "w-2 bg-gray-300"
+                index === currentPage
+                  ? "w-4 bg-olive"
+                  : "w-3 bg-gray-300 hover:bg-olive"
               }`}
             />
           ))}

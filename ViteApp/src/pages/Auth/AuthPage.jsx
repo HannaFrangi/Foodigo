@@ -1,12 +1,12 @@
 import { useState, useRef } from "react";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import { gsap } from "gsap";
 import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
-  const { loading, authUser, signup, login, logout, updateProfile } =
-    useAuthStore();
+  const { signup, login } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +15,8 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const buttonRef = useRef(null);
   const formRef = useRef(null);
+  const backButtonRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleSignup = async (userData) => {
     console.log("SignUp");
@@ -31,7 +33,6 @@ const AuthPage = () => {
   };
 
   const toggleMode = () => {
-    // Animate form opacity on mode change
     gsap.to(formRef.current, {
       opacity: 0,
       duration: 0.2,
@@ -41,6 +42,35 @@ const AuthPage = () => {
           opacity: 1,
           duration: 0.2,
         });
+      },
+    });
+  };
+
+  const handleBackHover = () => {
+    gsap.to(backButtonRef.current, {
+      scale: 1.1,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  };
+
+  const handleBackLeave = () => {
+    gsap.to(backButtonRef.current, {
+      scale: 1,
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  };
+
+  const handleBackClick = () => {
+    gsap.to(backButtonRef.current, {
+      rotate: -360,
+      duration: 0.6,
+      ease: "power2.inOut",
+      onComplete: () => {
+        // Handle navigation here
+        console.log("Navigate back");
+        navigate("/");
       },
     });
   };
@@ -71,15 +101,23 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4 relative">
+      {/* Back Button */}
+      <button
+        ref={backButtonRef}
+        onClick={handleBackClick}
+        onMouseEnter={handleBackHover}
+        onMouseLeave={handleBackLeave}
+        className="absolute top-4 left-4 md:top-8 md:left-8 p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300 active:scale-95 z-10"
+      >
+        <ArrowLeft className="w-6 h-6 text-olive" />
+      </button>
+
       <div className="max-w-md w-full space-y-8 relative">
         {/* Decorative food-themed elements */}
-        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full ">
-          {" "}
-          {/* Adjusted padding */}
+        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full">
           <div>
-            <Avatar src="/src/assets/logo.png" size={150} />{" "}
-            {/* Increased size */}
+            <Avatar src="/src/assets/logo.png" size={150} />
           </div>
         </div>
 
@@ -119,7 +157,6 @@ const AuthPage = () => {
 
         <div
           ref={formRef}
-          // onSubmit={handleSubmit}
           onSubmit={(e) => {
             e.preventDefault();
             handleLogin({ email, password });
@@ -165,7 +202,7 @@ const AuthPage = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-0 bottom-5 text-zinc-400 hover:text-olivetransition-colors duration-200"
+              className="absolute right-0 bottom-5 text-zinc-400 hover:text-olive transition-colors duration-200"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5 -my-1.5" />

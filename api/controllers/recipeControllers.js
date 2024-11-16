@@ -214,7 +214,7 @@ export const deleteReview = async (req, res) => {
 };
 
 export const getLatestRecipe = async (req, res) => {
-  const limit = parseInt(req.query.limit) || 6;
+  const limit = 12;
   try {
     const latestRecipes = await Recipe.find()
       .sort({ createdAt: -1 })

@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import logo from "/src/assets/logo.png";
 import { useAuthStore } from "../store/useAuthStore";
-import { toast } from "react-hot-toast"; // Ensure toast is imported
 
 const UserAvatar = ({ user, handleLogout }) => {
   if (!user) {
@@ -77,9 +76,9 @@ const UserAvatar = ({ user, handleLogout }) => {
     >
       <div className="flex items-center space-x-2 cursor-pointer p-1 rounded-full hover:bg-gray-50 transition-colors">
         <div className="flex items-center">
-          {user.imageUrl ? (
+          {user.ProfilePicURL ? (
             <Avatar
-              src={user.imageUrl}
+              src={user.ProfilePicURL}
               className="border-2 border-[#5d6544] shadow-sm"
               size="large"
             />
@@ -183,21 +182,21 @@ const Navbar = ({ user, handleLogout }) => {
                 isActive={location.pathname === item.path}
               />
             ))}
-            <div className="ml-4">
+            <div className="ml-3">
               <UserAvatar user={user} handleLogout={handleLogout} />
             </div>
           </div>
 
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
             <UserAvatar user={user} handleLogout={handleLogout} />
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center" // Adjust padding and ensure content fits in one line
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6" /> // Adjust the icon size
               ) : (
-                <MenuIcon className="h-6 w-6" />
+                <MenuIcon className="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6" /> // Adjust the icon size
               )}
             </button>
           </div>
@@ -267,7 +266,10 @@ const PageLayout = ({ children, authUser }) => {
   return (
     <div className="flex flex-col min-h-screen">
       {!isAuthPage && <Navbar user={authUser} handleLogout={handleLogout} />}
-      <main className="flex-grow" ref={mainContentRef}>
+      <main
+        ref={mainContentRef}
+        className="flex-1 bg-gray-50 transition-all duration-500"
+      >
         {children}
       </main>
     </div>
