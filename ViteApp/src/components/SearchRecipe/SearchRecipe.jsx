@@ -42,10 +42,10 @@ const SearchHeroSection = () => {
                 hasSearched ? "md:text-5xl" : "md:text-6xl"
               } animate-fade-in`}
             >
-              Je3na ya zalme
+              Hmm! looks Hungry inhere🤷‍♂️
             </h1>
             <p className="mt-3 max-w-md mx-auto text-base text-[#7A845E] sm:text-lg md:mt-5 md:text-xl md:max-w-3xl animate-fade-in-delayed">
-              3mel shi
+              Need any Help! Foodigo Have Your Back👩‍🍳
             </p>
 
             <form onSubmit={handleSearch} className="mt-8 max-w-xl mx-auto">

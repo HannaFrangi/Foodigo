@@ -3,7 +3,7 @@ module.exports = {
   darkMode: ["class"],
 
   content: [
-    "../foodima/**/*.html",
+    "../foodigo/**/*.html",
     "./pages/**/*.{js,jsx}",
     "./components/**/*.{js,jsx}",
     "./app/**/*.{js,jsx,html}",

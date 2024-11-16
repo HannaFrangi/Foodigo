@@ -19,6 +19,7 @@ const LatestRecipe = () => {
   useEffect(() => {
     LatestRecipe();
     fetchCategories();
+    console.log(recipeData);
   }, [LatestRecipe, fetchCategories]);
 
   // GSAP text reveal animation

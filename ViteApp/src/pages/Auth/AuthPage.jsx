@@ -3,7 +3,6 @@ import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import { gsap } from "gsap";
 import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
-import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const { signup, login } = useAuthStore();
@@ -16,7 +15,6 @@ const AuthPage = () => {
   const buttonRef = useRef(null);
   const formRef = useRef(null);
   const backButtonRef = useRef(null);
-  const navigate = useNavigate();
 
   const handleSignup = async (userData) => {
     console.log("SignUp");
@@ -70,7 +68,6 @@ const AuthPage = () => {
       onComplete: () => {
         // Handle navigation here
         console.log("Navigate back");
-        navigate("/");
       },
     });
   };
