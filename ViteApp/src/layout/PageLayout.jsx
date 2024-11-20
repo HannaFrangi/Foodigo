@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import logo from "/src/assets/logo.png";
 import { useAuthStore } from "../store/useAuthStore";
+import ResetPassword from "../pages/Auth/reset_password";
 
 const UserAvatar = ({ user, handleLogout }) => {
   if (!user) {
@@ -228,6 +229,7 @@ const Navbar = ({ user, handleLogout }) => {
 const PageLayout = ({ children, authUser }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
+  const isResetPage = location.pathname.startsWith("/auth/reset_password");
   const mainContentRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const { logout } = useAuthStore();
@@ -265,7 +267,9 @@ const PageLayout = ({ children, authUser }) => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {!isAuthPage && <Navbar user={authUser} handleLogout={handleLogout} />}
+      {!isAuthPage && !ResetPassword && (
+        <Navbar user={authUser} handleLogout={handleLogout} />
+      )}
       <main
         ref={mainContentRef}
         className="flex-1 bg-gray-50 transition-all duration-500"
