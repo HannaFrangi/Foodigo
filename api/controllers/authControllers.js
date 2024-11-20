@@ -29,16 +29,36 @@ const sendVerificationEmail = async (user) => {
     }
   );
   const htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
-      <h2 style="color: #5d6544;">Welcome to Foodigo, ${user.name}!</h2>
-      <p>We're excited to have you join us on your culinary journey!</p>
-      <p>Foodigo is your go-to app for discovering and organizing recipes, creating grocery lists, and more. Before you get started, please confirm your email address to access all the tasty features we have in store.</p>
-      <a href="${process.env.BASE_URL}/verify?token=${verificationToken}" style="display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #5d6544; color: #ffffff; text-decoration: none; border-radius: 5px;">Verify Your Email</a>
-      <p>If the button above doesn’t work, paste this link into your browser:</p>
-      <p style="word-break: break-all;"><a href="${process.env.BASE_URL}/verify?token=${verificationToken}" style="color: #5d6544;">${process.env.BASE_URL}/verify?token=${verificationToken}</a></p>
-      <p>Bon appétit, and happy cooking!</p>
-      <p>The Foodigo Team</p>
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <div style="display: inline-block; position: relative; width: 120px; height: 120px; overflow: hidden; border-radius: 50%; border: 4px solid #5d6544; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+      <img src="https://firebasestorage.googleapis.com/v0/b/hdarne-3d2b6.appspot.com/o/profilePics%2FfoodigoLogo.jpeg?alt=media&token=101a2049-1009-45e3-a364-534ee23c5153" 
+           alt="Foodigo Logo" 
+           style="width: 100%; height: 100%; object-fit: cover; display: block;">
     </div>
+  </div>
+  <h2 style="color: #5d6544; text-align: center; margin-bottom: 20px;">Welcome to Foodigo, ${user.name}!</h2>
+  <p style="color: #333; font-size: 16px; line-height: 1.6;">We're excited to have you join us on your culinary journey!</p>
+  <p style="color: #333; font-size: 16px; line-height: 1.6;">Foodigo is your go-to app for discovering and organizing recipes, creating grocery lists, and more. Before you get started, please confirm your email address to access all the tasty features we have in store.</p>
+  <div style="text-align: center; margin: 20px 0;">
+    <a href="${process.env.BASE_URL}/verify?token=${verificationToken}" 
+       style="display: inline-block; padding: 12px 24px; background-color: #5d6544; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, transform 0.2s;" 
+       onmouseover="this.style.backgroundColor='#4a5238'; this.style.transform='scale(1.05)';" 
+       onmouseout="this.style.backgroundColor='#5d6544'; this.style.transform='scale(1)';">
+      Verify Your Email
+    </a>
+  </div>
+  <p style="color: #333; font-size: 16px; line-height: 1.6;">If the button above doesn’t work, paste this link into your browser:</p>
+  <p style="word-break: break-all; color: #5d6544; font-size: 14px;">
+    <a href="${process.env.BASE_URL}/verify?token=${verificationToken}" 
+       style="color: #5d6544; text-decoration: underline;">
+      ${process.env.BASE_URL}/verify?token=${verificationToken}
+    </a>
+  </p>
+  <p style="color: #333; font-size: 16px; line-height: 1.6;">Bon appétit, and happy cooking!</p>
+  <p style="color: #333; font-size: 16px; line-height: 1.6; text-align: center;">The Foodigo Team</p>
+</div>
+
   `;
 
   const message = {
