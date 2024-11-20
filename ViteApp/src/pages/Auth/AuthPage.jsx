@@ -1,32 +1,93 @@
 import { useState, useRef } from "react";
-import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft, X, Send } from "lucide-react";
 import { gsap } from "gsap";
 import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
-  const { signup, login } = useAuthStore();
+  const { signup, login, forgotPassword } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+
   const buttonRef = useRef(null);
   const formRef = useRef(null);
   const backButtonRef = useRef(null);
+  const modalRef = useRef(null);
+  const modalContentRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await forgotPassword(resetEmail);
+      setResetEmailSent(true);
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const openForgotPassword = () => {
+    setShowForgotPassword(true);
+    gsap.set(modalRef.current, { display: "flex" });
+    gsap.to(modalRef.current, {
+      opacity: 1,
+      duration: 0.3,
+    });
+    gsap.fromTo(
+      modalContentRef.current,
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.3, delay: 0.1 }
+    );
+  };
+
+  const closeForgotPassword = () => {
+    gsap.to(modalContentRef.current, {
+      y: 20,
+      opacity: 0,
+      duration: 0.2,
+    });
+    gsap.to(modalRef.current, {
+      opacity: 0,
+      duration: 0.2,
+      onComplete: () => {
+        gsap.set(modalRef.current, { display: "none" });
+        setShowForgotPassword(false);
+        setResetEmail("");
+        setResetEmailSent(false);
+      },
+    });
+  };
 
   const handleSignup = async (userData) => {
     console.log("SignUp");
     setIsLoading(true);
-    await signup(userData);
+    try {
+      await signup(userData);
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+    }
     setIsLoading(false);
   };
 
   const handleLogin = async (loginData) => {
     console.log("login");
     setIsLoading(true);
-    await login(loginData);
+    try {
+      await login(loginData);
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+    }
     setIsLoading(false);
   };
 
@@ -66,8 +127,7 @@ const AuthPage = () => {
       duration: 0.6,
       ease: "power2.inOut",
       onComplete: () => {
-        // Handle navigation here
-        console.log("Navigate back");
+        navigate("/");
       },
     });
   };
@@ -99,6 +159,77 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4 relative">
+      {/* Forgot Password Modal */}
+      <div
+        ref={modalRef}
+        className="fixed inset-0 bg-black/50 items-center justify-center z-50 hidden opacity-0"
+        onClick={(e) => e.target === modalRef.current && closeForgotPassword()}
+      >
+        <div
+          ref={modalContentRef}
+          className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative"
+        >
+          <button
+            onClick={closeForgotPassword}
+            className="absolute right-4 top-4 p-2 hover:bg-zinc-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-zinc-500" />
+          </button>
+
+          {!resetEmailSent ? (
+            <>
+              <h3 className="text-2xl font-medium text-dark mb-2">
+                Reset Password
+              </h3>
+              <p className="text-zinc-600 mb-6">
+                Enter your email address and we'll send you instructions to
+                reset your password.
+              </p>
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div className="group">
+                  <input
+                    type="email"
+                    required
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-olive text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-olive/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/20"
+                >
+                  <Send className="w-5 h-5" />
+                  {isLoading ? "Sending..." : "Send Reset Link"}
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Send className="w-8 h-8 text-olive" />
+              </div>
+              <h3 className="text-2xl font-medium text-dark mb-2">
+                Check Your Email
+              </h3>
+              <p className="text-zinc-600 mb-6">
+                We've sent password reset instructions to:
+                <br />
+                <span className="font-medium text-dark">{resetEmail}</span>
+              </p>
+              <button
+                onClick={closeForgotPassword}
+                className="relative w-full bg-olive text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-olive disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive"
+              >
+                Back to Sign In
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Back Button */}
       <button
         ref={backButtonRef}
@@ -145,18 +276,22 @@ const AuthPage = () => {
           <button
             onClick={() => isLogin && toggleMode()}
             className={`pb-2 px-4 text-lg transition-all duration-300 ${
-              !isLogin ? "olive border-b-2 olive" : "text-zinc-400 hover:olive"
+              !isLogin
+                ? "text-olive border-b-2 border-olive"
+                : "text-zinc-400 hover:text-olive"
             }`}
           >
             Create Account
           </button>
         </div>
 
-        <div
+        <form
           ref={formRef}
           onSubmit={(e) => {
             e.preventDefault();
-            handleLogin({ email, password });
+            isLogin
+              ? handleLogin({ email, password })
+              : handleSignup({ name, email, password });
           }}
           className="mt-8 space-y-6 bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
         >
@@ -214,6 +349,7 @@ const AuthPage = () => {
             <div className="flex items-center justify-center pt-4">
               <button
                 type="button"
+                onClick={openForgotPassword}
                 className="text-zinc-600 hover:text-olive transition-colors duration-200"
               >
                 Forgot password?
@@ -228,14 +364,7 @@ const AuthPage = () => {
               onMouseMove={callParallax}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
-              onClick={(e) => {
-                e.preventDefault();
-                {
-                  !isLogin
-                    ? handleSignup({ name, email, password })
-                    : handleLogin({ email, password });
-                }
-              }}
+              type="submit"
               disabled={isLoading}
               className="relative w-full bg-olive text-white py-4 rounded-full font-medium transition-all duration-300 hover:bg-olive disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive"
             >
@@ -267,7 +396,7 @@ const AuthPage = () => {
               </button>
             </p>
           )}
-        </div>
+        </form>
       </div>
     </div>
   );

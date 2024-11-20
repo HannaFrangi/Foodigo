@@ -85,4 +85,15 @@ export const useAuthStore = create((set) => ({
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   },
+
+  forgotPassword: async (email) => {
+    try {
+      await axiosInstance.post("/auth/forgot-password", { email });
+      toast.success("Password reset link Sent To Your Email !");
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to send reset link"
+      );
+    }
+  },
 }));
