@@ -4,15 +4,19 @@ import { gsap } from "gsap";
 import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const AuthPage = () => {
   const { signup, login, forgotPassword } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -70,25 +74,30 @@ const AuthPage = () => {
   };
 
   const handleSignup = async (userData) => {
-    console.log("SignUp");
+    if (password !== confirmPassword) {
+      setPasswordError("Passwords do not match!");
+      toast.error(passwordError);
+      return;
+    }
     setIsLoading(true);
     try {
       await signup(userData);
     } catch (error) {
-      console.error("Error sending reset email:", error);
+      console.error("Error during signup:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleLogin = async (loginData) => {
-    console.log("login");
     setIsLoading(true);
     try {
       await login(loginData);
     } catch (error) {
-      console.error("Error sending reset email:", error);
+      console.error("Error during login:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const toggleMode = () => {
@@ -343,6 +352,38 @@ const AuthPage = () => {
               )}
             </button>
           </div>
+
+          {/* Confirm Password only in create Acc */}
+          {!isLogin && (
+            <div className="group relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                required
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  // Clear error when user starts typing
+                  if (passwordError) setPasswordError("");
+                }}
+                className="w-full pb-3 text-lg text-dark bg-transparent border-b-2 border-zinc-200 focus:border-olive focus:outline-none transition-all duration-300 pr-12"
+                placeholder="Confirm Password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-0 bottom-5 text-zinc-400 hover:text-olive transition-colors duration-200"
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          )}
 
           {/* Remember me and Forgot password (Login only) */}
           {isLogin && (
