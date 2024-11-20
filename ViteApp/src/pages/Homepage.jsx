@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SearchRecipe from "../components/SearchRecipe/SearchRecipe";
-import { Hero } from "./Home/Hero";
+import { Carouselle } from "./Home/Carouselle";
 import LatestRecipe from "../components/LatestRecipe/LatestRecipe";
 
 const Footer = () => {
@@ -131,14 +131,14 @@ const Footer = () => {
 const Homepage = () => {
   const latestRef = useRef(null);
   const searchRef = useRef(null);
-  const heroRef = useRef(null);
+  const CarouselleRef = useRef(null);
   const footerRef = useRef(null);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { duration: 1, ease: "power3.out" } });
     tl.from(latestRef.current, { opacity: 0, y: 100 })
       .from(searchRef.current, { opacity: 0, y: 100 }, "-=0.8")
-      .from(heroRef.current, { opacity: 0, y: 100 }, "-=0.8")
+      .from(CarouselleRef.current, { opacity: 0, y: 100 }, "-=0.8")
       .from(footerRef.current, { opacity: 0, y: 50 }, "-=0.8");
   }, []);
 

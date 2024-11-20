@@ -1,7 +1,7 @@
-import { Image } from "/src/components/HeroSection/Image";
-import { Texts } from "/src/components/HeroSection/Texts";
+import { Image } from "/src/components/CarouselleSection/Image";
+import { Texts } from "/src/components/CarouselleSection/Texts";
 
-export const Hero = () => {
+export const Carouselle = () => {
   return (
     <section
       id="section"

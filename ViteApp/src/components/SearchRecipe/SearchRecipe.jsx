@@ -5,7 +5,7 @@ import RecipeResults from "../../components/RecipeCard/RecipeResults";
 import { CircularProgress } from "@mui/material";
 import { Input } from "antd";
 
-const SearchHeroSection = () => {
+const SearchCarouselleSection = () => {
   const { searchQuery, setSearchQuery, searchRecipes, hasSearched, Searching } =
     useRecipeStore();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -93,4 +93,4 @@ const SearchHeroSection = () => {
   );
 };
 
-export default SearchHeroSection;
+export default SearchCarouselleSection;
