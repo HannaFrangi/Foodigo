@@ -4,27 +4,10 @@ import { RecipeCard } from "./RecipeCard";
 import { ChefHat } from "lucide-react";
 
 const RecipeResults = () => {
-  const { recipes, isLoading, hasSearched } = useRecipeStore();
+  const { SearchResults, Searching, hasSearched } = useRecipeStore();
   const containerRef = useRef(null);
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {Array(3)
-          .fill(0)
-          .map((_, index) => (
-            <div
-              key={index}
-              className="animate-pulse bg-white rounded-3xl shadow-sm"
-            >
-              {/* Your loading skeleton content */}
-            </div>
-          ))}
-      </div>
-    );
-  }
-
-  if (!isLoading && hasSearched && recipes.length === 0) {
+  if (!Searching && hasSearched && SearchResults.length === 0) {
     return (
       <div className="text-center py-12">
         <ChefHat className="mx-auto h-12 w-12 text-[#606848] mb-4" />
@@ -41,8 +24,8 @@ const RecipeResults = () => {
       ref={containerRef}
       className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
     >
-      {recipes.map((recipe, index) => (
-        <RecipeCard key={recipe.id} recipe={recipe} index={index} />
+      {SearchResults.map((recipe, index) => (
+        <RecipeCard key={recipe._id} recipe={recipe} index={index} />
       ))}
     </div>
   );

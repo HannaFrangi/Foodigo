@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../../lib/axios";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -17,6 +17,7 @@ const ResetPassword = () => {
     e.preventDefault();
     setError("");
 
+    console.log(token);
     // Basic validation
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -34,14 +35,14 @@ const ResetPassword = () => {
         return;
       }
 
-      await axios.post("/api/auth/reset-password", {
+      await axiosInstance.post("/auth/reset-password", {
         token,
         newPassword: password,
       });
 
       setSuccess(true);
       toast.success("Password reset successfully!");
-      setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate("/"), 2500);
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
     }

@@ -11,7 +11,7 @@ import Error from "./pages/404/NotFound";
 import Favorites from "./pages/Favorites/Favorites";
 import { useAuthStore } from "./store/useAuthStore";
 import { useRecipeStore } from "./store/useRecipeStore";
-import ResetPassword from "./pages/Auth/reset_password";
+import ResetPassword from "./pages/Auth/ResetPassword";
 
 function App() {
   const lenis = useLenis(({ scroll }) => {
@@ -55,7 +55,7 @@ function App() {
             <Route path="/recipe" element={<RecipePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/reset_password/:token" element={<ResetPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>
