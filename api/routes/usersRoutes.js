@@ -3,6 +3,8 @@ import multer from "multer";
 import { protectRoute } from "../middleware/auth.js";
 import {
   AddtoFavorites,
+  AddtoGroceryList,
+  togglePurchasedStatus,
   updateProfile,
 } from "../controllers/userControllers.js";
 
@@ -29,5 +31,8 @@ router.put(
 );
 
 router.put("/addtofavorites/:id", protectRoute, AddtoFavorites);
+
+router.post("/addToGroceryList/", protectRoute, AddtoGroceryList);
+router.patch("/togglepurchased", protectRoute, togglePurchasedStatus);
 
 export default router;

@@ -6,6 +6,9 @@ import {
 } from "firebase/storage";
 import User from "../models/Users.js";
 import Recipe from "../models/Recipe.js";
+import Ingredient from "../models/Ingredient.js";
+import convert from "convert-units";
+
 import { storage } from "../config/firebase.js";
 
 export const updateProfile = async (req, res) => {
@@ -112,6 +115,257 @@ export const AddtoFavorites = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error updating favorites: " + error.message,
+    });
+  }
+};
+
+const standardizeQuantity = (quantityStr) => {
+  try {
+    // Extract number and unit from string (e.g., "2 cups" -> { value: 2, unit: "cups" })
+    const match = quantityStr.trim().match(/^([\d.]+)\s*([a-zA-Z]+)$/);
+    if (!match) return null;
+
+    const [, value, unit] = match;
+    const numValue = parseFloat(value);
+
+    // Map common unit variations to standard units
+    const unitMap = {
+      // Volume
+      cup: "cup",
+      cups: "cup",
+      c: "cup",
+      tablespoon: "Tbs",
+      tablespoons: "Tbs",
+      tbsp: "Tbs",
+      tbs: "Tbs",
+      teaspoon: "tsp",
+      teaspoons: "tsp",
+      tsp: "tsp",
+      ml: "ml",
+      milliliter: "ml",
+      milliliters: "ml",
+      l: "l",
+      liter: "l",
+      liters: "l",
+      // Mass
+      g: "g",
+      gram: "g",
+      grams: "g",
+      kg: "kg",
+      kilogram: "kg",
+      kilograms: "kg",
+      oz: "oz",
+      ounce: "oz",
+      ounces: "oz",
+      lb: "lb",
+      pound: "lb",
+      pounds: "lb",
+      // Add more mappings as needed
+    };
+
+    const standardUnit = unitMap[unit.toLowerCase()];
+    if (!standardUnit) return null;
+
+    let standardValue;
+    let standardizedUnit;
+
+    // Convert to standard units based on type
+    if (["cup", "Tbs", "tsp", "ml", "l"].includes(standardUnit)) {
+      // Convert all volume measurements to milliliters
+      standardValue = convert(numValue).from(standardUnit).to("ml");
+      standardizedUnit = "ml";
+    } else if (["g", "kg", "oz", "lb"].includes(standardUnit)) {
+      // Convert all mass measurements to grams
+      standardValue = convert(numValue).from(standardUnit).to("g");
+      standardizedUnit = "g";
+    } else {
+      return null;
+    }
+
+    return {
+      value: standardValue,
+      unit: standardizedUnit,
+    };
+  } catch (error) {
+    console.error("Error in standardizeQuantity:", error);
+    return null;
+  }
+};
+
+// Helper function to format quantity for display
+const formatQuantity = (value, unit) => {
+  let displayValue, displayUnit;
+
+  if (unit === "ml") {
+    if (value >= 1000) {
+      displayValue = (value / 1000).toFixed(2);
+      displayUnit = "L";
+    } else {
+      displayValue = Math.round(value);
+      displayUnit = "ml";
+    }
+  } else if (unit === "g") {
+    if (value >= 1000) {
+      displayValue = (value / 1000).toFixed(2);
+      displayUnit = "kg";
+    } else {
+      displayValue = Math.round(value);
+      displayUnit = "g";
+    }
+  } else {
+    return `${value} ${unit}`;
+  }
+
+  return `${displayValue} ${displayUnit}`;
+};
+
+export const AddtoGroceryList = async (req, res) => {
+  try {
+    const { ingredientID, quantity } = req.body;
+    const userID = req.user._id;
+
+    if (!ingredientID) {
+      return res.status(400).json({
+        success: false,
+        message: "Ingredient ID is required",
+      });
+    }
+
+    // Find the user
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Standardize the new quantity if provided
+    let standardizedNewQuantity = null;
+    if (quantity) {
+      standardizedNewQuantity = standardizeQuantity(quantity);
+      if (!standardizedNewQuantity && quantity.trim() !== "") {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid quantity format. Please use format like '2 cups' or '500 g'",
+        });
+      }
+    }
+
+    // Check if ingredient already exists in the grocery list
+    const existingItem = user.groceryList.find((item) =>
+      item.ingredientID.some((id) => id.toString() === ingredientID.toString())
+    );
+
+    if (existingItem) {
+      // Reset isPurchased if it was true
+      if (existingItem.isPurchased) {
+        existingItem.isPurchased = false;
+      }
+
+      // Handle quantity updates
+      if (existingItem.quantity && standardizedNewQuantity) {
+        const existingStandardized = standardizeQuantity(existingItem.quantity);
+
+        if (
+          existingStandardized &&
+          existingStandardized.unit === standardizedNewQuantity.unit
+        ) {
+          // Add quantities if units are compatible
+          const totalValue =
+            existingStandardized.value + standardizedNewQuantity.value;
+          existingItem.quantity = formatQuantity(
+            totalValue,
+            existingStandardized.unit
+          );
+        } else {
+          // If units are incompatible or can't parse, keep both quantities
+          existingItem.quantity = `${existingItem.quantity}, ${quantity}`;
+        }
+      } else if (standardizedNewQuantity) {
+        existingItem.quantity = formatQuantity(
+          standardizedNewQuantity.value,
+          standardizedNewQuantity.unit
+        );
+      }
+    } else {
+      // Add new item
+      user.groceryList.push({
+        ingredientID: [ingredientID],
+        quantity: standardizedNewQuantity
+          ? formatQuantity(
+              standardizedNewQuantity.value,
+              standardizedNewQuantity.unit
+            )
+          : quantity || "",
+        isPurchased: false,
+      });
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: existingItem
+        ? "Item updated in grocery list"
+        : "New item added to grocery list",
+      groceryList: user.groceryList,
+    });
+  } catch (error) {
+    console.error("Error in AddtoGroceryList:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding item to grocery list",
+      error: error.message,
+    });
+  }
+};
+
+export const togglePurchasedStatus = async (req, res) => {
+  try {
+    const { groceryItemId } = req.body;
+    const userID = req.user._id;
+
+    if (!groceryItemId) {
+      return res.status(400).json({
+        success: false,
+        message: "Grocery item ID is required",
+      });
+    }
+
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const groceryItem = user.groceryList.id(groceryItemId);
+    if (!groceryItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Grocery item not found",
+      });
+    }
+
+    groceryItem.isPurchased = !groceryItem.isPurchased;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Item marked as ${
+        groceryItem.isPurchased ? "purchased" : "not purchased"
+      }`,
+      // groceryList: user.groceryList,
+    });
+  } catch (error) {
+    console.error("Error in togglePurchasedStatus:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating purchase status",
+      error: error.message,
     });
   }
 };

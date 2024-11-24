@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { ref } from "firebase/storage";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -23,7 +24,9 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   groceryList: [
     {
-      ingredientName: { type: String, required: true },
+      ingredientID: [
+        { type: mongoose.Schema.Types.ObjectId, ref: "Ingredient" },
+      ],
       quantity: { type: String, default: "" },
       isPurchased: { type: Boolean, default: false },
     },
