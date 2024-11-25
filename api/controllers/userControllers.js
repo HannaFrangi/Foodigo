@@ -82,10 +82,18 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-export const AddtoFavorites = async (req, res) => {
+export const AddToFavorites = async (req, res) => {
   try {
-    const recipeId = req.params.id;
+    // Input validation
+    const { recipeId } = req.body;
+    if (!recipeId || typeof recipeId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Valid recipe ID is required",
+      });
+    }
 
+    // Validate recipe exists
     const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
       return res.status(404).json({
@@ -93,28 +101,53 @@ export const AddtoFavorites = async (req, res) => {
         message: "Recipe not found",
       });
     }
-    const user = await User.findById(req.user._id);
-    const favoriteIndex = user.recipeFavorites.indexOf(recipeId);
 
-    if (favoriteIndex !== -1) {
-      user.recipeFavorites.splice(favoriteIndex, 1);
-      await user.save();
-      return res.status(200).json({
-        success: true,
-        message: "Recipe removed from favorites successfully",
+    // Find and update user using findOneAndUpdate to ensure atomic operation
+    const result = await User.findOneAndUpdate(
+      { _id: req.user._id },
+      {
+        $addToSet: { recipeFavorites: recipeId }, // Adds recipeId if it's not already in the array
+      },
+      { new: true } // Returns the updated document
+    );
+
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
-    } else {
-      user.recipeFavorites.push(recipeId);
-      await user.save();
+    }
+
+    // Check if the recipe was actually added (wasn't already in favorites)
+    const wasAdded = result.recipeFavorites.includes(recipeId);
+
+    if (wasAdded) {
       return res.status(200).json({
         success: true,
         message: "Recipe added to favorites successfully",
+        isFavorited: true,
+      });
+    } else {
+      // If recipe was already in favorites, remove it
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+          $pull: { recipeFavorites: recipeId }, // Removes recipeId from the array
+        },
+        { new: true }
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: "Recipe removed from favorites successfully",
+        isFavorited: false,
       });
     }
   } catch (error) {
+    console.error("Error in AddToFavorites:", error);
     return res.status(500).json({
       success: false,
-      message: "Error updating favorites: " + error.message,
+      message: "Internal server error occurred while updating favorites",
     });
   }
 };

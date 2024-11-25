@@ -12,17 +12,14 @@ export const useAuthStore = create((set) => ({
       set({ loading: true });
       const { data } = await axiosInstance.get("/auth/me");
 
-      // Remove password field if it exists in the user object
       const user = { ...data.user };
       delete user.password;
 
       set({ authUser: user });
-
-      // Update localStorage with the password-free user object
       localStorage.setItem("user-info", JSON.stringify(user));
     } catch (error) {
       set({ authUser: null });
-      localStorage.removeItem("user-info"); // Clear localStorage if authentication fails
+      localStorage.removeItem("user-info");
       console.error(error?.response?.data?.message || "Authentication failed");
     } finally {
       set({ loading: false });
@@ -62,8 +59,6 @@ export const useAuthStore = create((set) => ({
     try {
       const { data } = await axiosInstance.post("/auth/login", loginData);
       const { user } = data;
-
-      // Security issue wateva dafaq
       delete user.password;
 
       set({ authUser: user });
@@ -79,7 +74,7 @@ export const useAuthStore = create((set) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       localStorage.removeItem("user-info");
-      Cookies.remove("jwt_token"); // Optionally remove JWT cookie on logout
+      Cookies.remove("jwt_token");
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -94,6 +89,76 @@ export const useAuthStore = create((set) => ({
       toast.error(
         error?.response?.data?.message || "Failed to send reset link"
       );
+    }
+  },
+
+  toggleFavorite: async (recipeId) => {
+    const { authUser } = useAuthStore.getState();
+    try {
+      set({ loading: true });
+
+      if (!authUser) {
+        const favorites = JSON.parse(Cookies.get("favorites") || "[]");
+        const isCurrentlyFavorited = favorites.includes(recipeId);
+
+        const updatedFavorites = isCurrentlyFavorited
+          ? favorites.filter((id) => id !== recipeId)
+          : [...favorites, recipeId];
+
+        Cookies.set("favorites", JSON.stringify(updatedFavorites), {
+          expires: 7,
+          sameSite: "Strict",
+        });
+
+        toast.success(
+          isCurrentlyFavorited
+            ? "Recipe removed from favorites"
+            : "Recipe added to favorites"
+        );
+        return;
+      }
+
+      const isCurrentlyFavorited = authUser.recipeFavorites?.includes(recipeId);
+      const endpoint = isCurrentlyFavorited
+        ? "/users/removefromfavorites"
+        : "/users/addtofavorites";
+
+      await axiosInstance.put(endpoint, { recipeId });
+
+      set((state) => ({
+        authUser: {
+          ...state.authUser,
+          recipeFavorites: isCurrentlyFavorited
+            ? state.authUser.recipeFavorites.filter((id) => id !== recipeId)
+            : [...(state.authUser.recipeFavorites || []), recipeId],
+        },
+      }));
+
+      toast.success(
+        isCurrentlyFavorited
+          ? "Recipe removed from favorites"
+          : "Recipe added to favorites"
+      );
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message || "Failed to update favorites"
+      );
+      console.error(error);
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  getFavorites: () => {
+    const { authUser } = useAuthStore.getState();
+    if (authUser) {
+      return authUser.recipeFavorites || [];
+    }
+    try {
+      return JSON.parse(Cookies.get("favorites") || "[]");
+    } catch (error) {
+      console.error("Error parsing favorites cookie:", error);
+      return [];
     }
   },
 }));

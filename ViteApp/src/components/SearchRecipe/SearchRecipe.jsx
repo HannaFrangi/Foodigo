@@ -75,6 +75,7 @@ const SearchCarouselleSection = () => {
                   className="relative z-10 block w-full pl-10 pr-3 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#606848] focus:ring-2 focus:ring-[#606848] focus:ring-opacity-50 transition-all duration-300"
                   placeholder='Try something like "salad" or "beef"'
                   value={searchQuery}
+                  // autoFocus={isSearchFocused}
                   disabled={Searching}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => setIsSearchFocused(true)}

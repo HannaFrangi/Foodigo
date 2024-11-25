@@ -13,13 +13,11 @@ const LatestRecipe = () => {
   const { LatestRecipe, recipes, fetchCategories, categories } =
     useRecipeStore();
 
-  // Reference for the title
   const titleRef = useRef(null);
 
   useEffect(() => {
     LatestRecipe();
     fetchCategories();
-    console.log(recipeData);
   }, [LatestRecipe, fetchCategories]);
 
   // GSAP text reveal animation
@@ -52,7 +50,6 @@ const LatestRecipe = () => {
     return 3;
   };
 
-  // Get recipes data from store and enhance with category names
   const recipeData =
     recipes?.data?.map((recipe) => {
       const categoryNames = recipe.categories

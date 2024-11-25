@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { protectRoute } from "../middleware/auth.js";
 import {
-  AddtoFavorites,
+  AddToFavorites,
   AddtoGroceryList,
   togglePurchasedStatus,
   updateProfile,
@@ -30,7 +30,7 @@ router.put(
   updateProfile
 );
 
-router.put("/addtofavorites/:id", protectRoute, AddtoFavorites);
+router.put("/addtofavorites/", protectRoute, AddToFavorites);
 
 router.post("/addToGroceryList/", protectRoute, AddtoGroceryList);
 router.patch("/togglepurchased", protectRoute, togglePurchasedStatus);
