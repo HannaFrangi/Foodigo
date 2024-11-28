@@ -290,6 +290,8 @@ const PageLayout = ({ children, authUser }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
   const isResetPage = location.pathname.startsWith("/reset-password");
+
+  const isVerificationPage = location.pathname.startsWith("/verify");
   const mainContentRef = useRef(null);
   const { logout } = useAuthStore();
 
@@ -317,7 +319,7 @@ const PageLayout = ({ children, authUser }) => {
       transition={{ duration: 0.5 }}
       className="flex flex-col min-h-screen"
     >
-      {!isAuthPage && !isResetPage && (
+      {!isAuthPage && !isResetPage && !isVerificationPage && (
         <Navbar user={authUser} handleLogout={handleLogout} />
       )}
       <main

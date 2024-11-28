@@ -1,6 +1,6 @@
 import User from "../models/Users.js";
 import crypto from "crypto";
-import bcrypt from "bcryptjs";
+//import bcrypt from "bcryptjs";
 import PasswordResetToken from "../models/PasswordResetToken.js";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
@@ -217,7 +217,7 @@ export const logout = async (req, res) => {
 
 export const CheckerificationEmail = async (req, res) => {
   try {
-    const { token } = req.query;
+    const { token } = req.body;
 
     if (!token) {
       return res.status(400).json({
