@@ -1,5 +1,14 @@
-import { useState, useRef } from "react";
-import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft, X, Send } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Eye,
+  EyeOff,
+  LogIn,
+  UserPlus,
+  ArrowLeft,
+  X,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import { gsap } from "gsap";
 import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
@@ -22,6 +31,7 @@ const AuthPage = () => {
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const buttonRef = useRef(null);
+  const logoRef = useRef(null);
   const formRef = useRef(null);
   const backButtonRef = useRef(null);
   const modalRef = useRef(null);
@@ -44,14 +54,26 @@ const AuthPage = () => {
   const openForgotPassword = () => {
     setShowForgotPassword(true);
     gsap.set(modalRef.current, { display: "flex" });
-    gsap.to(modalRef.current, {
-      opacity: 1,
-      duration: 0.3,
-    });
+    gsap.fromTo(
+      modalRef.current,
+      { opacity: 0, scale: 0.5 },
+      {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out",
+      }
+    );
     gsap.fromTo(
       modalContentRef.current,
-      { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.3, delay: 0.1 }
+      { y: 50, opacity: 0, rotation: -5 },
+      {
+        y: 0,
+        opacity: 1,
+        rotation: 0,
+        duration: 0.4,
+        ease: "power2.out",
+      }
     );
   };
 
@@ -60,10 +82,11 @@ const AuthPage = () => {
       y: 20,
       opacity: 0,
       duration: 0.2,
+      ease: "power2.in",
     });
     gsap.to(modalRef.current, {
       opacity: 0,
-      duration: 0.2,
+      duration: 0.3,
       onComplete: () => {
         gsap.set(modalRef.current, { display: "none" });
         setShowForgotPassword(false);
@@ -252,9 +275,13 @@ const AuthPage = () => {
 
       <div className="max-w-md w-full space-y-8 relative">
         {/* Decorative food-themed elements */}
-        <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full">
-          <div>
+        <div
+          ref={logoRef}
+          className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
+        >
+          <div className="relative">
             <Avatar src="/src/assets/logo.png" size={150} />
+            <Sparkles className="absolute -top-2 -right-2 text-olive animate-pulse" />
           </div>
         </div>
 

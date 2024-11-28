@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SearchRecipe from "../components/SearchRecipe/SearchRecipe";
-import { Carouselle } from "./Home/Carouselle";
+// import { Carouselle } from "./Home/Carouselle";
 import LatestRecipe from "../components/LatestRecipe/LatestRecipe";
 
 const Footer = () => {

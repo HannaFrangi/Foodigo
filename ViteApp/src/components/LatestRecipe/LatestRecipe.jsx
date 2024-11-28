@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import RecipeCard from "../RecipeCard/RecipeCard";
 import RecipeCardSkeleton from "../RecipeCard/RecipeCardSkeleton";
 import { useRecipeStore } from "/src/store/useRecipeStore";
@@ -10,10 +10,15 @@ const LatestRecipe = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 
+  // Touch interaction states
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
   const { LatestRecipe, recipes, fetchCategories, categories } =
     useRecipeStore();
 
   const titleRef = useRef(null);
+  const sliderRef = useRef(null);
 
   useEffect(() => {
     LatestRecipe();
@@ -68,6 +73,36 @@ const LatestRecipe = () => {
   const autoPlay = true;
   const autoPlayInterval = 5000;
 
+  // Touch event handlers for mobile scrolling
+  const handleTouchStart = (e) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isSignificantSwipe = Math.abs(distance) > 50;
+
+    if (isSignificantSwipe) {
+      if (distance > 0) {
+        // Swiped left, go to next page
+        handleNext();
+      } else {
+        // Swiped right, go to previous page
+        handlePrev();
+      }
+    }
+
+    // Reset touch states
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
   useEffect(() => {
     let timer;
     if (autoPlay && !isAnimating && recipeData.length > 0) {
@@ -79,10 +114,10 @@ const LatestRecipe = () => {
   }, [currentPage, isAnimating, recipeData.length]);
 
   const handleNext = () => {
-    if (totalPages <= 1 || isAnimating) return; // Prevent if there's only one page or if already animating
+    if (totalPages <= 1 || isAnimating) return;
     setIsAnimating(true);
     setCurrentPage((prev) => (prev + 1) % totalPages);
-    setTimeout(() => setIsAnimating(false), 500); // End animation after 500ms
+    setTimeout(() => setIsAnimating(false), 500);
   };
 
   const handlePrev = () => {
@@ -191,7 +226,13 @@ const LatestRecipe = () => {
           </div>
         </div>
 
-        <div className="relative px-0 md:px-4">
+        <div
+          ref={sliderRef}
+          className="relative px-0 md:px-4"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="overflow-hidden">
             <div
               className="flex transition-transform duration-500 ease-out"

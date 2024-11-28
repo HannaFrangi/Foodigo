@@ -29,7 +29,8 @@ const PORT = process.env.PORT || 5001;
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow requests from Vite's development server
+    origin: "http://192.168.1.4:5173",
+    // origin: "http://localhost:5173",
     credentials: true, // Allow cookies to be sent with requests
   })
 );

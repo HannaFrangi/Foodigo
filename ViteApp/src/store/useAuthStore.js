@@ -119,9 +119,7 @@ export const useAuthStore = create((set) => ({
       }
 
       const isCurrentlyFavorited = authUser.recipeFavorites?.includes(recipeId);
-      const endpoint = isCurrentlyFavorited
-        ? "/users/removefromfavorites"
-        : "/users/addtofavorites";
+      const endpoint = "/users/addtofavorites";
 
       await axiosInstance.put(endpoint, { recipeId });
 

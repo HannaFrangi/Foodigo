@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Heart, Search } from "lucide-react";
+import { Heart, Search, Filter, X } from "lucide-react";
 import { RecipeCard } from "../../components/RecipeCard/RecipeCard";
 import { useAuthStore } from "../../store/useAuthStore";
 import { axiosInstance } from "../../lib/axios";
@@ -8,14 +8,33 @@ import Cookies from "js-cookie";
 
 const Favorites = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { authUser, getFavorites } = useAuthStore();
   const isLoggedIn = Boolean(authUser);
 
-  // First, fetch favorite IDs from cookies or auth store
+  useEffect(() => {
+    try {
+      const categoriesData = JSON.parse(
+        localStorage.getItem("categories") ||
+          "[" +
+            document
+              .querySelector('meta[name="categories"]')
+              .getAttribute("content") +
+            "]"
+      );
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error parsing categories:", error);
+    }
+  }, []);
+
+  // Fetch favorite IDs
   useEffect(() => {
     const fetchFavoriteIds = async () => {
       try {
@@ -38,7 +57,7 @@ const Favorites = () => {
     fetchFavoriteIds();
   }, [isLoggedIn, getFavorites]);
 
-  // Then, fetch recipe details for each favorite ID
+  // Fetch recipe details
   useEffect(() => {
     const fetchRecipeDetails = async () => {
       if (!favorites || favorites.length === 0) {
@@ -76,11 +95,34 @@ const Favorites = () => {
     fetchRecipeDetails();
   }, [favorites]);
 
-  // Filter recipes based on the search query
-  const filteredRecipes = recipes.filter((recipe) =>
-    recipe.data.recipeTitle.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Handle category selection
+  const handleCategorySelect = (categoryId) => {
+    const newSelectedCategories = selectedCategories.includes(categoryId)
+      ? selectedCategories.filter((catId) => catId !== categoryId)
+      : [...selectedCategories, categoryId];
 
+    setSelectedCategories(newSelectedCategories);
+  };
+
+  // Clear all selected categories
+  const clearCategories = () => {
+    setSelectedCategories([]);
+    localStorage.removeItem("selectedCategories");
+  };
+
+  const filteredRecipes = recipes.filter((recipe) => {
+    const matchesSearch = recipe.data.recipeTitle
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    const matchesCategories =
+      selectedCategories.length === 0 ||
+      recipe.data.categories.some((categoryId) =>
+        selectedCategories.includes(categoryId)
+      );
+
+    return matchesSearch && matchesCategories;
+  });
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
@@ -104,11 +146,12 @@ const Favorites = () => {
         </div>
       </div>
 
-      {/* Search Section */}
+      {/* Search and Category Filter Section */}
       <div className="border-b bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="py-4">
-            <div className="relative flex-1 max-w-md mx-auto">
+          <div className="py-4 flex items-center space-x-4">
+            {/* Search Input */}
+            <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
@@ -118,12 +161,79 @@ const Favorites = () => {
                 className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d6544] focus:border-transparent"
               />
             </div>
+
+            {/* Category Dropdown */}
+            <div className="relative z-50">
+              <div
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-48 py-2 px-4 border rounded-lg flex items-center justify-between cursor-pointer transition"
+              >
+                <div className="flex items-center">
+                  <Filter className="mr-2 w-5 h-5 text-gray-500" />
+                  <span className="text-sm">
+                    {selectedCategories.length > 0
+                      ? `${selectedCategories.length} categor${
+                          selectedCategories.length === 1 ? "y" : "ies"
+                        }`
+                      : "All Categories"}
+                  </span>
+                </div>
+                {selectedCategories.length > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearCategories();
+                    }}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              {/* Dropdown Menu */}
+              {isDropdownOpen && (
+                <div
+                  className="absolute top-full right-0 w-48 border rounded-lg bg-white shadow-lg mt-1 max-h-60 overflow-y-auto z-20"
+                  role="menu"
+                >
+                  {categories.map((category) => (
+                    <div
+                      key={category._id}
+                      onClick={() => handleCategorySelect(category._id)}
+                      className={`px-4 py-2 cursor-pointer  flex items-center text-sm ${
+                        selectedCategories.includes(category._id)
+                          ? "bg-[#5d6544] text-white"
+                          : ""
+                      }`}
+                      role="menuitem"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(category._id)}
+                        readOnly
+                        className="mr-2 form-checkbox h-4 w-4 text-[#5d6544] rounded"
+                      />
+                      {category.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Click Outside Handler */}
+              {isDropdownOpen && (
+                <div
+                  onClick={() => setIsDropdownOpen(false)}
+                  className="fixed inset-0 z-10 bg-transparent"
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 z-0">
         {isLoading ? (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#5d6544] mx-auto"></div>
@@ -135,20 +245,34 @@ const Favorites = () => {
           <div className="text-center py-16">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-gray-600 mb-2">
-              No favorites yet
+              {selectedCategories.length > 0
+                ? `No favorites in selected categor${
+                    selectedCategories.length === 1 ? "y" : "ies"
+                  }`
+                : "No favorites yet"}
             </h2>
             <p className="text-gray-500">
-              Start adding your favorite recipes to build your collection!
+              {selectedCategories.length > 0
+                ? "Try removing some category filters"
+                : "Start adding your favorite recipes to build your collection!"}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 z-0">
             {filteredRecipes.map((recipe) => (
-              <RecipeCard key={recipe._id} recipe={recipe.data} />
+              <RecipeCard key={recipe.data._id} recipe={recipe.data} />
             ))}
           </div>
         )}
       </div>
+
+      {/* Click outside handler for dropdown */}
+      {isDropdownOpen && (
+        <div
+          onClick={() => setIsDropdownOpen(false)}
+          className="fixed inset-0 z-0"
+        />
+      )}
     </div>
   );
 };

@@ -134,7 +134,6 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   let { email, password } = req.body;
-  console.log(password);
   try {
     if (!email || !password) {
       return res.status(400).json({
@@ -144,7 +143,6 @@ export const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select("+password");
-    console.log(user);
     if (!user) {
       return res.status(401).json({
         success: false,

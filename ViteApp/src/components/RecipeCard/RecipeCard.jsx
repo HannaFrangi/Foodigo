@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const getTagColors = (categoryName) => {
   switch (categoryName?.toLowerCase()) {
@@ -29,6 +30,7 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [categoryNames, setCategoryNames] = useState([]);
   const { toggleFavorite, getFavorites, authUser } = useAuthStore();
+  const navigate = useNavigate();
 
   // Initialize liked state and category names
   useEffect(() => {
@@ -84,21 +86,34 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
       bg-white rounded-2xl sm:rounded-3xl overflow-hidden
       transition-all duration-500 ease-out cursor-pointer relative
       active:scale-98 sm:hover:-translate-y-2 sm:hover:shadow-xl
-      touch-manipulation select-none group"
+      touch-manipulation select-none group z-0"
       style={{
         animationDelay: `${index * 100}ms`,
         WebkitTapHighlightColor: "transparent",
       }}
+      onClick={() => navigate(`/recipe/${recipe._id}`)}
     >
       {/* Shine effect overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 duration-700 hidden sm:block">
+      {/* Shine effect overlay */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] 
-          bg-gradient-to-r from-transparent via-white/20 to-transparent duration-1000 
-          transform transition-transform"
+          className="absolute inset-0 
+      bg-gradient-to-r 
+      from-transparent 
+      via-white/20 
+      to-transparent 
+      opacity-0 
+      group-hover:opacity-100 
+      transition-opacity 
+      duration-500
+      shine-effect"
+          style={{
+            backgroundSize: "200% 100%",
+            backgroundPosition: "-100% 0",
+            transition: "opacity 0.5s, background-position 1s ease-in-out",
+          }}
         />
       </div>
-
       {/* Image container */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/0 to-black/20 z-10" />
