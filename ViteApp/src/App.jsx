@@ -13,7 +13,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useRecipeStore } from "./store/useRecipeStore";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
-
+import RecipeDetails from "./pages/Recipe/RecipeDetails";
 function App() {
   const lenis = useLenis(({ scroll }) => {
     // called every scroll
@@ -58,6 +58,7 @@ function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <Route path="/recipe/:id" element={<RecipeDetails />} />
             <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>

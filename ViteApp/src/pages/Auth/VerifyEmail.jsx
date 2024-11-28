@@ -13,7 +13,7 @@ const EmailVerification = () => {
   const { token } = useParams();
 
   const formRef = useRef(null);
-  const buttonRef = useRef(null);
+  //const buttonRef = useRef(null);
   const logoRef = useRef(null);
 
   useEffect(() => {
