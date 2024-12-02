@@ -38,6 +38,7 @@ export const useAuthStore = create((set) => ({
       set({ authUser: updatedUser.user });
       toast.success("Profile updated successfully");
     } catch (error) {
+      console.log(error?.response?.data?.message);
       toast.error(error?.response?.data?.message || "Something went wrong");
     } finally {
       set({ loading: false });
@@ -51,6 +52,7 @@ export const useAuthStore = create((set) => ({
       localStorage.setItem("user-info", JSON.stringify(data.user));
       toast.success("Signup successful! Welcome.");
     } catch (error) {
+      console.error(error);
       toast.error(error?.response?.data?.message || "Signup failed");
     }
   },

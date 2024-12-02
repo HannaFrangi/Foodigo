@@ -11,14 +11,13 @@ import {
   PlusCircle,
   Menu as MenuIcon,
   X,
-  Search,
-  Bell,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "/src/assets/logo.png";
 import { useAuthStore } from "../store/useAuthStore";
+import ProfileModal from "../pages/Profile/ProfileModal";
 
-const UserAvatar = ({ user, handleLogout }) => {
+const UserAvatar = ({ user, handleLogout, onProfileEdit }) => {
   if (!user) {
     return (
       <Link
@@ -44,13 +43,13 @@ const UserAvatar = ({ user, handleLogout }) => {
     {
       key: "profile",
       label: (
-        <Link
-          to="/profile"
-          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md transition-colors"
+        <div
+          onClick={onProfileEdit}
+          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
         >
           <Settings className="h-4 w-4" />
           <span>Profile Settings</span>
-        </Link>
+        </div>
       ),
     },
     {
@@ -119,6 +118,7 @@ const UserAvatar = ({ user, handleLogout }) => {
     </Dropdown>
   );
 };
+
 const NavLink = ({ to, icon: Icon, label, isActive }) => (
   <Link
     to={to}
@@ -146,6 +146,7 @@ const NavLink = ({ to, icon: Icon, label, isActive }) => (
 const Navbar = ({ user, handleLogout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
   const location = useLocation();
   const navRef = useRef(null);
   const searchInputRef = useRef(null);
@@ -189,44 +190,103 @@ const Navbar = ({ user, handleLogout }) => {
     }, 100);
   };
 
-  return (
-    <nav
-      ref={navRef}
-      className="sticky top-0 z-50 bg-white transition-all duration-300"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center">
-            <Link
-              to="/"
-              className="flex items-center"
-              aria-label="Foodigo Home"
-            >
-              <motion.div
-                whileHover={{ rotate: 360 }}
-                transition={{ duration: 0.6 }}
-              >
-                <Avatar
-                  size={80}
-                  style={{ backgroundColor: "transparent" }}
-                  className="transition-transform"
-                >
-                  <img src={logo} alt="Foodigo" />
-                </Avatar>
-              </motion.div>
-              <span className="ml-2 text-xl font-bold text-[#5d6544]">
-                FOODIGO
-              </span>
-            </Link>
-          </div>
+  const handleProfileEdit = () => {
+    setIsProfileModalVisible(true);
+  };
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+  const handleProfileModalCancel = () => {
+    setIsProfileModalVisible(false);
+  };
+
+  return (
+    <>
+      <nav
+        ref={navRef}
+        className="sticky top-0 z-50 bg-white transition-all duration-300"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <Link
+                to="/"
+                className="flex items-center"
+                aria-label="Foodigo Home"
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Avatar
+                    size={80}
+                    style={{ backgroundColor: "transparent" }}
+                    className="transition-transform"
+                  >
+                    <img src={logo} alt="Foodigo" />
+                  </Avatar>
+                </motion.div>
+                <span className="ml-2 text-xl font-bold text-[#5d6544]">
+                  FOODIGO
+                </span>
+              </Link>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-center space-x-2"
+              >
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    icon={item.icon}
+                    label={item.label}
+                    isActive={location.pathname === item.path}
+                  />
+                ))}
+              </motion.div>
+
+              <div>
+                <UserAvatar
+                  user={user}
+                  handleLogout={handleLogout}
+                  onProfileEdit={handleProfileEdit}
+                />
+              </div>
+            </div>
+
+            {/* Mobile Navigation */}
+            <div className="md:hidden flex items-center space-x-2">
+              <UserAvatar
+                user={user}
+                handleLogout={handleLogout}
+                onProfileEdit={handleProfileEdit}
+              />
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
+              >
+                {isMenuOpen ? (
+                  <X className="h-5 w-5 text-gray-800" />
+                ) : (
+                  <MenuIcon className="h-5 w-5 text-gray-800" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMenuOpen && (
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex items-center space-x-2"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-white"
             >
               {navItems.map((item) => (
                 <NavLink
@@ -238,51 +298,16 @@ const Navbar = ({ user, handleLogout }) => {
                 />
               ))}
             </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
 
-            <div>
-              <UserAvatar user={user} handleLogout={handleLogout} />
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center space-x-2">
-            <UserAvatar user={user} handleLogout={handleLogout} />
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
-            >
-              {isMenuOpen ? (
-                <X className="h-5 w-5 text-gray-800" />
-              ) : (
-                <MenuIcon className="h-5 w-5 text-gray-800" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-white"
-          >
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                icon={item.icon}
-                label={item.label}
-                isActive={location.pathname === item.path}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+      {/* Profile Modal */}
+      <ProfileModal
+        visible={isProfileModalVisible}
+        onCancel={handleProfileModalCancel}
+      />
+    </>
   );
 };
 
@@ -290,7 +315,6 @@ const PageLayout = ({ children, authUser }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
   const isResetPage = location.pathname.startsWith("/reset-password");
-
   const isVerificationPage = location.pathname.startsWith("/verify");
   const mainContentRef = useRef(null);
   const { logout } = useAuthStore();

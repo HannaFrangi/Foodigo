@@ -13,41 +13,54 @@ import { storage } from "../config/firebase.js";
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name } = req.body;
     const updateFields = {};
 
     if (name) updateFields.name = name;
-    if (email) updateFields.email = email;
 
     if (req.file) {
       const user = await User.findById(req.user._id);
+
       if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
       }
 
+      // Delete existing profile picture if one exists
       if (user.ProfilePicURL) {
         const oldPicRef = ref(storage, user.ProfilePicURL);
         await deleteObject(oldPicRef);
       }
 
+      // Generate a consistent filename using user's MongoDB _id
+      const fileExtension = req.file.originalname.split(".").pop();
+      const fileName = `${req.user._id}.${fileExtension}`;
+
       const metadata = {
         contentType: req.file.mimetype,
+        customMetadata: {
+          userId: req.user._id.toString(),
+        },
       };
-      const fileName = `${req.user._id}-${Date.now()}-${req.file.originalname}`;
+
+      // Create storage reference with user ID as filename
       const storageRef = ref(storage, `profilePics/${fileName}`);
-      const fileBuffer = req.file.buffer;
 
-      const snapshot = await uploadBytes(storageRef, fileBuffer, metadata);
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
 
+      // Get download URL
       const downloadURL = await getDownloadURL(
         ref(storage, snapshot.metadata.fullPath)
       );
 
+      // Update fields with new profile picture URL
       updateFields.ProfilePicURL = downloadURL;
     }
 
+    // Update user in database
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { $set: updateFields },
@@ -61,14 +74,14 @@ export const updateProfile = async (req, res) => {
       });
     }
 
+    // Return updated user info
     res.json({
       success: true,
       message: "Profile updated successfully",
       user: {
-        _id: updatedUser._id,
+        id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
-        bio: updatedUser.bio,
         ProfilePicURL: updatedUser.ProfilePicURL,
       },
     });

@@ -321,7 +321,7 @@ export const forgotPassword = async (req, res) => {
   const resetTokenEntry = new PasswordResetToken({
     userId: user._id,
     token: resetToken,
-    expiresAt: Date.now() + 3600000, // Token expires in 1 hour
+    expiresAt: Date.now() + 3600000,
   });
 
   await resetTokenEntry.save();

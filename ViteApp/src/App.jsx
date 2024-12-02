@@ -6,7 +6,6 @@ import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
 import PageLayout from "./layout/PageLayout";
 import Homepage from "./pages/Homepage";
-import ProfilePage from "./pages/Profile/ProfilePage";
 import Error from "./pages/404/NotFound";
 import Favorites from "./pages/Favorites/Favorites";
 import { useAuthStore } from "./store/useAuthStore";
@@ -54,7 +53,6 @@ function App() {
               element={authUser ? <Navigate to="/" /> : <AuthPage />}
             />
             <Route path="/recipe" element={<RecipePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
