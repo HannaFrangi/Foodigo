@@ -21,3 +21,38 @@ export const getAllIngredientNames = async (req, res) => {
     });
   }
 };
+
+export const getIngredientNameByid = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate that an ID is provided
+    if (!id) {
+      return res.status(400).json({
+        message: "Ingredient ID is required",
+      });
+    }
+
+    // Find the ingredient by ID
+    const ingredient = await Ingredient.findById(id).select("name");
+
+    // Check if ingredient exists
+    if (!ingredient) {
+      return res.status(404).json({
+        message: "Ingredient not found",
+      });
+    }
+
+    // Return the ingredient name
+    res.status(200).json({
+      name: ingredient.name,
+    });
+  } catch (error) {
+    // Handle any unexpected errors
+    console.error("Error retrieving ingredient:", error);
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

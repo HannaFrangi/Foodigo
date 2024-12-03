@@ -6,7 +6,6 @@ const useGetRecipeById = (id) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [Recipe, setRecipe] = useState({});
-  console.log(id);
 
   const fetchRecipeById = async () => {
     if (!id) {
@@ -42,7 +41,6 @@ const useGetRecipeById = (id) => {
   useEffect(() => {
     if (id) {
       fetchRecipeById();
-      console.log(Recipe);
     }
   }, [id]);
   return { Recipe, loading, error, fetchRecipeById };
