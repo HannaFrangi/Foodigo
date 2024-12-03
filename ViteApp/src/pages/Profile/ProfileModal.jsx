@@ -10,6 +10,8 @@ import {
 import { useAuthStore } from "/src/store/useAuthStore";
 import useUpdateProfile from "/src/hooks/useUpdateProfile";
 import { ChefHat } from "lucide-react";
+import toast from "react-hot-toast";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const ProfileModal = ({ visible, onCancel }) => {
   const { authUser } = useAuthStore();
@@ -20,14 +22,14 @@ const ProfileModal = ({ visible, onCancel }) => {
   const handleFinish = async (values) => {
     try {
       const result = await updateProfile(uploadedFile, values.username);
-      if (success) {
-        message.success("Profile updated successfully!", 2);
-        onCancel(); // Close the modal on successful update
+      if (result) {
+        toast.success("Profile updated successfully!");
+        onCancel();
       } else {
         throw new Error(result || "Unknown error");
       }
     } catch (err) {
-      message.error(`Error: ${err.message}`);
+      toast.error(`Error: ${err.message}`);
     }
   };
 
@@ -36,12 +38,12 @@ const ProfileModal = ({ visible, onCancel }) => {
       const isValidType =
         file.type === "image/jpeg" || file.type === "image/png";
       if (!isValidType) {
-        message.error("You can only upload JPG/PNG files!");
+        toast.error("You can only upload JPG/PNG files!");
         return false;
       }
       const isLessThan2MB = file.size / 1024 / 1024 < 2;
       if (!isLessThan2MB) {
-        message.error("Image must be smaller than 2MB!");
+        toast.error("Image must be smaller than 2MB!");
         return false;
       }
       setUploadedFile(file);
@@ -138,25 +140,11 @@ const ProfileModal = ({ visible, onCancel }) => {
           >
             {loading ? (
               <span className="flex items-center">
-                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
+                <ChefHatSpinner size={32} />
                 Updating...
               </span>
             ) : (
-              "Update Profile"
+              <span className="flex items-center">Update Profile</span>
             )}
           </button>
         </Form.Item>

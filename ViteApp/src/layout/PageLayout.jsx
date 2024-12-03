@@ -213,14 +213,10 @@ const Navbar = ({ user, handleLogout }) => {
                 aria-label="Foodigo Home"
               >
                 <motion.div
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
+                // whileHover={{ rotate: 360 }}
+                // transition={{ duration: 0.6 }}
                 >
-                  <Avatar
-                    size={80}
-                    style={{ backgroundColor: "transparent" }}
-                    className="transition-transform"
-                  >
+                  <Avatar size={80} style={{ backgroundColor: "transparent" }}>
                     <img src={logo} alt="Foodigo" />
                   </Avatar>
                 </motion.div>
