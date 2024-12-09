@@ -1,24 +1,87 @@
-import { Spin } from "antd";
-import useGetRecipeById from "./../../hooks/useGetRecipebyId";
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  Chip,
+  Link,
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@nextui-org/react";
+import { Steps } from "antd";
+import { ChefHat, BookOpen, Video, Leaf, ArrowLeft, Plus } from "lucide-react";
+import useGetRecipeById from "/src/hooks/useGetRecipebyId";
+import useGetIngredientNamesByIds from "/src/hooks/useGetIngredientNameById";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
+import toast from "react-hot-toast";
 
 const RecipeDetails = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
-  const { Recipe, loading, error } = useGetRecipeById(id);
+  const [processedIngredients, setProcessedIngredients] = useState([]);
+  const [openPopoverId, setOpenPopoverId] = useState(null); // Track which popover is open
 
-  if (loading) {
+  const handleAddToGroceryList = (ingredient) => {
+    // Add the ingredient to the grocery list (your actual logic here)
+    toast.success(`Added ${ingredient.fullName} to the grocery list!`);
+
+    // Close the popover after adding
+    setOpenPopoverId(null);
+  };
+
+  const {
+    Recipe,
+    loading: recipeLoading,
+    error: recipeError,
+  } = useGetRecipeById(id);
+
+  const {
+    ingredientNames,
+    loading: ingredientsLoading,
+    error: ingredientsError,
+    fetchIngredientNamesByIds,
+  } = useGetIngredientNamesByIds();
+
+  useEffect(() => {
+    if (Recipe?.data?.recipeIngredients) {
+      const ingredientIds = Recipe.data.recipeIngredients.map(
+        (ingredient) => ingredient.ingredientName
+      );
+      if (ingredientIds.length > 0) {
+        fetchIngredientNamesByIds(ingredientIds);
+      }
+    }
+  }, [Recipe, fetchIngredientNamesByIds]);
+
+  useEffect(() => {
+    if (
+      Recipe?.data?.recipeIngredients &&
+      Object.keys(ingredientNames).length > 0
+    ) {
+      const processed = Recipe.data.recipeIngredients.map((ingredient) => ({
+        ...ingredient,
+        fullName: ingredientNames[ingredient.ingredientName] || "Unknown",
+      }));
+      setProcessedIngredients(processed);
+    }
+  }, [Recipe, ingredientNames]);
+
+  if (recipeLoading || ingredientsLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <Spin />
+      <div className="flex justify-center items-center h-screen bg-transparent z-auto">
+        <ChefHatSpinner />
       </div>
     );
   }
 
-  if (error) {
+  if (recipeError || ingredientsError) {
     return (
-      <div className="text-red-600 text-center mt-20 text-lg">
-        Error: {error.message || "Something went wrong."}
+      <div className="text-danger text-center mt-20 text-lg">
+        Error:{" "}
+        {recipeError?.message || ingredientsError || "Something went wrong."}
       </div>
     );
   }
@@ -33,93 +96,155 @@ const RecipeDetails = () => {
 
   const {
     recipeTitle,
-    recipeIngredients,
     recipeImage,
     recipeVideoTutorial,
     recipeInstructions,
     categories,
   } = Recipe.data;
 
+  const recipeSteps = recipeInstructions
+    .split(".")
+    .filter((step) => step.trim())
+    .map((step, index) => ({
+      title: `Step ${index + 1}`,
+      description: step.trim() + ".",
+    }));
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-10">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Recipe Image */}
-        <img
-          src={recipeImage}
-          alt={recipeTitle}
-          className="w-full h-80 object-cover"
-        />
-
-        {/* Recipe Content */}
-        <div className="p-8">
-          {/* Title */}
-          <h1 className="text-4xl font-bold text-gray-800 mb-4 border-b pb-2">
-            {recipeTitle}
-          </h1>
-
-          {/* Ingredients */}
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-              Ingredients
+    <div className="container mx-auto px-4 py-8 min-h-screen">
+      <Card className="max-w-4xl mx-auto shadow-2xl relative flex flex-col md:flex-row">
+        <div className="w-full md:w-1/3 md:border-r border-gray-200">
+          <Button
+            isIconOnly
+            color="primary"
+            className="absolute top-4 left-4 z-30 bg-gradient-to-r from-olive to-olive hover:from-olive hover:to-olive shadow-md hover:shadow-xl rounded-full p-3 transition-all duration-300"
+            onClick={handleGoBack}
+          >
+            <ArrowLeft className="w-6 h-6 text-white" />
+          </Button>
+          <CardHeader className="relative">
+            <img
+              src={recipeImage}
+              alt={recipeTitle}
+              className="w-full h-[300px] md:h-[400px] object-cover"
+            />
+          </CardHeader>
+          <div className="p-4">
+            <h2 className="text-2xl font-semibold text-olive mb-4 flex items-center underline">
+              <ChefHat className="mr-3 text-black" /> Ingredients:
             </h2>
-            <ul className="space-y-2">
-              {recipeIngredients.map((ingredient) => (
-                <li
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-3">
+              {processedIngredients.map((ingredient) => (
+                <Popover
                   key={ingredient._id}
-                  className="text-gray-600 text-lg flex items-center"
+                  placement="bottom"
+                  showArrow={true}
+                  backdrop="blur"
+                  isOpen={openPopoverId === ingredient._id} // Only open the popover for the selected ingredient
+                  onOpenChange={(open) =>
+                    setOpenPopoverId(open ? ingredient._id : null)
+                  }
                 >
-                  <span className="font-medium">{ingredient.quantity}</span>
-                  <span className="ml-2">- {ingredient.ingredientName}</span>
-                </li>
+                  <PopoverTrigger>
+                    <Button
+                      variant="light"
+                      className="justify-start text-black gap-2 w-full"
+                      onClick={() => setOpenPopoverId(ingredient._id)} // Open the popover for the clicked ingredient
+                    >
+                      <Plus className="w-4 h-4 text-olive cursor-pointer" />
+                      <span className="font-medium mr-2">
+                        {ingredient.quantity}
+                      </span>
+                      {ingredient.fullName}
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent>
+                    <div className="px-1 py-2">
+                      <div className="text-small font-bold">
+                        Do you want to add {ingredient.fullName} to your grocery
+                        list?
+                      </div>
+                      <div className="flex gap-4 mt-2">
+                        <Button
+                          variant="solid"
+                          color="success"
+                          onClick={() => handleAddToGroceryList(ingredient)} // Pass the ingredient to handleAddToGroceryList
+                        >
+                          Yes
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          onClick={() => setOpenPopoverId(null)} // Close the popover when No is clicked
+                        >
+                          No
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               ))}
-            </ul>
-          </section>
-
-          {/* Instructions */}
-          <section className="mt-6">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-              Instructions
+            </div>
+          </div>
+        </div>
+        <CardBody className="w-full md:w-2/3 space-y-6 p-4 md:p-8">
+          <section className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-olive flex justify-center items-center">
+              <Leaf className="mr-3 text-olive" />
+              {recipeTitle}
             </h2>
-            <p className="text-gray-600 leading-relaxed">
-              {recipeInstructions}
-            </p>
           </section>
-
-          {/* Video Tutorial */}
+          <section>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center">
+              <BookOpen className="mr-3 text-olive" /> Instructions
+            </h2>
+            <Steps
+              direction="vertical"
+              current={-1}
+              type="process"
+              items={recipeSteps}
+              className="pl-5"
+              styles={{
+                title: { color: "black" },
+                description: { color: "black" },
+              }}
+              responsive
+            />
+          </section>
           {recipeVideoTutorial && (
-            <section className="mt-6">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-                Video Tutorial
+            <section>
+              <h2 className="text-2xl font-semibold text-olive mb-4 flex items-center">
+                <Video className="mr-3 text-olive" /> Video Tutorial
               </h2>
-              <a
+              <Link
                 href={recipeVideoTutorial}
                 target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-2 text-blue-600 hover:text-blue-800 transition"
+                underline="hover"
+                className="text-lg flex items-center text-olive"
               >
-                Watch the Tutorial
-              </a>
+                Watch Tutorial
+              </Link>
             </section>
           )}
-
-          {/* Categories */}
-          <section className="mt-6">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+          <section>
+            <h2 className="text-2xl font-semibold text-olive mb-4">
               Categories
             </h2>
-            <div className="flex flex-wrap gap-3 mt-2">
-              {categories.map((categoryId, index) => (
-                <span
-                  key={index}
-                  className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg shadow text-sm font-medium"
-                >
-                  {categoryId}
-                </span>
+            <div className="flex flex-wrap gap-3">
+              {categories.map((category, index) => (
+                <Chip key={index} color="success" variant="solid">
+                  {category}
+                </Chip>
               ))}
             </div>
           </section>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </div>
   );
 };

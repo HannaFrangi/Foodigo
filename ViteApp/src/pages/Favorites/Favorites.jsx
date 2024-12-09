@@ -5,6 +5,7 @@ import { useAuthStore } from "../../store/useAuthStore";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const Favorites = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -236,8 +237,8 @@ const Favorites = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 z-0">
         {isLoading ? (
           <div className="text-center py-16">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#5d6544] mx-auto"></div>
-            <p className="mt-4 text-gray-600">
+            <ChefHatSpinner />
+            <p className="mt-4 text-gray-600 text-2xl">
               Loading your favorite recipes...
             </p>
           </div>

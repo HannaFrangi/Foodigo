@@ -10,14 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mui/material": "^6.1.6",
+    "@ant-design/cssinjs": "^1.22.1",
+    "@nextui-org/react": "^2.4.8",
     "@studio-freight/react-lenis": "^0.0.43",
     "antd": "^5.21.6",
     "axios": "^1.7.7",
-    "bootstrap": "^5.3.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "framer-motion": "^11.11.17",
+    "framer-motion": "^11.13.1",
     "gsap": "^3.12.5",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.309.0",
@@ -45,8 +45,6 @@
     "globals": "^15.11.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14",
-    "vite": "^5.4.10",
-    "vite-plugin-pwa": "^0.20.5"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+    "vite": "^5.4.10"
+  }
 }
