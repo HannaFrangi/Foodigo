@@ -80,7 +80,14 @@ const sendVerificationEmail = async (user) => {
 export const signup = async (req, res) => {
   try {
     let { name, email, password } = req.body;
-    email = email.toLowerCase();
+
+    // Trim whitespace and convert to lowercase
+    email = email.trim().toLowerCase();
+
+    // Comprehensive email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    // Validate all fields
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -88,6 +95,15 @@ export const signup = async (req, res) => {
       });
     }
 
+    // Email format validation
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
+
+    // Password length validation
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
@@ -95,6 +111,7 @@ export const signup = async (req, res) => {
       });
     }
 
+    // Check for existing user
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
@@ -103,6 +120,7 @@ export const signup = async (req, res) => {
       });
     }
 
+    // Create new user
     const newUser = await User.create({
       name,
       email,
