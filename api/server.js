@@ -17,6 +17,7 @@ dotenv.config(); // Load environment variables
 
 // Initialize Express app
 const app = express();
+const __dirname = path.resolve();
 const PORT = process.env.PORT || 5001;
 
 // // Create server with http and integrate socket.io
