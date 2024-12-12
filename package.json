@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/server.js",
-    "build": "npm install && npm install --prefix viteApp && npm run build --prefix viteApp",
+    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp",
     "start": "node api/server.js"
   },
   "keywords": [],
