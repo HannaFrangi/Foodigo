@@ -14,6 +14,7 @@ import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import logo from "/src/assets/logo.png";
 
 const AuthPage = () => {
   const { signup, login, forgotPassword } = useAuthStore();
@@ -280,7 +281,7 @@ const AuthPage = () => {
           className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
         >
           <div className="relative">
-            <Avatar src="/src/assets/logo.png" size={150} />
+            <Avatar src={logo} size={150} />
             <Sparkles className="absolute -top-2 -right-2 text-olive animate-pulse" />
           </div>
         </div>
