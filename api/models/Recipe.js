@@ -29,7 +29,7 @@ const RecipeSchema = new mongoose.Schema({
   },
   recipeInstructions: { type: String, default: "", required: true },
   reviews: [ReviewSchema],
-  // userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
   createdAt: { type: Date, default: Date.now },
 });

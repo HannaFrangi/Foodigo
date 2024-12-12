@@ -415,3 +415,29 @@ export const togglePurchasedStatus = async (req, res) => {
     });
   }
 };
+
+export const getUserInfoByID = async (req, res) => {
+  const userID = req.params.id;
+
+  try {
+    const user = await User.findById(userID, "name ProfilePicURL");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error("Error in getUserInfoByID:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -53,7 +53,6 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/area", areaRoutes);
 app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
-app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
 
 // Listen for socket connections
@@ -69,6 +68,13 @@ app.use("/api/ingredients", ingredientsRoutes);
 //     console.log(`User with ID ${userId} disconnected`);
 //   });
 // });
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "ViteApp", "dist", "index.html"));
+  });
+}
 
 // Start Server
 app.listen(PORT, () => {

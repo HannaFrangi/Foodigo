@@ -8,9 +8,9 @@ import {
 } from "lucide-react";
 import { useRecipeStore } from "../../store/useRecipeStore";
 import RecipeResults from "../../components/RecipeCard/RecipeResults";
-import { CircularProgress } from "@mui/material";
 import { Input } from "antd";
 import RecipeCardSkeleton from "../RecipeCard/RecipeCardSkeleton";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const SearchCarouselleSection = () => {
   const {
@@ -90,15 +90,7 @@ const SearchCarouselleSection = () => {
                 type="submit"
                 className="mt-4 px-6 py-3 bg-[#606848] text-white rounded-xl hover:bg-[#4A5139] transition-colors duration-300"
               >
-                {Searching ? (
-                  <CircularProgress
-                    variant="indeterminate"
-                    size={20}
-                    sx={(theme) => ({ color: "white" })}
-                  />
-                ) : (
-                  "Search Recipes"
-                )}
+                {Searching ? <ChefHatSpinner size={32} /> : "Search Recipes"}
               </button>
             </form>
           </div>

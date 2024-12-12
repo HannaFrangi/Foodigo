@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 const { nextui } = require("@nextui-org/react");
+
 module.exports = {
   content: [
     "../foodigo/**/*.html",
@@ -20,7 +21,7 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        figtree: ["Figtree"],
+        figtree: ["Figtree", "sans-serif"], // Ensure fallback font for compatibility
       },
       colors: {
         peach: "#FBE0DC",
@@ -28,14 +29,17 @@ module.exports = {
         "gray-text": "#ABABAA",
         sandia: "#ff7470",
         olive: "#5d6544",
+        // Dark mode shades
+        darkBackground: "#121212", // Background for dark mode
+        darkText: "#EAEAEA", // Text color for dark mode
+        darkAccent: "#BB86FC", // Accent color for dark mode (light purple)
+        lightBackground: "#FFFFFF", // Background for light mode
+        lightText: "#121212", // Text color for light mode
       },
       backgroundImage: {
         chef: "url('/src/assets/chef.png')",
         chef2: "url('/src/assets/mobilechef.jpg')",
       },
-      // background: {
-      //   'dark': "#1B1B1B"
-      // },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

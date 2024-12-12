@@ -152,7 +152,9 @@ export const addReview = async (req, res) => {
       user: req.user._id,
       rating: req.body.rating,
       comment: req.body.comment,
+      createdAt: Date.now(),
     };
+
     recipe.reviews.push(newReview);
     await recipe.save();
     res.status(201).json({ success: true, data: newReview });
