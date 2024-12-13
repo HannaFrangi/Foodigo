@@ -183,13 +183,6 @@ const Navbar = ({ user, handleLogout }) => {
     setIsSearchOpen(false);
   }, [location.pathname]);
 
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-    setTimeout(() => {
-      searchInputRef.current?.focus();
-    }, 100);
-  };
-
   const handleProfileEdit = () => {
     setIsProfileModalVisible(true);
   };

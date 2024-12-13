@@ -4,11 +4,10 @@ import { RecipeHeader } from "../../components/RecipeDetails/RecipeHeader";
 import { IngredientsSection } from "../../components/RecipeDetails/IngredientsSection";
 import { InstructionsSection } from "../../components/RecipeDetails/InstructionsSection";
 import { ReviewSection } from "../../components/RecipeDetails/ReviewSection";
-
+import RecipeDetailsLoading from "../../components/RecipeDetails/RecipeDetailsLoading";
 import useGetRecipeById from "../../hooks/useGetRecipebyId";
 import useGetIngredientNamesById from "../../hooks/useGetIngredientNameById";
 import useGetUserInfoById from "../../hooks/useGetUserInfoById";
-import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const RecipeDetails = () => {
   const { id } = useParams();
@@ -18,6 +17,7 @@ const RecipeDetails = () => {
     Recipe,
     loading: recipeLoading,
     error: recipeError,
+    fetchRecipeById, // Assuming the hook provides a refetch method
   } = useGetRecipeById(id);
 
   const {
@@ -57,20 +57,25 @@ const RecipeDetails = () => {
     }
   }, [Recipe, ingredientNames]);
 
+  const handleReviewAdded = () => {
+    // Trigger a refetch of the recipe to get updated reviews
+    fetchRecipeById(id);
+  };
+
   if (recipeLoading || ingredientsLoading || authorLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <ChefHatSpinner />
+        <RecipeDetailsLoading />
       </div>
     );
   }
 
   if (recipeError || ingredientsError || authorError) {
-    return <div className="text-olive-600">Error loading recipe</div>;
+    return <div className="text-olive">Error loading recipe</div>;
   }
 
   if (!Recipe || !Recipe.data) {
-    return <div className="text-olive-600">Recipe not found.</div>;
+    return <div className="text-olive">Recipe not found.</div>;
   }
 
   const { recipeTitle, recipeImage, recipeInstructions, reviews } = Recipe.data;
@@ -90,11 +95,16 @@ const RecipeDetails = () => {
           recipeTitle={recipeTitle}
           recipeImage={recipeImage}
           authorInfo={authorInfo}
+          recipeId={id}
         />
         <div className="p-6 space-y-6">
           <IngredientsSection ingredients={processedIngredients} />
           <InstructionsSection instructions={recipeSteps} />
-          <ReviewSection reviews={reviews} recipeId={id} />
+          <ReviewSection
+            reviews={reviews}
+            recipeId={id}
+            onReviewAdded={handleReviewAdded} // Pass the callback
+          />
         </div>
       </div>
     </div>

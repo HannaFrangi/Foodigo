@@ -9,7 +9,7 @@ const useAddReview = () => {
   const addReview = async ({ recipeId, rating, comment }) => {
     setLoading(true);
     setError(null);
-    setSuccess(false);
+    setSuccess(true);
 
     try {
       const response = await axiosInstance.post(`/recipe/${recipeId}/review`, {
@@ -21,6 +21,7 @@ const useAddReview = () => {
         setSuccess(true);
       }
     } catch (err) {
+      setSuccess(false);
       setError(err.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);

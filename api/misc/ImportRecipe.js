@@ -130,6 +130,7 @@ const fetchAndSaveRecipes = async () => {
               recipeIngredients: recipeIngredients,
               recipeImage: recipe.strMealThumb,
               recipeVideoTutorial: recipe.strYoutube || "",
+              userId: "675afaab143c11f684324a06",
               area: areaId,
               recipeInstructions: recipe.strInstructions,
               categories: categoryIds,
