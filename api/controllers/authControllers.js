@@ -41,7 +41,7 @@ const sendVerificationEmail = async (user) => {
   <p style="color: #333; font-size: 16px; line-height: 1.6;">We're excited to have you join us on your culinary journey!</p>
   <p style="color: #333; font-size: 16px; line-height: 1.6;">Foodigo is your go-to app for discovering and organizing recipes, creating grocery lists, and more. Before you get started, please confirm your email address to access all the tasty features we have in store.</p>
   <div style="text-align: center; margin: 20px 0;">
-    <a href="${process.env.BASE_URL}/verify?token=${verificationToken}" 
+    <a href="${process.env.BASE_URL}/verify-email/${verificationToken}" 
        style="display: inline-block; padding: 12px 24px; background-color: #5d6544; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, transform 0.2s;" 
        onmouseover="this.style.backgroundColor='#4a5238'; this.style.transform='scale(1.05)';" 
        onmouseout="this.style.backgroundColor='#5d6544'; this.style.transform='scale(1)';">
