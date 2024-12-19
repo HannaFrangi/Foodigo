@@ -1,17 +1,80 @@
 import Area from "../models/Area.js";
 import Recipe from "../models/Recipe.js";
 import Ingredient from "../models/Ingredient.js";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { storage } from "../config/firebase.js";
 
 export const createRecipe = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required. Please log in.",
+      });
+    }
+
+    const recipeData = { ...req.body };
+
+    if (req.file) {
+      // Generate filename using userId and timestamp for uniqueness
+      const fileExtension = req.file.originalname.split(".").pop();
+      const fileName = `${req.user._id}_${Date.now()}.${fileExtension}`;
+
+      const metadata = {
+        contentType: req.file.mimetype,
+        customMetadata: {
+          userId: req.user._id.toString(),
+          recipeTitle: recipeData.recipeTitle,
+        },
+      };
+
+      // Create storage reference
+      const storageRef = ref(storage, `recipes/${fileName}`);
+
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
+
+      // Get download URL
+      const downloadURL = await getDownloadURL(
+        ref(storage, snapshot.metadata.fullPath)
+      );
+
+      // Update recipe data with the image URL
+      recipeData.recipeImage = downloadURL;
+    }
+
+    // Create recipe in database
     const newRecipe = await Recipe.create({
-      ...req.body,
+      ...recipeData,
       userId: req.user._id,
     });
-    res.status(201).json({ success: true, data: newRecipe });
+
+    if (!newRecipe) {
+      return res.status(404).json({
+        success: false,
+        message: "Failed to create recipe",
+      });
+    }
+
+    // Return created recipe info
+    res.status(201).json({
+      success: true,
+      message: "Recipe created successfully",
+      recipe: newRecipe,
+    });
   } catch (error) {
-    console.error("Error in createRecipe:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error creating recipe:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating recipe",
+      error: error.message,
+    });
   }
 };
 
@@ -111,23 +174,46 @@ export const updateRecipe = async (req, res) => {
 
 export const deleteRecipe = async (req, res) => {
   try {
+    // Find the recipe by ID
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res
         .status(404)
         .json({ success: false, message: "Recipe not found" });
     }
+
+    // Check if the user is authorized to delete the recipe
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized to delete this recipe",
       });
     }
+
+    // Check if the recipe has an image URL and delete it from Firebase Storage
+    if (recipe.recipeImage) {
+      const imageRef = ref(storage, recipe.recipeImage);
+      try {
+        await deleteObject(imageRef);
+      } catch (error) {
+        console.error("Error deleting image from Firebase Storage:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to delete recipe image from storage",
+          error: error.message,
+        });
+      }
+    }
+
+    // Delete the recipe from the database
     await Recipe.findByIdAndDelete(req.params.id);
+
     res.json({ success: true, message: "Recipe deleted successfully" });
   } catch (error) {
     console.error("Error in deleteRecipe:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 

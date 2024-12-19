@@ -18,10 +18,24 @@ import {
   getRecipesByIngredientsId,
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
+import multer from "multer";
 
 const router = express.Router();
 
-router.post("/", protectRoute, createRecipe);
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error("Only image files are allowed!"), false);
+    }
+    cb(null, true);
+  },
+});
+
+router.post("/", protectRoute, upload.single("recipeImage"), createRecipe);
 router.get("/latest", getLatestRecipe);
 router.get("/search", getRecipesByName);
 router.get("/category/:categoryId", getRecipesByCategory);

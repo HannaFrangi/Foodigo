@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 export const createIngredient = async (req, res) => {
   try {
     const { name } = req.body;
+    name = name.toLowerCase(); // Safety Wise
 
     if (!name) {
       return res.status(400).json({
