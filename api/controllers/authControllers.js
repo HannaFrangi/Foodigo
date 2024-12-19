@@ -42,7 +42,7 @@ const sendVerificationEmail = async (user) => {
   <p style="color: #333; font-size: 16px; line-height: 1.6;">Foodigo is your go-to app for discovering and organizing recipes, creating grocery lists, and more. Before you get started, please confirm your email address to access all the tasty features we have in store.</p>
   <div style="text-align: center; margin: 20px 0;">
     <a href="${process.env.BASE_URL}/verify-email/${verificationToken}" 
-       style="display: inline-block; padding: 12px 24px; background-color: #5d6544; color: #ffffff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, transform 0.2s;" 
+        style="display: inline-block; padding: 15px 30px; background-color: #5d6544; color: white; font-size: 16px; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 10px rgba(93, 101, 68, 0.3); transition: background-color 0.3s ease;"
        onmouseover="this.style.backgroundColor='#4a5238'; this.style.transform='scale(1.05)';" 
        onmouseout="this.style.backgroundColor='#5d6544'; this.style.transform='scale(1)';">
       Verify Your Email
@@ -292,7 +292,11 @@ const sendResetEmail = async (user, token) => {
   const htmlContent = `
 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #fafafa; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
   <div style="text-align: center; margin-bottom: 20px;">
-    <img src="https://firebasestorage.googleapis.com/v0/b/hdarne-3d2b6.appspot.com/o/profilePics%2FfoodigoLogo.jpeg?alt=media&token=101a2049-1009-45e3-a364-534ee23c5153" alt="Foodigo Logo" style="max-width: 150px; height: auto;">
+    <div style="display: inline-block; position: relative; width: 120px; height: 120px; overflow: hidden; border-radius: 50%; border: 4px solid #5d6544; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);">
+      <img src="https://firebasestorage.googleapis.com/v0/b/hdarne-3d2b6.appspot.com/o/profilePics%2FfoodigoLogo.jpeg?alt=media&token=101a2049-1009-45e3-a364-534ee23c5153" 
+           alt="Foodigo Logo" 
+           style="width: 100%; height: 100%; object-fit: cover; display: block;">
+    </div>
   </div>
   
   <h2 style="color: #5a6f3a; font-size: 24px; margin-bottom: 10px;">Password Reset Request</h2>
