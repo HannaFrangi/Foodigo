@@ -23,9 +23,9 @@ mongoose.connection.on("error", (err) => {
 // Function to import areas from a JSON file
 const importAreas = async () => {
   try {
-    // Read areas from areas.json
-    const areasFilePath = path.resolve("Areas.json");
-    const areasData = JSON.parse(fs.readFileSync(areasFilePath, "utf-8"));
+    // Fetch categories from TheMealDB API
+    const response = await axios.get("");
+    const areas = response.data.meals; // Corrected to reference 'meals'
 
     // Loop through each area and insert into the database
     for (const area of areasData) {
