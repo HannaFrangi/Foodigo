@@ -45,7 +45,7 @@ export const InstructionsSection = ({ instructions }) => {
         variants={stepVariants}
         initial="hidden"
         animate="visible"
-        className="text-olive-900 font-medium"
+        className="text-olive font-medium"
       >
         {instruction.title}
       </motion.span>
@@ -55,7 +55,7 @@ export const InstructionsSection = ({ instructions }) => {
         variants={stepVariants}
         initial="hidden"
         animate="visible"
-        className="text-olive-700"
+        className="text-olive"
       >
         {instruction.description}
       </motion.span>
@@ -73,7 +73,7 @@ export const InstructionsSection = ({ instructions }) => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-xl font-semibold text-olive-800 mb-4"
+        className="text-xl font-semibold text-olive mb-4"
       >
         Instructions
       </motion.h2>

@@ -20,20 +20,10 @@ const app = express();
 const __dirname = path.resolve();
 const PORT = process.env.PORT || 5001;
 
-// // Create server with http and integrate socket.io
-// const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:5173", // Allow requests from Vite's development server
-//     credentials: true, // Allow cookies to be sent with requests
-//   },
-// });
-
 app.use(
   cors({
-    // origin: "http://192.168.1.15:5173",
     origin: "http://localhost:5173",
-    credentials: true, // Allow cookies to be sent with requests
+    credentials: true,
   })
 );
 
@@ -45,7 +35,7 @@ app.use(express.json());
 app.use(cookieParser()); // Parse cookies for auth
 
 // Test Route
-app.get("/api", (req, res) => {
+app.get("/api", (res) => {
   res.send("Hi! Welcome to Foodigo API.");
 });
 
@@ -57,23 +47,10 @@ app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
 
-// Listen for socket connections
-// io.on("connection", (socket) => {
-//   console.log("A user connected with socket ID:", socket.id);
-
-//   // You can access the query parameter (userId) here if needed
-//   const userId = socket.handshake.query.userId;
-//   console.log("User ID from query:", userId);
-
-//   // Listen for disconnect events
-//   socket.on("disconnect", () => {
-//     console.log(`User with ID ${userId} disconnected`);
-//   });
-// });
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
 
-  app.get("*", (req, res) => {
+  app.get("*", (res) => {
     res.sendFile(path.resolve(__dirname, "ViteApp", "dist", "index.html"));
   });
 }

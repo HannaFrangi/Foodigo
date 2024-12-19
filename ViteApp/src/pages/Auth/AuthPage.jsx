@@ -191,7 +191,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-5 relative">
       {/* Forgot Password Modal */}
       <div
         ref={modalRef}
@@ -275,7 +275,6 @@ const AuthPage = () => {
       </button>
 
       <div className="max-w-md w-full space-y-8 relative">
-        {/* Decorative food-themed elements */}
         <div
           ref={logoRef}
           className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"

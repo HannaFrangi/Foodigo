@@ -150,7 +150,7 @@ export const IngredientsSection = ({ ingredients }) => {
                   >
                     <div className="mb-3">
                       <motion.p
-                        className="font-semibold text-olive-900 text-lg mb-1"
+                        className="font-semibold text-olive text-lg mb-1"
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.1 }}
@@ -164,7 +164,7 @@ export const IngredientsSection = ({ ingredients }) => {
                         transition={{ delay: 0.2 }}
                       >
                         <span className="mr-2">Quantity:</span>
-                        <span className="font-medium text-olive-700">
+                        <span className="font-medium text-olive">
                           {ingredient.quantity}
                         </span>
                       </motion.p>

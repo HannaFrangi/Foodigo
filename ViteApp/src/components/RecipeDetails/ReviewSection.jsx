@@ -191,7 +191,7 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
                   <Rate disabled value={review.rating} />
                 </div>
               </div>
-              <p className="text-olive">{review.comment}</p>
+              <p className="text-black ">{review.comment}</p>
               <p className="text-sm text-gray-600">
                 {new Date(review.date).toLocaleDateString()}
               </p>

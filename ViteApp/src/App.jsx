@@ -13,7 +13,7 @@ import { useRecipeStore } from "./store/useRecipeStore";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
-import AddRecipe from "./pages/Recipe/AddRecipe";
+import AddRecipe from "./pages/AddRecipe/AddRecipe";
 function App() {
   const lenis = useLenis(({ scroll }) => {
     // called every scroll

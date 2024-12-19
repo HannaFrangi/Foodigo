@@ -89,7 +89,7 @@ const RecipeDetails = () => {
     }));
 
   return (
-    <div className="bg-olive-50 min-h-screen pt-8 pb-12 text-olive-700">
+    <div className=" min-h-screen pt-8 pb-12 text-olive">
       <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
         <RecipeHeader
           recipeTitle={recipeTitle}
