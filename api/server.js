@@ -12,6 +12,7 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import areaRoutes from "./routes/areaRoutes.js";
 import ingredientsRoutes from "./routes/ingredientsRoutes.js";
 import { connectDB } from "./config/db.js";
+import { cacheMiddleware } from "./config/cache.js";
 
 dotenv.config(); // Load environment variables
 
@@ -41,8 +42,8 @@ app.get("/api", (res) => {
 
 // Route middleware
 app.use("/api/auth", authRoutes);
-app.use("/api/category", categoryRoutes);
-app.use("/api/area", areaRoutes);
+app.use("/api/category", cacheMiddleware(1800), categoryRoutes);
+app.use("/api/area", cacheMiddleware(1800), areaRoutes);
 app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
@@ -50,7 +51,7 @@ app.use("/api/ingredients", ingredientsRoutes);
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
 
-  app.get("*", (res) => {
+  app.get("*", cacheMiddleware(1800), (res) => {
     res.sendFile(path.resolve(__dirname, "ViteApp", "dist", "index.html"));
   });
 }
