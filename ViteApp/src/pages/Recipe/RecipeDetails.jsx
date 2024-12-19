@@ -78,7 +78,8 @@ const RecipeDetails = () => {
     return <div className="text-olive">Recipe not found.</div>;
   }
 
-  const { recipeTitle, recipeImage, recipeInstructions, reviews } = Recipe.data;
+  const { recipeTitle, recipeImage, recipeInstructions, reviews, area } =
+    Recipe.data;
 
   const recipeSteps = recipeInstructions
     .split(".")
@@ -96,6 +97,7 @@ const RecipeDetails = () => {
           recipeImage={recipeImage}
           authorInfo={authorInfo}
           recipeId={id}
+          recipeArea={area}
         />
         <div className="p-6 space-y-6">
           <IngredientsSection ingredients={processedIngredients} />
@@ -103,7 +105,7 @@ const RecipeDetails = () => {
           <ReviewSection
             reviews={reviews}
             recipeId={id}
-            onReviewAdded={handleReviewAdded} // Pass the callback
+            onReviewAdded={handleReviewAdded}
           />
         </div>
       </div>

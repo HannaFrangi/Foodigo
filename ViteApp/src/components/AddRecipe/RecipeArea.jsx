@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { Spin } from "antd";
+import { Select, Spin } from "antd";
 import useGetAllAreas from "/src/hooks/useGetAllAreas";
-import { Select, SelectItem } from "@nextui-org/react";
 
 const RecipeArea = ({ formData, setFormData, errors }) => {
   const { area, fetchALlAreas, loading, error } = useGetAllAreas();
@@ -26,18 +25,25 @@ const RecipeArea = ({ formData, setFormData, errors }) => {
 
   return (
     <div className="space-y-2">
+      <p className="text-sm font-medium text-olive">Recipe Area</p>
       <Select
-        placeholder="Select a cuisine area"
         showSearch
+        placeholder="Select a cuisine area"
+        optionFilterProp="children"
         onChange={handleAreaChange}
-        isInvalid={!!errors?.recipeArea}
+        value={formData?.recipeArea}
+        status={errors?.recipeArea ? "error" : ""}
+        loading={loading}
         className="w-full"
-        aria-label="Recipe Area"
-      >
-        {area.map((Area) => (
-          <SelectItem key={Area._id}>{Area.name}</SelectItem>
-        ))}
-      </Select>
+        filterOption={(input, option) =>
+          option?.label?.toLowerCase().includes(input.toLowerCase())
+        }
+        options={area?.map((item) => ({
+          value: item._id,
+          label: item.name,
+        }))}
+        allowClear
+      />
       {errors?.recipeArea && (
         <p className="text-sm text-red-500 mt-1">{errors.recipeArea}</p>
       )}

@@ -36,3 +36,25 @@ export const getAllAreas = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const getAreaByid = async (req, res) => {
+  try {
+    const area = await Area.findById(req.params.id);
+    console.log(req.params.id);
+    if (!area) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Area not found" });
+    }
+    return res.status(200).json({
+      success: true,
+      data: area,
+    });
+  } catch (error) {
+    console.error("Error fetching Area by ID:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve the Area due to server error",
+    });
+  }
+};

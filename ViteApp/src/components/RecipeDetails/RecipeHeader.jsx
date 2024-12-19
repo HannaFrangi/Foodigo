@@ -5,17 +5,24 @@ import { ArrowLeft, Heart, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "/src/store/useAuthStore";
 import toast from "react-hot-toast";
+import useGetAreaByid from "/src/hooks/useGetAreaByid";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 export const RecipeHeader = ({
-  recipe,
   recipeTitle,
   recipeImage,
   authorInfo,
   recipeId,
+  recipeArea,
 }) => {
   const navigate = useNavigate();
   const { toggleFavorite, getFavorites } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
+  const { area, loading, error, fetchIngredientAreaByIds } = useGetAreaByid();
+  useEffect(() => {
+    fetchIngredientAreaByIds(recipeArea);
+    // console.log(area.data.name); // hayde la majd
+  }, []);
 
   useEffect(() => {
     const initializeCard = () => {
@@ -53,6 +60,10 @@ export const RecipeHeader = ({
       toast.error("Sharing not supported in this browser");
     }
   };
+
+  if (loading) {
+    return <ChefHatSpinner />;
+  }
 
   return (
     <motion.div
