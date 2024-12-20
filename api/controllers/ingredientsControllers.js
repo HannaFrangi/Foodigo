@@ -1,9 +1,10 @@
 import Ingredient from "../models/Ingredient.js";
 import mongoose from "mongoose";
+import { cache } from "../config/cache.js";
 
 export const createIngredient = async (req, res) => {
   try {
-    const { name } = req.body;
+    let { name } = req.body;
     name = name.toLowerCase(); // Safety Wise
 
     if (!name) {
@@ -23,6 +24,14 @@ export const createIngredient = async (req, res) => {
 
     const newIngredient = new Ingredient({ name });
     await newIngredient.save();
+
+    // Clear any cached ingredient data
+    const cacheKeys = cache.keys();
+    cacheKeys.forEach((key) => {
+      if (key.includes("/api/ingredients")) {
+        cache.del(key);
+      }
+    });
 
     res.status(201).json({
       success: true,
@@ -57,7 +66,6 @@ export const getIngredientNamesByIds = async (req, res) => {
     const validIds = ingredientIds.filter((id) =>
       mongoose.Types.ObjectId.isValid(id)
     );
-
     if (validIds.length === 0) {
       return res.status(400).json({
         success: false,
@@ -98,7 +106,6 @@ export const getIngredientNamesByIds = async (req, res) => {
 export const getAllIngredients = async (req, res) => {
   try {
     const ingredients = await Ingredient.find().select("_id name");
-
     res.status(200).json({
       success: true,
       data: ingredients,

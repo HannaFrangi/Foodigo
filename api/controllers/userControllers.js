@@ -159,6 +159,7 @@ export const AddToFavorites = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error occurred while updating favorites",
+      error: error.message,
     });
   }
 };

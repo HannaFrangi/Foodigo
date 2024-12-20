@@ -1,4 +1,5 @@
 import Category from "../models/Category.js";
+import { cache } from "../config/cache.js";
 
 export const createCategory = async (req, res) => {
   const { name } = req.body;
@@ -15,6 +16,14 @@ export const createCategory = async (req, res) => {
 
     const newCategory = new Category({ name });
     await newCategory.save();
+
+    // Clear any cached ingredient data
+    const cacheKeys = cache.keys();
+    cacheKeys.forEach((key) => {
+      if (key.includes("/api/category")) {
+        cache.del(key);
+      }
+    });
 
     res.status(201).json({
       success: true,

@@ -1,4 +1,5 @@
 import Area from "../models/Area.js";
+import { cache } from "../config/cache.js";
 
 export const createArea = async (req, res) => {
   const { name } = req.body;
@@ -13,6 +14,15 @@ export const createArea = async (req, res) => {
     }
     const newArea = new Area({ name });
     await newArea.save();
+
+    // Clear all area-related caches when a new area is created
+    const cacheKeys = cache.keys();
+    cacheKeys.forEach((key) => {
+      if (key.includes("/api/area")) {
+        cache.del(key);
+      }
+    });
+
     res.status(201).json({
       success: true,
       message: "Area created successfully",
@@ -42,9 +52,10 @@ export const getAreaByid = async (req, res) => {
     const area = await Area.findById(req.params.id);
     console.log(req.params.id);
     if (!area) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Area not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Area not found",
+      });
     }
     return res.status(200).json({
       success: true,
