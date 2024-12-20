@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Avatar } from "antd";
-import { ArrowLeft, Heart, Share2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Globe } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "/src/store/useAuthStore";
 import toast from "react-hot-toast";
@@ -19,9 +19,9 @@ export const RecipeHeader = ({
   const { toggleFavorite, getFavorites } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
   const { area, loading, error, fetchIngredientAreaByIds } = useGetAreaByid();
+
   useEffect(() => {
     fetchIngredientAreaByIds(recipeArea);
-    // console.log(area.data.name); // hayde la majd
   }, []);
 
   useEffect(() => {
@@ -182,27 +182,66 @@ export const RecipeHeader = ({
         >
           {recipeTitle}
         </motion.h1>
+
         <motion.div
-          className="flex items-center mt-4 space-x-3"
-          initial={{ opacity: 0, x: -20 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+          initial={{ opacity: 0, y: 20 }}
           animate={{
             opacity: 1,
-            x: 0,
+            y: 0,
             transition: {
               duration: 0.5,
-              delay: 0.4,
+              delay: 0.3,
             },
           }}
         >
-          <Avatar
-            src={authorInfo?.ProfilePicURL || "/src/assets/logo.png"}
-            alt={authorInfo?.name || "Foodigo Team"}
-            className="border-2 border-[#5d6544] shadow-sm shadow-olive"
-            size={50}
-          />
-          <p className="text-olive font-semibold text-lg">
-            {authorInfo?.name || "Foodigo Team"}
-          </p>
+          <motion.div
+            className="flex items-center space-x-3"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{
+              opacity: 1,
+              x: 0,
+              transition: {
+                duration: 0.5,
+                delay: 0.4,
+              },
+            }}
+          >
+            <Avatar
+              src={authorInfo?.ProfilePicURL || "/src/assets/logo.png"}
+              alt={authorInfo?.name || "Foodigo Team"}
+              className="border-2 border-[#5d6544] shadow-sm shadow-olive"
+              size={50}
+            />
+            <p className="text-olive font-semibold text-lg">
+              {authorInfo?.name || "Foodigo Team"}
+            </p>
+          </motion.div>
+
+          {area?.data?.name && (
+            <motion.div
+              className="flex items-center space-x-2 bg-white/90 backdrop-blur-sm 
+                rounded-full px-4 py-2 shadow-sm border border-olive/10"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                transition: {
+                  duration: 0.5,
+                  delay: 0.5,
+                },
+              }}
+              whileHover={{
+                scale: 1.05,
+                transition: {
+                  duration: 0.2,
+                },
+              }}
+            >
+              <Globe className="w-5 h-5 text-olive" />
+              <span className="text-olive font-medium">{area.data.name}</span>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </motion.div>
