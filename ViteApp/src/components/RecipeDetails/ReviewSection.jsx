@@ -7,6 +7,7 @@ import useGetUserInfoById from "/src/hooks/useGetUserInfoById";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 import { useAuthStore } from "/src/store/useAuthStore";
 import useAddReview from "../../hooks/useAddReview";
+import useUpdateRecipeReview from "/src/hooks/useUpdateRecipeReview";
 
 const { TextArea } = Input;
 
@@ -23,9 +24,13 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
     comment: "",
   });
 
-  const { addReview, loading, error, success } = useAddReview();
+  const { addReview, loading, error } = useAddReview();
 
-  // Create user info hooks for each unique user ID
+  const userHasWrittenReview = reviews.some(
+    (review) => review.user === authUser?._id
+  );
+  const { updateRecipeReview } = useUpdateRecipeReview();
+
   const userInfoHooks = reviews.reduce((acc, review) => {
     if (!acc[review.user]) {
       acc[review.user] = useGetUserInfoById(review.user);
@@ -33,7 +38,6 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
     return acc;
   }, {});
 
-  // Track loading and user info
   useEffect(() => {
     const updatedAuthors = {};
     const stillLoading = [];
@@ -61,7 +65,23 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
     ...Object.values(userInfoHooks).map((hook) => hook.userInfo),
   ]);
 
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal = () => {
+    if (userHasWrittenReview) {
+      const existingReview = reviews.find(
+        (review) => review.user === authUser?._id
+      );
+      if (existingReview) {
+        setNewReview({
+          rating: existingReview.rating,
+          comment: existingReview.comment,
+        });
+      }
+    } else {
+      setNewReview({ rating: 0, comment: "" });
+    }
+    setIsModalOpen(true);
+  };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setNewReview({ rating: 0, comment: "" });
@@ -69,39 +89,47 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
 
   const handleAddReview = async () => {
     if (newReview.rating === 0) {
-      toast.error("Please select a rating", {
-        duration: 3000,
-      });
+      toast.error("Please select a rating", { duration: 3000 });
       return;
     }
 
     if (!newReview.comment.trim()) {
-      toast.error("Please write a review comment", {
-        duration: 3000,
-      });
+      toast.error("Please write a review comment", { duration: 3000 });
       return;
     }
 
-    try {
-      const response = await addReview({
-        recipeId,
-        rating: newReview.rating,
-        comment: newReview.comment,
-      });
+    const reviewData = {
+      rating: newReview.rating,
+      comment: newReview.comment,
+    };
 
-      toast.success("Review added successfully!", {
-        duration: 3000,
-      });
-      onReviewAdded?.(newReview);
+    try {
+      if (userHasWrittenReview) {
+        // Update the existing review
+        await updateRecipeReview({
+          recipeId,
+          reviewData,
+        });
+        toast.success("Review updated successfully!", { duration: 3000 });
+        // Update the reviews list by directly modifying the relevant review
+        onReviewAdded?.(reviewData); // This assumes onReviewAdded handles the update
+      } else {
+        // Add a new review
+        await addReview({
+          recipeId,
+          ...reviewData,
+        });
+        toast.success("Review added successfully!", { duration: 3000 });
+        onReviewAdded?.(reviewData);
+      }
       handleCloseModal();
     } catch (err) {
-      toast.error("Failed to add review. Please try again.", {
+      toast.error("Failed to submit review. Please try again.", {
         duration: 3000,
       });
     }
   };
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -145,7 +173,7 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
               className="text-olive flex items-center"
               icon={<PlusCircle className="mr-1" size={16} />}
             >
-              Add Review
+              {userHasWrittenReview ? "Edit Review" : "Write a Review"}
             </Button>
           </motion.div>
         )}
@@ -204,13 +232,13 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
         title={
           <div className="flex items-center">
             <Star className="mr-2 text-olive" />
-            Add a Review
+            {userHasWrittenReview ? "Edit Your Review" : "Add a Review"}
           </div>
         }
         open={isModalOpen}
         onOk={handleAddReview}
         onCancel={handleCloseModal}
-        okText="Submit"
+        okText={userHasWrittenReview ? "Update Review" : "Submit"}
         cancelText="Cancel"
         confirmLoading={loading}
         okButtonProps={{

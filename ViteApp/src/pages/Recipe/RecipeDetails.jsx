@@ -8,10 +8,14 @@ import RecipeDetailsLoading from "../../components/RecipeDetails/RecipeDetailsLo
 import useGetRecipeById from "../../hooks/useGetRecipebyId";
 import useGetIngredientNamesById from "../../hooks/useGetIngredientNameById";
 import useGetUserInfoById from "../../hooks/useGetUserInfoById";
+import { useAuthStore } from "/src/store/useAuthStore"; // Assuming you have this hook to get auth user
 
 const RecipeDetails = () => {
   const { id } = useParams();
   const [processedIngredients, setProcessedIngredients] = useState([]);
+  const [reviews, setReviews] = useState([]);
+
+  const { authUser } = useAuthStore(); // Get the authenticated user from the store
 
   const {
     Recipe,
@@ -57,9 +61,30 @@ const RecipeDetails = () => {
     }
   }, [Recipe, ingredientNames]);
 
-  const handleReviewAdded = () => {
-    // Trigger a refetch of the recipe to get updated reviews
-    fetchRecipeById(id);
+  useEffect(() => {
+    if (Recipe?.data?.reviews) {
+      setReviews(Recipe.data.reviews);
+    }
+  }, [Recipe]);
+
+  const handleReviewAdded = (newReview) => {
+    setReviews((prevReviews) => {
+      const existingReviewIndex = prevReviews.findIndex(
+        (review) => review.user === authUser?._id
+      );
+      if (existingReviewIndex !== -1) {
+        // Update the existing review
+        const updatedReviews = [...prevReviews];
+        updatedReviews[existingReviewIndex] = {
+          ...updatedReviews[existingReviewIndex],
+          ...newReview,
+        };
+        return updatedReviews;
+      } else {
+        // Add a new review
+        return [...prevReviews, { ...newReview, user: authUser?._id }];
+      }
+    });
   };
 
   if (recipeLoading || ingredientsLoading || authorLoading) {
@@ -78,8 +103,7 @@ const RecipeDetails = () => {
     return <div className="text-olive">Recipe not found.</div>;
   }
 
-  const { recipeTitle, recipeImage, recipeInstructions, reviews, area } =
-    Recipe.data;
+  const { recipeTitle, recipeImage, recipeInstructions, area } = Recipe.data;
 
   const recipeSteps = recipeInstructions
     .split(".")
@@ -90,7 +114,7 @@ const RecipeDetails = () => {
     }));
 
   return (
-    <div className=" min-h-screen pt-8 pb-12 text-olive">
+    <div className="min-h-screen pt-8 pb-12 text-olive">
       <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden">
         <RecipeHeader
           recipeTitle={recipeTitle}

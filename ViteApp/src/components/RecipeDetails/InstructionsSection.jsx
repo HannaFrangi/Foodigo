@@ -84,23 +84,25 @@ export const InstructionsSection = ({ instructions }) => {
         className="custom-steps"
       />
 
-      {/* Inline styles to ensure icon styling */}
-      <style jsx>{`
-        .custom-steps .ant-steps-item-icon {
-          background-color: #5d6544 !important;
-          border-color: #14532d !important;
-        }
-        .custom-steps .ant-steps-item-icon .ant-steps-icon {
-          color: white !important;
-        }
-        .custom-steps .ant-steps-item-title {
-          color: #5d6544 !important;
-          text-decoration: underline !important;
-        }
-        .custom-steps .ant-steps-item-description {
-          color: #000000 !important;
-        }
-      `}</style>
+      {/* CSS Styling for Steps Component */}
+      <style>
+        {`
+          .custom-steps .ant-steps-item-icon {
+            background-color: #5d6544 !important;
+            border-color: #14532d !important;
+          }
+          .custom-steps .ant-steps-item-icon .ant-steps-icon {
+            color: white !important;
+          }
+          .custom-steps .ant-steps-item-title {
+            color: #5d6544 !important;
+            text-decoration: underline !important;
+          }
+          .custom-steps .ant-steps-item-description {
+            color: #000000 !important;
+          }
+        `}
+      </style>
     </motion.div>
   );
 };

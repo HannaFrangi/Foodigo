@@ -17,7 +17,6 @@ const useGetAllIngredients = () => {
         id: ingredient._id,
         name: ingredient.name,
       }));
-      console.log(response.data.data);
       setIngredientNames(namesArray);
     } catch (e) {
       setIngredientNames([]);
