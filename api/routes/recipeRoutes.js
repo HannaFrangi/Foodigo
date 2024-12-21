@@ -16,6 +16,7 @@ import {
   getRecipesByAreaName,
   getRecipesByIngredients,
   getRecipesByIngredientsId,
+  getReviewsByRecipeId,
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
@@ -37,6 +38,7 @@ const upload = multer({
 
 router.post("/", protectRoute, upload.single("recipeImage"), createRecipe);
 router.get("/latest", getLatestRecipe);
+router.get("/:id/review", getReviewsByRecipeId);
 router.get("/search", getRecipesByName);
 router.get("/category/:categoryId", getRecipesByCategory);
 router.get("/random", getRandomRecipe);

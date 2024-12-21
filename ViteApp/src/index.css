@@ -294,3 +294,18 @@
     transform: rotate(360deg);
   }
 }
+.review-modal .ant-modal-content {
+  @apply bg-gradient-to-br from-white to-gray-50;
+}
+
+.review-modal .ant-modal-header {
+  @apply bg-transparent border-b-0 pb-4;
+}
+
+.review-modal .ant-modal-body {
+  @apply py-6;
+}
+
+.review-modal .ant-modal-footer {
+  @apply border-t-0 pt-4;
+}

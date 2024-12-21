@@ -139,7 +139,7 @@ const LatestRecipe = () => {
 
   // Render loading skeleton or actual data
   const renderLoadingState = (
-    <div className="w-full py-6 md:py-8 bg-gray-50">
+    <div className="w-full py-6 md:py-8 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-center items-center h-64 m-auto space-x-4">
           <RecipeCardSkeleton />
@@ -152,7 +152,7 @@ const LatestRecipe = () => {
 
   // No recipes state
   const renderNoRecipesState = (
-    <div className="w-full py-6 md:py-8 bg-gray-50">
+    <div className="w-full py-6 md:py-8 bg-transparent">
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-center items-center h-64">
           <div className="text-lg text-gray-500">No recipes available</div>
@@ -202,7 +202,7 @@ const LatestRecipe = () => {
   }
 
   return (
-    <div className="w-full py-6 md:py-8 bg-gray-50">
+    <div className="w-full py-6 md:py-8 ">
       <div className="max-w-7xl mx-auto px-4 md:px-8 lg:px-12">
         <div className="flex justify-between items-center mb-6 md:mb-8">
           <h2
@@ -228,7 +228,7 @@ const LatestRecipe = () => {
 
         <div
           ref={sliderRef}
-          className="relative px-0 md:px-4"
+          className="relative px-0 md:px-4 bg-transparent"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}

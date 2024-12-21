@@ -1,74 +1,44 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, Rate, Modal, Button, Input } from "antd";
 import { toast } from "react-hot-toast";
-import { Star, PlusCircle, MessageSquare } from "lucide-react";
-import useGetUserInfoById from "/src/hooks/useGetUserInfoById";
-import ChefHatSpinner from "/src/utils/ChefHatSpinner";
+import { Star, MessageSquare, PenIcon, TrashIcon } from "lucide-react";
 import { useAuthStore } from "/src/store/useAuthStore";
 import useAddReview from "../../hooks/useAddReview";
 import useUpdateRecipeReview from "/src/hooks/useUpdateRecipeReview";
+import useDeleteRecipeReview from "/src/hooks/useDeleteRecipeReview";
+import useGetReviewsById from "../../hooks/useGetReviewsById";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const { TextArea } = Input;
 
-export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
+export const ReviewSection = ({ recipeId }) => {
   const { authUser } = useAuthStore();
 
-  const [reviewAuthors, setReviewAuthors] = useState({});
-  const [loadingUserIds, setLoadingUserIds] = useState(
-    reviews.map((review) => review.user)
-  );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newReview, setNewReview] = useState({
-    rating: 0,
-    comment: "",
-  });
+  const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
 
-  const { addReview, loading, error } = useAddReview();
+  const { addReview, loading: addLoading } = useAddReview();
+  const { updateRecipeReview, loading: updateLoading } =
+    useUpdateRecipeReview();
+  const { DeleteRecipeReview, loading: deleteLoading } =
+    useDeleteRecipeReview();
+  const {
+    reviews,
+    loading: reviewsLoading,
+    error: reviewsError,
+    fetchReviews,
+  } = useGetReviewsById(recipeId);
 
-  const userHasWrittenReview = reviews.some(
-    (review) => review.user === authUser?._id
+  const userHasWrittenReview = useMemo(
+    () => reviews?.some((review) => review.user._id === authUser?._id),
+    [reviews, authUser]
   );
-  const { updateRecipeReview } = useUpdateRecipeReview();
-
-  const userInfoHooks = reviews.reduce((acc, review) => {
-    if (!acc[review.user]) {
-      acc[review.user] = useGetUserInfoById(review.user);
-    }
-    return acc;
-  }, {});
-
-  useEffect(() => {
-    const updatedAuthors = {};
-    const stillLoading = [];
-
-    reviews.forEach((review) => {
-      const { userInfo, isLoading } = userInfoHooks[review.user];
-
-      if (userInfo) {
-        updatedAuthors[review.user] = userInfo;
-      }
-
-      if (isLoading) {
-        stillLoading.push(review.user);
-      }
-    });
-
-    setReviewAuthors((prevAuthors) => ({
-      ...prevAuthors,
-      ...updatedAuthors,
-    }));
-
-    setLoadingUserIds(stillLoading);
-  }, [
-    ...Object.values(userInfoHooks).map((hook) => hook.isLoading),
-    ...Object.values(userInfoHooks).map((hook) => hook.userInfo),
-  ]);
 
   const handleOpenModal = () => {
     if (userHasWrittenReview) {
       const existingReview = reviews.find(
-        (review) => review.user === authUser?._id
+        (review) => review.user._id === authUser?._id
       );
       if (existingReview) {
         setNewReview({
@@ -88,45 +58,43 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
   };
 
   const handleAddReview = async () => {
-    if (newReview.rating === 0) {
-      toast.error("Please select a rating", { duration: 3000 });
+    if (!newReview.rating) {
+      toast.error("Please select a rating");
       return;
     }
-
     if (!newReview.comment.trim()) {
-      toast.error("Please write a review comment", { duration: 3000 });
+      toast.error("Please write a review comment");
       return;
     }
-
-    const reviewData = {
-      rating: newReview.rating,
-      comment: newReview.comment,
-    };
 
     try {
+      const reviewData = {
+        rating: newReview.rating,
+        comment: newReview.comment,
+      };
+
       if (userHasWrittenReview) {
-        // Update the existing review
-        await updateRecipeReview({
-          recipeId,
-          reviewData,
-        });
-        toast.success("Review updated successfully!", { duration: 3000 });
-        // Update the reviews list by directly modifying the relevant review
-        onReviewAdded?.(reviewData); // This assumes onReviewAdded handles the update
+        await updateRecipeReview({ recipeId, reviewData });
+        toast.success("Review updated successfully!");
       } else {
-        // Add a new review
-        await addReview({
-          recipeId,
-          ...reviewData,
-        });
-        toast.success("Review added successfully!", { duration: 3000 });
-        onReviewAdded?.(reviewData);
+        await addReview({ recipeId, ...reviewData });
+        toast.success("Review added successfully!");
       }
       handleCloseModal();
+      await fetchReviews(); // Refresh reviews list after adding/updating
     } catch (err) {
-      toast.error("Failed to submit review. Please try again.", {
-        duration: 3000,
-      });
+      toast.error("Failed to submit review");
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    try {
+      await DeleteRecipeReview(recipeId); // Call delete API
+      toast.success("Review deleted successfully!");
+      handleCloseModal(); // Close the modal
+      await fetchReviews();
+    } catch (err) {
+      toast.error("Failed to delete review");
     }
   };
 
@@ -135,8 +103,8 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
     visible: {
       opacity: 1,
       transition: {
-        delayChildren: 0.3,
-        staggerChildren: 0.1,
+        staggerChildren: 0.15,
+        delayChildren: 0.2,
       },
     },
   };
@@ -148,30 +116,36 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 300,
-        damping: 15,
+        stiffness: 200,
+        damping: 20,
       },
     },
   };
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={containerVariants}>
-      <div className="flex justify-between items-center mb-4">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="p-6 rounded-xl"
+    >
+      <div className="flex justify-between items-center mb-8">
         <motion.h2
-          className="text-xl font-semibold text-olive flex items-center"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
+          className="text-2xl font-bold text-olive flex items-center"
         >
-          <MessageSquare className="mr-2 text-olive" size={24} />
+          <MessageSquare className="mr-3 text-olive" size={28} />
           Reviews
         </motion.h2>
         {authUser && (
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               type="link"
+              loading={addLoading || updateLoading}
               onClick={handleOpenModal}
-              className="text-olive flex items-center"
-              icon={<PlusCircle className="mr-1" size={16} />}
+              className="bg-olive  text-white flex items-center px-6 py-2 rounded-full shadow-md transition-all"
+              icon={<PenIcon className="mr-2" size={18} />}
             >
               {userHasWrittenReview ? "Edit Review" : "Write a Review"}
             </Button>
@@ -179,72 +153,113 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
         )}
       </div>
 
-      {loadingUserIds.length > 0 && <ChefHatSpinner />}
-
-      <AnimatePresence>
-        {reviews.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center text-gray-500 py-6"
-          >
-            No reviews yet. Be the first to review!
-          </motion.div>
-        ) : (
-          reviews.map((review) => (
+      {reviewsLoading ? (
+        <div className="flex justify-center py-12">
+          <ChefHatSpinner />
+        </div>
+      ) : (
+        <AnimatePresence>
+          {reviews?.length === 0 ? (
             <motion.div
-              key={review.user}
-              variants={itemVariants}
-              className="border-b pb-4 mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12 text-gray-500"
             >
-              <div className="flex items-center space-x-3 mb-2">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Avatar
-                    src={
-                      reviewAuthors[review.user]?.ProfilePicURL ||
-                      "/src/assets/logo.png"
-                    }
-                    alt={reviewAuthors[review.user]?.name || "Anonymous"}
-                    size={40}
-                    className="border-2 border-[#5d6544] shadow-sm shadow-olive"
-                  />
-                </motion.div>
-                <div>
-                  <p className="font-semibold text-olive">
-                    {reviewAuthors[review.user]?.name || "Anonymous"}
-                  </p>
-                  <Rate disabled value={review.rating} />
-                </div>
-              </div>
-              <p className="text-black ">{review.comment}</p>
-              <p className="text-sm text-gray-600">
-                {new Date(review.date).toLocaleDateString()}
-              </p>
+              <MessageSquare size={48} className="mx-auto mb-4 text-olive" />
+              <p className="text-lg">No reviews yet. Be the first to review!</p>
             </motion.div>
-          ))
-        )}
-      </AnimatePresence>
+          ) : (
+            <div className="grid gap-6">
+              {reviews?.map((review) => (
+                <motion.div
+                  key={review._id}
+                  variants={itemVariants}
+                  className=" p-6 rounded-lg "
+                >
+                  <div className="flex items-start space-x-4">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className="relative"
+                    >
+                      <Avatar
+                        src={
+                          review.user.ProfilePicURL || "/src/assets/logo.png"
+                        }
+                        alt={review.user.name}
+                        size={50}
+                        className="border-2 border-olive shadow-sm"
+                      />
+                      <div className="absolute -bottom-1 -right-1 bg-olive rounded-full p-1" />
+                    </motion.div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-lg text-olive">
+                            {review.user.name || "Anonymous"}
+                          </h3>
+                          <Rate
+                            disabled
+                            value={review.rating}
+                            className="text-amber-400"
+                          />
+                        </div>
+                        <span className="text-sm text-gray-400">
+                          {new Date(review.date).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-gray-700 leading-relaxed">
+                        {review.comment}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </AnimatePresence>
+      )}
 
       <Modal
         title={
-          <div className="flex items-center">
-            <Star className="mr-2 text-olive" />
-            {userHasWrittenReview ? "Edit Your Review" : "Add a Review"}
+          <div className="flex items-center text-xl font-semibold">
+            <Star className="mr-3 text-amber-400" size={24} />
+            {userHasWrittenReview
+              ? "Edit Your Review"
+              : "Share Your Experience"}
           </div>
         }
         open={isModalOpen}
         onOk={handleAddReview}
         onCancel={handleCloseModal}
-        okText={userHasWrittenReview ? "Update Review" : "Submit"}
-        cancelText="Cancel"
-        confirmLoading={loading}
-        okButtonProps={{
-          className: "bg-olive text-white hover:bg-olive",
-          icon: <Star className="mr-1" size={16} />,
-        }}
+        className="review-modal"
+        footer={[
+          userHasWrittenReview && (
+            <Button
+              key="delete"
+              type="primary"
+              danger
+              onClick={handleDeleteReview}
+              icon={<TrashIcon className="mr-2" size={16} />}
+              className="hover:bg-red-50"
+            >
+              Delete Review
+            </Button>
+          ),
+          <Button
+            key="submit"
+            type="primary"
+            onClick={handleAddReview}
+            loading={addLoading || updateLoading}
+            className="bg-olive hover:bg-olive/90"
+            icon={<Star className="mr-2" size={16} />}
+          >
+            {userHasWrittenReview ? "Update Review" : "Submit Review"}
+          </Button>,
+        ].filter(Boolean)}
       >
         <div className="flex flex-col space-y-4">
           <motion.div
@@ -268,13 +283,13 @@ export const ReviewSection = ({ reviews, recipeId, onReviewAdded }) => {
             }
           />
         </div>
-        {error && (
+        {reviewsError && (
           <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-red-500 mt-2"
           >
-            {error}
+            {reviewsError}
           </motion.p>
         )}
       </Modal>

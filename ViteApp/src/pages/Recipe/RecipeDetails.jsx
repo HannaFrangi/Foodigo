@@ -9,19 +9,18 @@ import useGetRecipeById from "../../hooks/useGetRecipebyId";
 import useGetIngredientNamesById from "../../hooks/useGetIngredientNameById";
 import useGetUserInfoById from "../../hooks/useGetUserInfoById";
 import { useAuthStore } from "/src/store/useAuthStore"; // Assuming you have this hook to get auth user
+import useGetReviewsById from "../../hooks/useGetReviewsById"; // Import the reviews hook
 
 const RecipeDetails = () => {
   const { id } = useParams();
   const [processedIngredients, setProcessedIngredients] = useState([]);
-  const [reviews, setReviews] = useState([]);
 
-  const { authUser } = useAuthStore(); // Get the authenticated user from the store
+  const { authUser } = useAuthStore();
 
   const {
     Recipe,
     loading: recipeLoading,
     error: recipeError,
-    fetchRecipeById, // Assuming the hook provides a refetch method
   } = useGetRecipeById(id);
 
   const {
@@ -36,6 +35,13 @@ const RecipeDetails = () => {
     isLoading: authorLoading,
     error: authorError,
   } = useGetUserInfoById(Recipe?.data?.userId);
+
+  // Fetch reviews inside this component using the `id` param
+  const {
+    reviews,
+    loading: reviewsLoading,
+    error: reviewsError,
+  } = useGetReviewsById(id); // Fetch reviews for the recipe using its ID
 
   useEffect(() => {
     if (Recipe?.data?.recipeIngredients) {
@@ -61,33 +67,7 @@ const RecipeDetails = () => {
     }
   }, [Recipe, ingredientNames]);
 
-  useEffect(() => {
-    if (Recipe?.data?.reviews) {
-      setReviews(Recipe.data.reviews);
-    }
-  }, [Recipe]);
-
-  const handleReviewAdded = (newReview) => {
-    setReviews((prevReviews) => {
-      const existingReviewIndex = prevReviews.findIndex(
-        (review) => review.user === authUser?._id
-      );
-      if (existingReviewIndex !== -1) {
-        // Update the existing review
-        const updatedReviews = [...prevReviews];
-        updatedReviews[existingReviewIndex] = {
-          ...updatedReviews[existingReviewIndex],
-          ...newReview,
-        };
-        return updatedReviews;
-      } else {
-        // Add a new review
-        return [...prevReviews, { ...newReview, user: authUser?._id }];
-      }
-    });
-  };
-
-  if (recipeLoading || ingredientsLoading || authorLoading) {
+  if (recipeLoading || ingredientsLoading || authorLoading || reviewsLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <RecipeDetailsLoading />
@@ -95,7 +75,7 @@ const RecipeDetails = () => {
     );
   }
 
-  if (recipeError || ingredientsError || authorError) {
+  if (recipeError || ingredientsError || authorError || reviewsError) {
     return <div className="text-olive">Error loading recipe</div>;
   }
 
@@ -126,11 +106,8 @@ const RecipeDetails = () => {
         <div className="p-6 space-y-6">
           <IngredientsSection ingredients={processedIngredients} />
           <InstructionsSection instructions={recipeSteps} />
-          <ReviewSection
-            reviews={reviews}
-            recipeId={id}
-            onReviewAdded={handleReviewAdded}
-          />
+          {/* Pass only the id prop to ReviewSection */}
+          <ReviewSection recipeId={id} />
         </div>
       </div>
     </div>

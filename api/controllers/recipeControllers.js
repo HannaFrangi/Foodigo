@@ -579,3 +579,31 @@ export const getRecipesByIngredientsId = async (req, res) => {
     });
   }
 };
+
+export const getReviewsByRecipeId = async (req, res) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id).populate(
+      "reviews.user",
+      "name ProfilePicURL email"
+    );
+
+    if (!recipe) {
+      return res.status(404).json({
+        success: false,
+        message: "Recipe not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      reviews: recipe.reviews,
+    });
+  } catch (error) {
+    console.error("Error fetching reviews by recipe ID:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve reviews due to server error",
+      error: error.message,
+    });
+  }
+};
