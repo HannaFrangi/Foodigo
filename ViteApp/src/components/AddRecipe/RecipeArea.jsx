@@ -11,7 +11,7 @@ const RecipeArea = ({ formData, setFormData, errors }) => {
   const handleAreaChange = (value) => {
     setFormData((prev) => ({
       ...prev,
-      recipeArea: value,
+      area: value,
     }));
   };
 
@@ -42,7 +42,6 @@ const RecipeArea = ({ formData, setFormData, errors }) => {
           value: item._id,
           label: item.name,
         }))}
-        allowClear
       />
       {errors?.recipeArea && (
         <p className="text-sm text-red-500 mt-1">{errors.recipeArea}</p>

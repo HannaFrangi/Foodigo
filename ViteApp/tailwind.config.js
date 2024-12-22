@@ -29,6 +29,7 @@ module.exports = {
         "gray-text": "#ABABAA",
         sandia: "#ff7470",
         olive: "#5d6544",
+        lowolive: "5d65444d",
         // Dark mode shades
         darkBackground: "#121212", // Background for dark mode
         darkText: "#EAEAEA", // Text color for dark mode

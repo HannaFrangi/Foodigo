@@ -453,11 +453,11 @@ const PageLayout = ({ children, authUser }) => {
 
   return (
     <>
-      {/* <Particles
+      <Particles
         id="tsparticles"
         init={particlesInit}
         options={particlesConfig}
-      /> */}
+      />
       {!isAuthPage && !isResetPage && !isVerificationPage && (
         <Navbar user={authUser} handleLogout={logout} />
       )}

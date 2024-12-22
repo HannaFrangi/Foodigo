@@ -14,7 +14,7 @@ const useAddRecipe = () => {
     try {
       const response = await axiosInstance.post("/recipe", formData, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
 

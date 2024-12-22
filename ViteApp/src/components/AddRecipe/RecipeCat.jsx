@@ -33,7 +33,6 @@ const RecipeCat = ({ formData, setFormData, errors }) => {
     <div className="space-y-2">
       <p className="text-sm font-medium text-olive">Select Categories</p>
       <Select
-        mode="multiple"
         placeholder="Select categories"
         value={formData.categories}
         onChange={handleChange}

@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
-import fs from "fs";
-import path from "path";
-import Area from "../models/Area.js"; // Make sure this path is correct
+import axios from "axios";
+import Area from "../models/Area.js"; // Ensure this path is correct
 
-// MongoDB connection
+// MongoDB connection URI
 const mongoURI =
   process.env.MONGODB_URI ||
   "mongodb+srv://majdchbat:tSvXdHgpIdEbb45G@cluster0.knx1g.mongodb.net/foodigo_db?retryWrites=true&w=majority&appName=Cluster0";
+
+// Connect to MongoDB
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -23,22 +24,25 @@ mongoose.connection.on("error", (err) => {
 // Function to import areas from a JSON file
 const importAreas = async () => {
   try {
-    // Fetch categories from TheMealDB API
-    const response = await axios.get("");
-    const areas = response.data.meals; // Corrected to reference 'meals'
+    // Fetch areas from the Areas.json file (replace with the correct URL if necessary)
+    const response = await axios.get("http://localhost/Areas.json");
 
-    // Loop through each area and insert into the database
-    for (const area of areasData) {
-      const { name } = area;
+    // Assuming the response contains an array of areas
+    const areas = response.data; // If the areas are at a different path, adjust accordingly
 
-      // Check if the area already exists to avoid duplicates
+    // Loop through each area and insert it into the database
+    for (const area of areas) {
+      // Assuming each area has a 'name' and other fields
+      const { name } = area; // Modify this based on actual JSON structure
+
+      // Check if the area already exists in the database to avoid duplicates
       const existingArea = await Area.findOne({ name });
       if (existingArea) {
         console.log(`Area "${name}" already exists. Skipping...`);
         continue;
       }
 
-      // Create and save a new area document
+      // Create a new area document and save it
       const newArea = new Area({
         name,
       });
@@ -51,7 +55,7 @@ const importAreas = async () => {
   } catch (error) {
     console.error("Error importing areas:", error);
   } finally {
-    mongoose.connection.close();
+    mongoose.connection.close(); // Close the MongoDB connection after import
   }
 };
 
