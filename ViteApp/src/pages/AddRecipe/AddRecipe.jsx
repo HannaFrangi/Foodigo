@@ -58,10 +58,11 @@ const AddRecipe = () => {
 
     if (validateForm()) {
       try {
+        console.log(formData.recipeIngredients);
         const recipeData = {
           recipeTitle: formData.recipeTitle,
           recipeIngredients: formData.recipeIngredients.map((ingredient) => ({
-            ingredientName: ingredient.name,
+            ingredientName: ingredient.ingredientId,
             quantity: `${ingredient.quantity} ${ingredient.unit}`.trim(),
           })),
           recipeImage: formData.recipeImage,
@@ -75,7 +76,6 @@ const AddRecipe = () => {
 
         console.log(recipeData);
 
-        // Use the addRecipe function from the hook
         await addRecipe(recipeData);
         toast.success("Recipe added successfully!");
         navigate("/recipe");
@@ -247,6 +247,7 @@ const AddRecipe = () => {
             type="submit"
             className="w-full bg-olive text-white hover:bg-olive/90 transition-colors"
             onClick={handleSubmit}
+            loading={loading}
           >
             Create Recipe
           </Button>

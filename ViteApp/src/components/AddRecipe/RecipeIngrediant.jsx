@@ -61,7 +61,7 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
       ...prev,
       recipeIngredients: [
         ...prev.recipeIngredients,
-        { ingredientId: "", quantity: "", unit: "g" },
+        { ingredientName: "", quantity: "", unit: "g" },
       ],
     }));
     setRecentlyAdded(newIndex);
