@@ -14,6 +14,8 @@ import ResetPassword from "./pages/Auth/ResetPassword";
 import VerifyEmail from "./pages/Auth/VerifyEmail";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import AddRecipe from "./pages/AddRecipe/AddRecipe";
+import TagManager from "react-gtm-module";
+
 function App() {
   const lenis = useLenis(({ scroll }) => {
     // called every scroll
@@ -38,6 +40,13 @@ function App() {
 
     fetchCategories();
   }, [checkAuth]);
+
+  useEffect(() => {
+    const tagManagerArgs = {
+      gtmId: "GTM-PXV2ZMZW",
+    };
+    TagManager.initialize(tagManagerArgs);
+  }, []);
 
   //Majd he le heta ??? idk shu bta3mul bas neyka l dene
   // if (loading) return null;
