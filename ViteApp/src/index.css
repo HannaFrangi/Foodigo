@@ -309,3 +309,20 @@
 .review-modal .ant-modal-footer {
   @apply border-t-0 pt-4;
 }
+
+.ant-btn-primary:not(.ant-btn-dangerous):hover {
+  background-color: rgb(
+    128,
+    128,
+    0,
+    0.8
+  ) !important; /* olive with 80% opacity */
+}
+
+.ant-btn-primary:not(.ant-btn-dangerous):focus {
+  background-color: rgb(128, 128, 0) !important; /* olive */
+}
+
+.ant-btn-link:hover {
+  background-color: rgb(128, 128, 0, 0.8) !important;
+}

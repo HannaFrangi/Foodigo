@@ -144,7 +144,8 @@ export const ReviewSection = ({ recipeId }) => {
               type="link"
               loading={addLoading || updateLoading}
               onClick={handleOpenModal}
-              className="bg-olive  text-white flex items-center px-6 py-2 rounded-full shadow-md transition-all"
+              style={{ color: "white" }}
+              className="relative w-full bg-olive hover:bg-olive/80 text-white py-4 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30"
               icon={<PenIcon className="mr-2" size={18} />}
             >
               {userHasWrittenReview ? "Edit Review" : "Write a Review"}
@@ -174,7 +175,7 @@ export const ReviewSection = ({ recipeId }) => {
                 <motion.div
                   key={review._id}
                   variants={itemVariants}
-                  className=" p-6 rounded-lg "
+                  className=" rounded-lg py-2 "
                 >
                   <div className="flex items-start space-x-4">
                     <motion.div
@@ -244,7 +245,7 @@ export const ReviewSection = ({ recipeId }) => {
               danger
               onClick={handleDeleteReview}
               icon={<TrashIcon className="mr-2" size={16} />}
-              className="hover:bg-red-50"
+              className=" bg-olive text-white rounded-full font-medium transition-all duration-300 hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed  shadow-lg shadow-red-500"
             >
               Delete Review
             </Button>
@@ -254,7 +255,7 @@ export const ReviewSection = ({ recipeId }) => {
             type="primary"
             onClick={handleAddReview}
             loading={addLoading || updateLoading}
-            className="bg-olive hover:bg-olive/90"
+            className=" bg-olive text-white rounded-full font-medium transition-all duration-300 hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed  shadow-lg shadow-olive"
             icon={<Star className="mr-2" size={16} />}
           >
             {userHasWrittenReview ? "Update Review" : "Submit Review"}
@@ -275,9 +276,11 @@ export const ReviewSection = ({ recipeId }) => {
             />
           </motion.div>
           <TextArea
-            rows={4}
+            maxLength={500}
+            showCount
             placeholder="Write your review here..."
             value={newReview.comment}
+            style={{ resize: "none", height: "200px" }}
             onChange={(e) =>
               setNewReview((prev) => ({ ...prev, comment: e.target.value }))
             }

@@ -1,8 +1,92 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SearchRecipe from "../components/SearchRecipe/SearchRecipe";
-// import { Carouselle } from "./Home/Carouselle";
 import LatestRecipe from "../components/LatestRecipe/LatestRecipe";
+
+const Homepage = () => {
+  const latestRef = useRef(null);
+  const searchRef = useRef(null);
+  const CarouselleRef = useRef(null);
+  const footerRef = useRef(null);
+
+  useEffect(() => {
+    // Make sure all refs are available before creating the animation
+    if (!latestRef.current || !searchRef.current) return;
+
+    const tl = gsap.timeline({
+      defaults: { duration: 1, ease: "power3.out" },
+    });
+
+    // Create the animation sequence
+    tl.from(latestRef.current, {
+      opacity: 0,
+      y: 100,
+      immediateRender: true,
+    }).from(
+      searchRef.current,
+      {
+        opacity: 0,
+        y: 100,
+        immediateRender: true,
+      },
+      "-=0.8"
+    );
+
+    // Only animate CarouselleRef if it exists
+    if (CarouselleRef.current) {
+      tl.from(
+        CarouselleRef.current,
+        {
+          opacity: 0,
+          y: 100,
+          immediateRender: true,
+        },
+        "-=0.8"
+      );
+    }
+
+    // Only animate footerRef if it exists
+    if (footerRef.current) {
+      tl.from(
+        footerRef.current,
+        {
+          opacity: 0,
+          y: 50,
+          immediateRender: true,
+        },
+        "-=0.8"
+      );
+    }
+
+    // Clean up the animation when component unmounts
+    return () => {
+      tl.kill();
+    };
+  }, []); // Empty dependency array means this runs once on mount
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <div ref={latestRef}>
+          <LatestRecipe />
+        </div>
+        <div ref={searchRef}>
+          <SearchRecipe />
+        </div>
+        {/* Uncomment these when you're ready to use them
+        <div ref={CarouselleRef}>
+          <Carouselle />
+        </div>
+         */}
+        <div ref={footerRef}>
+          <Footer />
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Homepage;
 
 const Footer = () => {
   return (
@@ -127,39 +211,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-const Homepage = () => {
-  const latestRef = useRef(null);
-  const searchRef = useRef(null);
-  const CarouselleRef = useRef(null);
-  const footerRef = useRef(null);
-
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { duration: 1, ease: "power3.out" } });
-    tl.from(latestRef.current, { opacity: 0, y: 100 })
-      .from(searchRef.current, { opacity: 0, y: 100 }, "-=0.8")
-      .from(CarouselleRef.current, { opacity: 0, y: 100 }, "-=0.8")
-      .from(footerRef.current, { opacity: 0, y: 50 }, "-=0.8");
-  }, []);
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow">
-        <div ref={latestRef}>
-          <LatestRecipe />
-        </div>
-        <div ref={searchRef}>
-          <SearchRecipe />
-        </div>
-        {/* <div ref={heroRef}>
-          <Hero />
-        </div> */}
-      </main>
-      <div ref={footerRef}>
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
-export default Homepage;

@@ -88,7 +88,7 @@ const SearchCarouselleSection = () => {
               </div>
               <button
                 type="submit"
-                className="mt-4 px-6 py-3 bg-[#606848] text-white rounded-xl hover:bg-[#4A5139] transition-colors duration-300"
+                className="mt-4 px-6 py-3 bg-olive text-white rounded-full hover:bg-[#4A5139] transition-colors  disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-olive"
               >
                 {Searching ? <ChefHatSpinner size={32} /> : "Search Recipes"}
               </button>

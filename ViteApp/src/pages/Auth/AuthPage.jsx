@@ -274,10 +274,10 @@ const AuthPage = () => {
         <ArrowLeft className="w-6 h-6 text-olive" />
       </button>
 
-      <div className="max-w-md w-full space-y-8 relative">
+      <div className="max-w-md w-full space-y-8 relative mt-24 sm:mt-16">
         <div
           ref={logoRef}
-          className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
+          className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
         >
           <div className="relative">
             <Avatar src={logo} size={150} />
@@ -455,11 +455,17 @@ const AuthPage = () => {
           {!isLogin && (
             <p className="text-center text-sm text-zinc-500 mt-4">
               By creating an account, you agree to our{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
+              <button
+                className="text-red-900 hover:text-red-900 underline bold"
+                onClick={() => navigate("/terms")}
+              >
                 Terms of Service
               </button>{" "}
               and{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
+              <button
+                className="text-red-900 hover:text-red-900 underline bold"
+                onClick={() => navigate("/privacy")}
+              >
                 Privacy Policy
               </button>
             </p>

@@ -24,7 +24,7 @@ const UserAvatar = ({ user, handleLogout, onProfileEdit }) => {
     return (
       <Link
         to="/auth"
-        className="flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-[#5d6544] text-white hover:bg-[#6d7a54] transition-colors duration-300 text-sm font-medium shadow-md hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#5d6544] focus:ring-opacity-50"
+        className="flex items-center justify-center space-x-2 px-4 py-2 rounded-full bg-[#5d6544] text-white hover:bg-[#6d7a54] transition-colors duration-300 text-sm font-medium shadow-sm hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#5d6544] focus:ring-opacity-50  shadow-olive"
       >
         <ChefHat className="h-4 w-4 md:h-5 md:w-5" />
         <span className="hidden xs:inline">Sign In</span>

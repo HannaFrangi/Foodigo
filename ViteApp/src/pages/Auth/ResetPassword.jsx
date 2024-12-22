@@ -137,7 +137,7 @@ const ResetPassword = () => {
           )}
 
           {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative">
+            <div className="bg-green-100 border border-olive text-green-700 px-4 py-3 rounded-lg relative">
               Password reset successfully. Redirecting to login...
             </div>
           )}
@@ -152,7 +152,7 @@ const ResetPassword = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 w-full py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d6544]"
+                className="pl-10 pr-10 w-full py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d6544] shadow-lg shadow-olive"
                 placeholder="Enter new password"
                 required
               />
