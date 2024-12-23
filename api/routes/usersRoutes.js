@@ -4,6 +4,7 @@ import { protectRoute } from "../middleware/auth.js";
 import {
   AddToFavorites,
   AddtoGroceryList,
+  GetGroceryList,
   getUserInfoByID,
   togglePurchasedStatus,
   updateProfile,
@@ -25,6 +26,7 @@ const upload = multer({
 });
 
 router.get("/getUserInfoByID/:id", getUserInfoByID);
+router.get("/getgroccerylist", protectRoute, GetGroceryList);
 router.put(
   "/update-profile",
   protectRoute,

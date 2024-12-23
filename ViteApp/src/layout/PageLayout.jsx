@@ -13,6 +13,7 @@ import {
   PlusCircle,
   Menu as MenuIcon,
   X,
+  ShoppingCart,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "/src/assets/logo.png";
@@ -55,6 +56,18 @@ const UserAvatar = ({ user, handleLogout, onProfileEdit }) => {
         >
           <PlusCircle className="h-4 w-4" />
           <span>Add Recipe</span>
+        </Link>
+      ),
+    },
+    {
+      key: "GrocceryList",
+      label: (
+        <Link
+          to="/groccery"
+          className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-md transition-colors"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          <span>Grocery List</span>
         </Link>
       ),
     },

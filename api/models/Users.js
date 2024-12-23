@@ -24,9 +24,7 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   groceryList: [
     {
-      ingredientID: [
-        { type: mongoose.Schema.Types.ObjectId, ref: "Ingredient" },
-      ],
+      ingredientID: { type: mongoose.Schema.Types.ObjectId, ref: "Ingredient" },
       quantity: { type: String, default: "" },
       isPurchased: { type: Boolean, default: false },
     },

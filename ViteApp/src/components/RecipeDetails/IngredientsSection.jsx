@@ -7,22 +7,26 @@ import {
   PopoverContent,
   Button,
 } from "@nextui-org/react";
+import { useAddToGrocceryList } from "/src/hooks/useAddToGrocceryList";
+import { useAuthStore } from "/src/store/useAuthStore";
 import toast from "react-hot-toast";
 
 export const IngredientsSection = ({ ingredients }) => {
   const [openPopoverId, setOpenPopoverId] = useState(null);
   const [addedIngredients, setAddedIngredients] = useState(new Set());
+  const { addToGrocceryList, loading } = useAddToGrocceryList();
 
-  const handleAddToGroceryList = (ingredient) => {
+  const { authUser } = useAuthStore();
+
+  const handleAddToGroceryList = async (ingredient) => {
+    if (authUser == null) {
+      toast.error("You must be Logged in!");
+      setOpenPopoverId(null);
+      return;
+    }
+    console.log(ingredient);
     setAddedIngredients((prev) => new Set(prev.add(ingredient._id)));
-
-    toast.success(`${ingredient.fullName} added to your grocery list.`, {
-      icon: "🛒",
-      style: {
-        borderRadius: "10px",
-      },
-    });
-
+    await addToGrocceryList(ingredient);
     setOpenPopoverId(null);
   };
 
@@ -176,6 +180,7 @@ export const IngredientsSection = ({ ingredients }) => {
                       endContent={<ChefHat className="w-4 h-4" />}
                       onClick={() => handleAddToGroceryList(ingredient)}
                       isDisabled={addedIngredients.has(ingredient._id)}
+                      loading={loading}
                     >
                       {addedIngredients.has(ingredient._id)
                         ? "Added to List"

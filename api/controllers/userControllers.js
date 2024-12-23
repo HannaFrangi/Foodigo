@@ -6,8 +6,9 @@ import {
 } from "firebase/storage";
 import User from "../models/Users.js";
 import Recipe from "../models/Recipe.js";
-
+import convert from "convert-units";
 import { storage } from "../config/firebase.js";
+import Ingredient from "../models/Ingredient.js";
 
 export const updateProfile = async (req, res) => {
   try {
@@ -205,7 +206,7 @@ const standardizeQuantity = (quantityStr) => {
       lb: "lb",
       pound: "lb",
       pounds: "lb",
-      // Add more mappings as needed
+      pcs: "pcs",
     };
 
     const standardUnit = unitMap[unit.toLowerCase()];
@@ -269,38 +270,47 @@ export const AddtoGroceryList = async (req, res) => {
     const { ingredientID, quantity } = req.body;
     const userID = req.user._id;
 
+    // Validate ingredientID
     if (!ingredientID) {
       return res.status(400).json({
         success: false,
-        message: "Ingredient ID is required",
+        message: "Ingredient ID is required.",
+      });
+    }
+
+    // Check if the ingredient exists in the Ingredient collection
+    const ingredientExists = await Ingredient.findById(ingredientID);
+    if (!ingredientExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid ingredient ID. Ingredient does not exist.",
       });
     }
 
     // Find the user
     const user = await User.findById(userID);
     if (!user) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "User not found.",
       });
     }
 
-    // Standardize the new quantity if provided
+    // Standardize the provided quantity
     let standardizedNewQuantity = null;
     if (quantity) {
       standardizedNewQuantity = standardizeQuantity(quantity);
       if (!standardizedNewQuantity && quantity.trim() !== "") {
         return res.status(400).json({
           success: false,
-          message:
-            "Invalid quantity format. Please use format like '2 cups' or '500 g'",
+          message: "Invalid quantity format. Please use '2 cups' or '500 g'.",
         });
       }
     }
 
-    // Check if ingredient already exists in the grocery list
-    const existingItem = user.groceryList.find((item) =>
-      item.ingredientID.some((id) => id.toString() === ingredientID.toString())
+    // Check if the ingredient already exists in the grocery list
+    const existingItem = user.groceryList.find(
+      (item) => item.ingredientID.toString() === ingredientID
     );
 
     if (existingItem) {
@@ -317,7 +327,7 @@ export const AddtoGroceryList = async (req, res) => {
           existingStandardized &&
           existingStandardized.unit === standardizedNewQuantity.unit
         ) {
-          // Add quantities if units are compatible
+          // Combine quantities if units match
           const totalValue =
             existingStandardized.value + standardizedNewQuantity.value;
           existingItem.quantity = formatQuantity(
@@ -325,7 +335,7 @@ export const AddtoGroceryList = async (req, res) => {
             existingStandardized.unit
           );
         } else {
-          // If units are incompatible or can't parse, keep both quantities
+          // If units are incompatible, append both quantities as a string
           existingItem.quantity = `${existingItem.quantity}, ${quantity}`;
         }
       } else if (standardizedNewQuantity) {
@@ -335,9 +345,9 @@ export const AddtoGroceryList = async (req, res) => {
         );
       }
     } else {
-      // Add new item
+      // Add a new item to the grocery list
       user.groceryList.push({
-        ingredientID: [ingredientID],
+        ingredientID, // Single ingredient ID
         quantity: standardizedNewQuantity
           ? formatQuantity(
               standardizedNewQuantity.value,
@@ -348,20 +358,21 @@ export const AddtoGroceryList = async (req, res) => {
       });
     }
 
+    // Save changes to the user
     await user.save();
 
     res.status(200).json({
       success: true,
       message: existingItem
-        ? "Item updated in grocery list"
-        : "New item added to grocery list",
+        ? "Item updated in grocery list."
+        : "New item added to grocery list.",
       groceryList: user.groceryList,
     });
   } catch (error) {
     console.error("Error in AddtoGroceryList:", error);
     res.status(500).json({
       success: false,
-      message: "Error adding item to grocery list",
+      message: "Error adding item to grocery list.",
       error: error.message,
     });
   }
@@ -437,6 +448,37 @@ export const getUserInfoByID = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+export const GetGroceryList = async (req, res) => {
+  try {
+    const userID = req.user._id;
+
+    // Find the user and populate ingredient details
+    const user = await User.findById(userID).populate({
+      path: "groceryList.ingredientID",
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Grocery list fetched successfully.",
+      groceryList: user.groceryList,
+    });
+  } catch (error) {
+    console.error("Error in GetGroceryList:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching grocery list.",
+      error: error.message,
     });
   }
 };

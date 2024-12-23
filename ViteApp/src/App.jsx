@@ -15,6 +15,7 @@ import VerifyEmail from "./pages/Auth/VerifyEmail";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import AddRecipe from "./pages/AddRecipe/AddRecipe";
 import TagManager from "react-gtm-module";
+import GrocceryList from "./pages/Groccery/GrocceryList";
 
 function App() {
   const lenis = useLenis(({ scroll }) => {
@@ -68,7 +69,7 @@ function App() {
             <Route path="/verify-email/:token" element={<VerifyEmail />} />
             <Route path="/recipe/:id" element={<RecipeDetails />} />
             <Route path="/recipes/new" element={<AddRecipe />} />
-
+            <Route path="/groccery" element={<GrocceryList />} />
             <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>
