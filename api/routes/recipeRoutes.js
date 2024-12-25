@@ -20,6 +20,7 @@ import {
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
+import { cacheMiddleware } from "../config/cache.js";
 
 const router = express.Router();
 
@@ -37,7 +38,7 @@ const upload = multer({
 });
 
 router.post("/", protectRoute, upload.single("recipeImage"), createRecipe);
-router.get("/latest", getLatestRecipe);
+router.get("/latest", cacheMiddleware(1800), getLatestRecipe);
 router.get("/:id/review", getReviewsByRecipeId);
 router.get("/search", getRecipesByName);
 router.get("/category/:categoryId", getRecipesByCategory);

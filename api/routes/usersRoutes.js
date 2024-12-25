@@ -6,6 +6,7 @@ import {
   AddtoGroceryList,
   GetGroceryList,
   getUserInfoByID,
+  RemoveFromGroceryList,
   togglePurchasedStatus,
   updateProfile,
 } from "../controllers/userControllers.js";
@@ -33,7 +34,11 @@ router.put(
   upload.single("profilePic"),
   updateProfile
 );
-
+router.delete(
+  "/removefromgrocerylist/:id",
+  protectRoute,
+  RemoveFromGroceryList
+);
 router.put("/addtofavorites/", protectRoute, AddToFavorites);
 
 router.post("/addToGroceryList/", protectRoute, AddtoGroceryList);

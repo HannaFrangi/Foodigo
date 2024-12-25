@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Search, Filter, X, ChevronDown, GridIcon, List } from "lucide-react";
 import { RecipeCard } from "../../components/RecipeCard/RecipeCard";
 
@@ -98,87 +98,19 @@ const FilterChip = ({ label, active, onClick }) => (
 );
 
 export default function RecipePage() {
-  const [recipes, setRecipes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    mealType: [],
-    dietary: [],
-    cuisine: [],
-    difficulty: [],
-    cookTime: [],
-  });
-  const [sortBy, setSortBy] = useState("popular");
-  const [loading, setLoading] = useState(false);
-  const [view, setView] = useState("grid");
+  const preparation = useRef();
+
+  gsap.registerPlugin(ScrollToPlugin);
 
   useEffect(() => {
-    const fetchRecipes = async () => {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setRecipes([
-        {
-          id: "1",
-          recipeTitle: "Classic Margherita Pizza",
-          description:
-            "Traditional Italian pizza with fresh basil and mozzarella",
-          recipeImage:
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxgbXJj7igPnSKXcgSP2UTJT0kTYxAGrcQhQ&s",
-          categories: ["6738bfdb4210d11bde43a40f"],
-          prepTime: "30 mins",
-          difficulty: "Medium",
-          rating: 4.8,
-          reviews: 245,
-          bookmarked: true,
-          author: {
-            name: "Chef Maria",
-            avatar: "/api/placeholder/40/40",
-          },
-        },
-      ]);
-      setLoading(false);
-    };
-    fetchRecipes();
+    window.scrollTo(0, 0);
   }, []);
 
-  const filteredRecipes = useMemo(() => {
-    return recipes.filter((recipe) => {
-      const searchMatch =
-        !searchQuery ||
-        recipe.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const filterMatch = Object.entries(filters).every(
-        ([category, selectedValues]) => {
-          if (selectedValues.length === 0) return true;
-          return selectedValues.some((value) =>
-            recipe.categories?.includes(value)
-          );
-        }
-      );
-      return searchMatch && filterMatch;
-    });
-  }, [recipes, searchQuery, filters]);
-
-  const handleFilterToggle = (category, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [category]: prev[category].includes(value)
-        ? prev[category].filter((item) => item !== value)
-        : [...prev[category], value],
-    }));
-  };
-
-  const clearAllFilters = () => {
-    setFilters({
-      mealType: [],
-      dietary: [],
-      cuisine: [],
-      difficulty: [],
-      cookTime: [],
-    });
-    setSearchQuery("");
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white p-4 md:p-8">
+    <div
+      className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white p-4 md:p-8"
+      ref={preparation}
+    >
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
           <h1 className="text-4xl font-bold text-gray-800 tracking-tight">

@@ -10,7 +10,6 @@ const useGetGrocceryList = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`users/getgroccerylist`);
-      console.log(response.data.groceryList);
       if (response.data.success) {
         setGrocceryList(response.data.groceryList);
       }

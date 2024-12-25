@@ -278,7 +278,7 @@ const generateResetToken = () => {
 };
 
 const sendResetEmail = async (user, token) => {
-  const resetLink = `${process.env.BASE_URL}/reset-password/${token}`;
+  const resetLink = `${process.env.BASE_URL}reset-password/${token}`;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",

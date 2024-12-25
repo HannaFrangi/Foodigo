@@ -76,11 +76,11 @@ const RecipeDetails = () => {
   }
 
   if (recipeError || ingredientsError || authorError || reviewsError) {
-    return <div className="text-olive">Error loading recipe</div>;
+    return <div className="text-olive">Error loading recipe</div>; // Majd Error Update
   }
 
   if (!Recipe || !Recipe.data) {
-    return <div className="text-olive">Recipe not found.</div>;
+    return <div className="text-olive">Recipe not found.</div>; // majd Upadate this
   }
 
   const { recipeTitle, recipeImage, recipeInstructions, area } = Recipe.data;

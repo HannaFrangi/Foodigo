@@ -165,14 +165,24 @@ export const AddToFavorites = async (req, res) => {
   }
 };
 
+const CONVERSION_FACTORS = {
+  cup: 236.588, // ml per cup
+  Tbs: 14.7868, // ml per tablespoon
+  tsp: 4.92892, // ml per teaspoon
+};
+
 const standardizeQuantity = (quantityStr) => {
   try {
+    if (!quantityStr || typeof quantityStr !== "string") return null;
+
     // Extract number and unit from string (e.g., "2 cups" -> { value: 2, unit: "cups" })
     const match = quantityStr.trim().match(/^([\d.]+)\s*([a-zA-Z]+)$/);
     if (!match) return null;
 
     const [, value, unit] = match;
     const numValue = parseFloat(value);
+
+    if (isNaN(numValue)) return null;
 
     // Map common unit variations to standard units
     const unitMap = {
@@ -206,6 +216,10 @@ const standardizeQuantity = (quantityStr) => {
       lb: "lb",
       pound: "lb",
       pounds: "lb",
+      // Count
+      pc: "pcs",
+      piece: "pcs",
+      pieces: "pcs",
       pcs: "pcs",
     };
 
@@ -215,15 +229,35 @@ const standardizeQuantity = (quantityStr) => {
     let standardValue;
     let standardizedUnit;
 
-    // Convert to standard units based on type
-    if (["cup", "Tbs", "tsp", "ml", "l"].includes(standardUnit)) {
-      // Convert all volume measurements to milliliters
-      standardValue = convert(numValue).from(standardUnit).to("ml");
+    // Handle volume conversions
+    if (["cup", "Tbs", "tsp"].includes(standardUnit)) {
+      standardValue = numValue * CONVERSION_FACTORS[standardUnit];
       standardizedUnit = "ml";
-    } else if (["g", "kg", "oz", "lb"].includes(standardUnit)) {
-      // Convert all mass measurements to grams
-      standardValue = convert(numValue).from(standardUnit).to("g");
-      standardizedUnit = "g";
+    }
+    // Handle direct ml/l measurements
+    else if (standardUnit === "ml") {
+      standardValue = numValue;
+      standardizedUnit = "ml";
+    } else if (standardUnit === "l") {
+      standardValue = numValue * 1000;
+      standardizedUnit = "ml";
+    }
+    // Handle mass conversions
+    else if (["g", "kg", "oz", "lb"].includes(standardUnit)) {
+      try {
+        standardValue = convert(numValue).from(standardUnit).to("g");
+        standardizedUnit = "g";
+      } catch (error) {
+        console.error("Conversion error:", error);
+        return null;
+      }
+    }
+    // Handle piece counts
+    else if (standardUnit === "pcs") {
+      return {
+        value: numValue,
+        unit: "pcs",
+      };
     } else {
       return null;
     }
@@ -238,37 +272,70 @@ const standardizeQuantity = (quantityStr) => {
   }
 };
 
-// Helper function to format quantity for display
 const formatQuantity = (value, unit) => {
-  let displayValue, displayUnit;
+  try {
+    if (typeof value !== "number") return "";
 
-  if (unit === "ml") {
-    if (value >= 1000) {
-      displayValue = (value / 1000).toFixed(2);
-      displayUnit = "L";
-    } else {
-      displayValue = Math.round(value);
-      displayUnit = "ml";
+    let displayValue, displayUnit;
+
+    switch (unit) {
+      case "ml":
+        if (value >= 1000) {
+          displayValue = (value / 1000).toFixed(2);
+          displayUnit = "L";
+        } else {
+          displayValue = Math.round(value);
+          displayUnit = "ml";
+        }
+        break;
+      case "g":
+        if (value >= 1000) {
+          displayValue = (value / 1000).toFixed(2);
+          displayUnit = "kg";
+        } else {
+          displayValue = Math.round(value);
+          displayUnit = "g";
+        }
+        break;
+      case "pcs":
+        displayValue = Math.round(value);
+        displayUnit = "pcs";
+        break;
+      default:
+        return `${value} ${unit}`;
     }
-  } else if (unit === "g") {
-    if (value >= 1000) {
-      displayValue = (value / 1000).toFixed(2);
-      displayUnit = "kg";
-    } else {
-      displayValue = Math.round(value);
-      displayUnit = "g";
-    }
-  } else {
-    return `${value} ${unit}`;
+
+    return `${displayValue} ${displayUnit}`;
+  } catch (error) {
+    console.error("Error in formatQuantity:", error);
+    return "";
   }
+};
 
-  return `${displayValue} ${displayUnit}`;
+const parseExistingQuantity = (quantityStr) => {
+  if (!quantityStr) return null;
+
+  const match = quantityStr.trim().match(/^([\d.]+)\s*([A-Za-z]+)$/);
+  if (!match) return null;
+
+  return {
+    value: parseFloat(match[1]),
+    unit: match[2].toLowerCase(),
+  };
 };
 
 export const AddtoGroceryList = async (req, res) => {
   try {
     const { ingredientID, quantity } = req.body;
-    const userID = req.user._id;
+    const userID = req.user?._id;
+
+    // Validate user
+    if (!userID) {
+      return res.status(401).json({
+        success: false,
+        message: "User authentication required",
+      });
+    }
 
     // Validate ingredientID
     if (!ingredientID) {
@@ -278,7 +345,7 @@ export const AddtoGroceryList = async (req, res) => {
       });
     }
 
-    // Check if the ingredient exists in the Ingredient collection
+    // Check if the ingredient exists
     const ingredientExists = await Ingredient.findById(ingredientID);
     if (!ingredientExists) {
       return res.status(400).json({
@@ -287,92 +354,158 @@ export const AddtoGroceryList = async (req, res) => {
       });
     }
 
-    // Find the user
-    const user = await User.findById(userID);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found.",
-      });
-    }
-
-    // Standardize the provided quantity
+    // Standardize the new quantity
     let standardizedNewQuantity = null;
     if (quantity) {
       standardizedNewQuantity = standardizeQuantity(quantity);
       if (!standardizedNewQuantity && quantity.trim() !== "") {
         return res.status(400).json({
           success: false,
-          message: "Invalid quantity format. Please use '2 cups' or '500 g'.",
+          message:
+            "Invalid quantity format. Please use format like '2 cups' or '500 g'.",
         });
       }
     }
 
-    // Check if the ingredient already exists in the grocery list
-    const existingItem = user.groceryList.find(
-      (item) => item.ingredientID.toString() === ingredientID
+    // Find the existing item first to get its current quantity
+    const existingItem = await User.findOne(
+      {
+        _id: userID,
+        "groceryList.ingredientID": ingredientID,
+      },
+      { "groceryList.$": 1 }
     );
 
-    if (existingItem) {
-      // Reset isPurchased if it was true
-      if (existingItem.isPurchased) {
-        existingItem.isPurchased = false;
-      }
+    let finalQuantity = standardizedNewQuantity;
 
-      // Handle quantity updates
-      if (existingItem.quantity && standardizedNewQuantity) {
-        const existingStandardized = standardizeQuantity(existingItem.quantity);
+    if (existingItem && existingItem.groceryList[0]) {
+      const existingQuantity = parseExistingQuantity(
+        existingItem.groceryList[0].quantity
+      );
 
-        if (
-          existingStandardized &&
-          existingStandardized.unit === standardizedNewQuantity.unit
-        ) {
-          // Combine quantities if units match
-          const totalValue =
-            existingStandardized.value + standardizedNewQuantity.value;
-          existingItem.quantity = formatQuantity(
-            totalValue,
-            existingStandardized.unit
-          );
+      if (existingQuantity && standardizedNewQuantity) {
+        // Only add quantities if units match or can be converted
+        if (existingQuantity.unit === standardizedNewQuantity.unit) {
+          finalQuantity = {
+            value: existingQuantity.value + standardizedNewQuantity.value,
+            unit: standardizedNewQuantity.unit,
+          };
         } else {
-          // If units are incompatible, append both quantities as a string
-          existingItem.quantity = `${existingItem.quantity}, ${quantity}`;
+          // Try to convert units if they're different but compatible
+          const existingStandardized = standardizeQuantity(
+            `${existingQuantity.value} ${existingQuantity.unit}`
+          );
+          if (
+            existingStandardized &&
+            existingStandardized.unit === standardizedNewQuantity.unit
+          ) {
+            finalQuantity = {
+              value: existingStandardized.value + standardizedNewQuantity.value,
+              unit: standardizedNewQuantity.unit,
+            };
+          }
         }
-      } else if (standardizedNewQuantity) {
-        existingItem.quantity = formatQuantity(
-          standardizedNewQuantity.value,
-          standardizedNewQuantity.unit
-        );
       }
-    } else {
-      // Add a new item to the grocery list
-      user.groceryList.push({
-        ingredientID, // Single ingredient ID
-        quantity: standardizedNewQuantity
-          ? formatQuantity(
-              standardizedNewQuantity.value,
-              standardizedNewQuantity.unit
-            )
-          : quantity || "",
-        isPurchased: false,
+    }
+
+    const formattedQuantity = finalQuantity
+      ? formatQuantity(finalQuantity.value, finalQuantity.unit)
+      : quantity?.trim() || "";
+
+    // Update the item with the new total quantity
+    const updateOperation = await User.findOneAndUpdate(
+      {
+        _id: userID,
+        "groceryList.ingredientID": ingredientID,
+      },
+      {
+        $set: {
+          "groceryList.$.quantity": formattedQuantity,
+          "groceryList.$.lastUpdated": new Date(),
+        },
+      },
+      { new: true }
+    );
+
+    // If item wasn't found, add it as new
+    if (!updateOperation) {
+      const addNewItem = await User.findByIdAndUpdate(
+        userID,
+        {
+          $push: {
+            groceryList: {
+              ingredientID,
+              quantity: formattedQuantity,
+              isPurchased: false,
+              lastUpdated: new Date(),
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!addNewItem) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found.",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "New item added to grocery list.",
+        groceryList: addNewItem.groceryList,
       });
     }
 
-    // Save changes to the user
-    await user.save();
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: existingItem
-        ? "Item updated in grocery list."
-        : "New item added to grocery list.",
-      groceryList: user.groceryList,
+      message: "Item quantity updated in grocery list.",
+      groceryList: updateOperation.groceryList,
     });
   } catch (error) {
     console.error("Error in AddtoGroceryList:", error);
     res.status(500).json({
       success: false,
       message: "Error adding item to grocery list.",
+      error: error.message,
+    });
+  }
+};
+
+export const RemoveFromGroceryList = async (req, res) => {
+  try {
+    const userID = req.user._id;
+
+    if (!req.params.id) {
+      return res.status(400).json({
+        success: false,
+        message: "Grocery item ID is required",
+      });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { _id: userID },
+      { $pull: { groceryList: { _id: req.params.id } } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Item removed from grocery list",
+    });
+  } catch (error) {
+    console.error("Error in RemoveFromGroceryList:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error removing item from grocery list",
       error: error.message,
     });
   }

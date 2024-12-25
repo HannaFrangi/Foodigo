@@ -7,14 +7,14 @@ import {
   PopoverContent,
   Button,
 } from "@nextui-org/react";
-import { useAddToGrocceryList } from "/src/hooks/useAddToGrocceryList";
+import { useAddToGroceryList } from "../../hooks/useAddToGrocceryList";
 import { useAuthStore } from "/src/store/useAuthStore";
 import toast from "react-hot-toast";
 
 export const IngredientsSection = ({ ingredients }) => {
   const [openPopoverId, setOpenPopoverId] = useState(null);
   const [addedIngredients, setAddedIngredients] = useState(new Set());
-  const { addToGrocceryList, loading } = useAddToGrocceryList();
+  const { addToGroceryList, loading } = useAddToGroceryList();
 
   const { authUser } = useAuthStore();
 
@@ -25,8 +25,8 @@ export const IngredientsSection = ({ ingredients }) => {
       return;
     }
     console.log(ingredient);
+    await addToGroceryList(ingredient);
     setAddedIngredients((prev) => new Set(prev.add(ingredient._id)));
-    await addToGrocceryList(ingredient);
     setOpenPopoverId(null);
   };
 

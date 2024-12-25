@@ -7,6 +7,7 @@ import { Lock, Eye, EyeOff, ChevronRight } from "lucide-react";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -62,6 +63,7 @@ const ResetPassword = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -99,6 +101,8 @@ const ResetPassword = () => {
       setTimeout(() => navigate("/"), 2500);
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,6 +164,7 @@ const ResetPassword = () => {
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                loading={loading}
               >
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>
