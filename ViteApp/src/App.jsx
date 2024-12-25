@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes, Navigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -10,16 +10,19 @@ import Error from "./pages/404/NotFound";
 import Favorites from "./pages/Favorites/Favorites";
 import { useAuthStore } from "./store/useAuthStore";
 import { useRecipeStore } from "./store/useRecipeStore";
-import ResetPassword from "./pages/Auth/ResetPassword";
-import VerifyEmail from "./pages/Auth/VerifyEmail";
-import RecipeDetails from "./pages/Recipe/RecipeDetails";
-import AddRecipe from "./pages/AddRecipe/AddRecipe";
 import TagManager from "react-gtm-module";
-import GrocceryList from "./pages/Groccery/GrocceryList";
+import ChefHatSpinner from "./utils/ChefHatSpinner";
+
+// Lazy load the components
+const RecipeDetails = lazy(() => import("./pages/Recipe/RecipeDetails"));
+const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
+const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
+const AddRecipe = lazy(() => import("./pages/AddRecipe/AddRecipe"));
+const GrocceryList = lazy(() => import("./pages/Groccery/GrocceryList"));
 
 function App() {
   const lenis = useLenis(({ scroll }) => {
-    // called every scroll
+    // Called every scroll
   });
 
   const { checkAuth, authUser, loading } = useAuthStore();
@@ -32,8 +35,6 @@ function App() {
         icon: "⚠",
         style: {
           borderRadius: "10px",
-          // background: "#333",
-          // color: "#fff",
           zIndex: 300,
         },
       });
@@ -49,8 +50,7 @@ function App() {
     TagManager.initialize(tagManagerArgs);
   }, []);
 
-  //Majd he le heta ??? idk shu bta3mul bas neyka l dene
-  // if (loading) return null;
+  // if (loading) return null; majd ferm l dene
 
   return (
     <>
@@ -65,11 +65,46 @@ function App() {
             />
             <Route path="/recipe" element={<RecipePage />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/reset-password/:token" element={<ResetPassword />} />
-            <Route path="/verify-email/:token" element={<VerifyEmail />} />
-            <Route path="/recipe/:id" element={<RecipeDetails />} />
-            <Route path="/recipes/new" element={<AddRecipe />} />
-            <Route path="/groccery" element={<GrocceryList />} />
+            <Route
+              path="/recipe/:id"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <RecipeDetails />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <ResetPassword />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/verify-email/:token"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <VerifyEmail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/recipes/new"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <AddRecipe />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/groccery"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <GrocceryList />
+                </Suspense>
+              }
+            />
             <Route path="/*" element={<Error />} />
           </Routes>
         </PageLayout>
