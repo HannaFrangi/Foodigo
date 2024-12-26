@@ -165,7 +165,7 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
                       <span>Search ingredients...</span>
                     </div>
                   }
-                  value={ingredient.ingredientId || undefined} // Changed from ingredientName to ingredientId
+                  value={ingredient.ingredientId} // Changed from ingredientName to ingredientId
                   onChange={
                     (value) =>
                       handleIngredientChange(value, index, "ingredientId") // Changed to ingredientId
@@ -214,6 +214,7 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
                 options={unitOptions}
                 status={errors?.recipeIngredients?.[index]?.unit ? "error" : ""}
                 popupClassName="rounded-lg shadow-lg"
+                placement="bottomLeft"
               />
 
               <Tooltip title="Remove Ingredient">

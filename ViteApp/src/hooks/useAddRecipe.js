@@ -17,10 +17,10 @@ const useAddRecipe = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      setSuccess(true);
-      setLoading(false);
-      return response.data;
+      if (response.data) {
+        setSuccess(true);
+        setLoading(false);
+      }
     } catch (err) {
       setSuccess(false);
       setLoading(false);

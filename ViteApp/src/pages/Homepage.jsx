@@ -57,6 +57,7 @@ const Homepage = () => {
         "-=0.8"
       );
     }
+    document.title = "Foodigo | Home";
 
     // Clean up the animation when component unmounts
     return () => {

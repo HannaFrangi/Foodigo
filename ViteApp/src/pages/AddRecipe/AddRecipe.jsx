@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
-import { Input, Textarea, Button, Tooltip } from "@nextui-org/react";
-import { Plus, Trash2, Image, X, CopySlash } from "lucide-react";
+import toast from "react-hot-toast";
+import { Input, Button, Tooltip } from "@nextui-org/react";
+import { Image, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import useAddRecipe from "/src/hooks/useAddRecipe";
 import RecipeCat from "/src/components/AddRecipe/RecipeCat";
 import RecipeIngrediant from "/src/components/AddRecipe/RecipeIngrediant";
 import RecipeArea from "/src/components/AddRecipe/RecipeArea";
+import RecipeInstructions from "/src/components/AddRecipe/RecipeInstructions";
+import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 
 const AddRecipe = () => {
   const navigate = useNavigate();
   const { authUser } = useAuthStore();
-  const { addRecipe, loading, error } = useAddRecipe();
+  const { addRecipe, loading } = useAddRecipe();
   // const { area, fetchALlAreas } = useGetAllAreas();
 
   if (!authUser) {
@@ -22,7 +24,6 @@ const AddRecipe = () => {
 
   const [formData, setFormData] = useState({
     recipeTitle: "",
-    recipeBio: "",
     area: "",
     recipeVideoTutorial: "",
     categories: [],
@@ -39,8 +40,6 @@ const AddRecipe = () => {
 
     if (!formData.recipeTitle.trim())
       newErrors.recipeTitle = "Recipe title is required";
-    if (!formData.recipeBio.trim())
-      newErrors.recipeBio = "Recipe description is required";
     if (formData.categories.length === 0)
       newErrors.categories = "Please select at least one category";
     if (!formData.recipeInstructions.trim())
@@ -58,7 +57,6 @@ const AddRecipe = () => {
 
     if (validateForm()) {
       try {
-        console.log(formData.recipeIngredients);
         const recipeData = {
           recipeTitle: formData.recipeTitle,
           recipeIngredients: formData.recipeIngredients.map((ingredient) => ({
@@ -69,16 +67,13 @@ const AddRecipe = () => {
           recipeVideoTutorial: formData.recipeVideoTutorial,
           area: formData.area,
           recipeInstructions: formData.recipeInstructions,
-          recipeBio: formData.recipeBio,
           userId: authUser._id,
           categories: formData.categories,
         };
 
-        console.log(recipeData);
-
         await addRecipe(recipeData);
         toast.success("Recipe added successfully!");
-        navigate("/recipe");
+        // navigate("/recipe");
       } catch (err) {
         console.error(err);
         toast.error(err.message || "Failed to add recipe");
@@ -96,7 +91,7 @@ const AddRecipe = () => {
       }
 
       // Validate file type
-      const validTypes = ["image/jpeg", "image/png", "image/gif"];
+      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg"];
       if (!validTypes.includes(file.type)) {
         toast.error("Only JPEG, PNG, and GIF images are allowed");
         return;
@@ -117,7 +112,7 @@ const AddRecipe = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white shadow-2xl rounded-2xl p-8 border-2 border-olive/20 space-y-6">
         <h1 className="text-4xl font-bold mb-6 text-center text-olive">
           Create a New Recipe
@@ -147,7 +142,6 @@ const AddRecipe = () => {
               errors={errors}
             />
           </div>
-
           <Input
             label="Recipe Video Tutorial (Optional)"
             variant="bordered"
@@ -159,18 +153,6 @@ const AddRecipe = () => {
               }))
             }
             className="w-full"
-          />
-          {/* Description */}
-          <Textarea
-            label="Recipe Description"
-            variant="bordered"
-            value={formData.recipeBio}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, recipeBio: e.target.value }))
-            }
-            className="w-full"
-            isInvalid={!!errors.recipeBio}
-            errorMessage={errors.recipeBio}
           />
 
           {/* Categories and Image */}
@@ -217,7 +199,6 @@ const AddRecipe = () => {
               )}
             </div>
           </div>
-
           {/* Ingredients Dynamic Section */}
           <RecipeIngrediant
             formData={formData}
@@ -225,31 +206,20 @@ const AddRecipe = () => {
             errors={errors}
           />
           {/* Instructions */}
-          <Textarea
-            label="Cooking Instructions"
-            variant="bordered"
-            value={formData.recipeInstructions}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                recipeInstructions: e.target.value,
-              }))
-            }
-            className="w-full"
-            isInvalid={!!errors.recipeInstructions}
-            errorMessage={errors.recipeInstructions}
-            minRows={6}
+          <RecipeInstructions
+            formData={formData}
+            setFormData={setFormData}
+            errors={errors}
           />
-
           {/* Submit Button */}
           <Button
             variant="solid"
             type="submit"
-            className="w-full bg-olive text-white hover:bg-olive/90 transition-colors"
+            className="w-full bg-olive text-white hover:bg-olive/90 transition-colors flex items-center justify-center"
             onClick={handleSubmit}
-            loading={loading}
+            disabled={loading}
           >
-            Create Recipe
+            {loading ? <ChefHatSpinner size={30} /> : "Create Recipe"}
           </Button>
         </form>
       </div>

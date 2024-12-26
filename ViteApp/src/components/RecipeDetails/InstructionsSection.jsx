@@ -4,6 +4,7 @@ import { Steps } from "antd";
 
 export const InstructionsSection = ({ instructions }) => {
   // Container animation
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

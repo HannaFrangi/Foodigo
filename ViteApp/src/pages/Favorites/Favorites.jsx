@@ -17,7 +17,6 @@ const Favorites = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { authUser, getFavorites } = useAuthStore();
-  const isLoggedIn = Boolean(authUser);
 
   useEffect(() => {
     try {
@@ -33,13 +32,15 @@ const Favorites = () => {
     } catch (error) {
       console.error("Error parsing categories:", error);
     }
+    window.scrollTo(0, 0);
+    document.title = "Foodigo | Favorites";
   }, []);
 
   // Fetch favorite IDs
   useEffect(() => {
     const fetchFavoriteIds = async () => {
       try {
-        if (!isLoggedIn) {
+        if (!authUser) {
           const cookieFavorites = Cookies.get("favorites");
           const parsedFavorites = cookieFavorites
             ? JSON.parse(cookieFavorites)
@@ -56,7 +57,7 @@ const Favorites = () => {
     };
 
     fetchFavoriteIds();
-  }, [isLoggedIn, getFavorites]);
+  }, [authUser, getFavorites]);
 
   // Fetch recipe details
   useEffect(() => {

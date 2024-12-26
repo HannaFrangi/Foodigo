@@ -38,7 +38,7 @@ const upload = multer({
 });
 
 router.post("/", protectRoute, upload.single("recipeImage"), createRecipe);
-router.get("/latest", cacheMiddleware(1800), getLatestRecipe);
+router.get("/latest", getLatestRecipe);
 router.get("/:id/review", getReviewsByRecipeId);
 router.get("/search", getRecipesByName);
 router.get("/category/:categoryId", getRecipesByCategory);

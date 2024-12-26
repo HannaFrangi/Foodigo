@@ -36,6 +36,10 @@ const RecipeDetails = () => {
     error: authorError,
   } = useGetUserInfoById(Recipe?.data?.userId);
 
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top on page load
+  }, []);
+
   // Fetch reviews inside this component using the `id` param
   const {
     reviews,
@@ -50,6 +54,7 @@ const RecipeDetails = () => {
       );
       if (ingredientIds.length > 0) {
         fetchIngredientNamesByIds(ingredientIds);
+        document.title = `Recipe | ${Recipe?.data?.recipeTitle} 👩‍🍳`;
       }
     }
   }, [Recipe, fetchIngredientNamesByIds]);

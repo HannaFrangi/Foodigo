@@ -24,7 +24,7 @@ export const IngredientsSection = ({ ingredients }) => {
       setOpenPopoverId(null);
       return;
     }
-    console.log(ingredient);
+
     await addToGroceryList(ingredient);
     setAddedIngredients((prev) => new Set(prev.add(ingredient._id)));
     setOpenPopoverId(null);
