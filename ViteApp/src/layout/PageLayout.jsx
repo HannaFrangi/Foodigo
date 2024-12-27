@@ -90,7 +90,7 @@ const UserAvatar = ({ user, handleLogout, onProfileEdit }) => {
       menu={{ items: menuItems }}
       placement="bottomRight"
       trigger={["click"]}
-      overlayClassName="w-48 mt-1 p-1 bg-white rounded-xl shadow-lg border border-gray-100"
+      overlayClassName="w-48 mt-1 p-1 bg-gradient-to-b from-[#FFFAF5] to-white rounded-xl shadow-lg border border-gray-100"
     >
       <motion.div
         whileHover={{ scale: 1.05 }}
@@ -198,7 +198,7 @@ const Navbar = ({ user, handleLogout }) => {
     <>
       <nav
         ref={navRef}
-        className="sticky top-0 z-50 bg-white transition-all duration-300"
+        className="sticky top-0 z-50 bg-gradient-to-b from-[#FFFAF5] to-white transition-all duration-300"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
@@ -275,7 +275,7 @@ const Navbar = ({ user, handleLogout }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-white"
+              className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-gradient-to-b from-[#FFFAF5] to-white"
             >
               {navItems.map((item) => (
                 <NavLink
@@ -474,7 +474,10 @@ const PageLayout = ({ children, authUser }) => {
       {!isAuthPage && !isResetPage && !isVerificationPage && (
         <Navbar user={authUser} handleLogout={logout} />
       )}
-      <main ref={mainContentRef} className="min-h-screen bg-white">
+      <main
+        ref={mainContentRef}
+        className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white"
+      >
         {children}
       </main>
     </>

@@ -125,6 +125,7 @@ export const getRecipesByName = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      count: recipes.length, // majd added this (wahesh Ya Chbat)
       data: recipes,
     });
   } catch (error) {
@@ -139,7 +140,7 @@ export const getRecipesByName = async (req, res) => {
 export const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find();
-    res.json({ success: true, data: recipes });
+    res.json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
     console.error("Error in getAllRecipes:", error);
     res.status(500).json({ success: false, message: "Server error" });

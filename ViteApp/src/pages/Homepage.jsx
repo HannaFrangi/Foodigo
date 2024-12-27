@@ -66,7 +66,7 @@ const Homepage = () => {
   }, []); // Empty dependency array means this runs once on mount
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col ">
       <main className="flex-grow">
         <div ref={latestRef}>
           <LatestRecipe />

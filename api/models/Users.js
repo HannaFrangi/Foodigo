@@ -11,6 +11,7 @@ const groceryListItemSchema = new mongoose.Schema({
   quantity: {
     type: String,
     default: "",
+    required: true,
   },
   isPurchased: {
     type: Boolean,

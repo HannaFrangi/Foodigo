@@ -11,6 +11,7 @@ import RecipeResults from "../../components/RecipeCard/RecipeResults";
 import { Input } from "antd";
 import RecipeCardSkeleton from "../RecipeCard/RecipeCardSkeleton";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
+import toast from "react-hot-toast";
 
 const SearchCarouselleSection = () => {
   const {
@@ -32,6 +33,23 @@ const SearchCarouselleSection = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
+
+    const regex = /^[a-zA-Z0-9\s]*$/;
+
+    if (searchQuery.length < 3) {
+      toast.error("Please enter at least 3 characters to search", {
+        duration: 1500,
+      });
+      return;
+    }
+
+    if (!regex.test(searchQuery)) {
+      toast.error("Please avoid special characters in your search", {
+        duration: 1000,
+      });
+      return;
+    }
+
     searchRecipes(searchQuery);
   };
 

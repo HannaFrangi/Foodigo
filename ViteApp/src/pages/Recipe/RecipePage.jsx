@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Filter, X, ChevronDown, GridIcon, List } from "lucide-react";
 import { RecipeCard } from "../../components/RecipeCard/RecipeCard";
+import gsap from "gsap";
+import { ScrollToPlugin } from "gsap/all";
 
 const CATEGORIES = {
   mealType: ["Breakfast", "Lunch", "Dinner", "Snack", "Dessert"],
@@ -99,7 +101,9 @@ const FilterChip = ({ label, active, onClick }) => (
 
 export default function RecipePage() {
   const preparation = useRef();
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const loading = true;
   gsap.registerPlugin(ScrollToPlugin);
 
   useEffect(() => {
@@ -137,76 +141,6 @@ export default function RecipePage() {
               ]}
             />
           </div>
-        </div>
-
-        <CustomAccordion title="Filters">
-          <div className="space-y-6">
-            {Object.entries(CATEGORIES).map(([category, values]) => (
-              <div key={category} className="space-y-2">
-                <h3 className="text-sm font-medium text-gray-700 capitalize">
-                  {category}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {values.map((value) => (
-                    <FilterChip
-                      key={value}
-                      label={value}
-                      active={filters[category].includes(value)}
-                      onClick={() => handleFilterToggle(category, value)}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-            {Object.values(filters).some((arr) => arr.length > 0) && (
-              <button
-                onClick={clearAllFilters}
-                className="px-4 py-2 text-olive"
-              >
-                <X className="h-4 w-4" /> Clear all filters
-              </button>
-            )}
-          </div>
-        </CustomAccordion>
-
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-gray-600">
-              {loading
-                ? "Loading..."
-                : `${filteredRecipes.length} recipes found`}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setView("grid")}
-                className={`p-2 rounded-lg ${
-                  view === "grid" ? "bg-olive text-white" : ""
-                }`}
-              >
-                <GridIcon />
-              </button>
-              <button
-                onClick={() => setView("list")}
-                className={`p-2 rounded-lg ${
-                  view === "list" ? "bg-olive text-white" : ""
-                }`}
-              >
-                <List />
-              </button>
-            </div>
-          </div>
-          <div
-            className={`${
-              view === "grid" ? "grid grid-cols-2 gap-6" : "space-y-4"
-            }`}
-          >
-            {filteredRecipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-          </div>
-          {!loading && filteredRecipes.length === 0 && (
-            <p>No recipes found. Adjust filters.</p>
-          )}
         </div>
       </div>
     </div>

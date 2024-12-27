@@ -41,7 +41,7 @@ const sendVerificationEmail = async (user) => {
   <p style="color: #333; font-size: 16px; line-height: 1.6;">We're excited to have you join us on your culinary journey!</p>
   <p style="color: #333; font-size: 16px; line-height: 1.6;">Foodigo is your go-to app for discovering and organizing recipes, creating grocery lists, and more. Before you get started, please confirm your email address to access all the tasty features we have in store.</p>
   <div style="text-align: center; margin: 20px 0;">
-    <a href="${process.env.BASE_URL}/verify-email/${verificationToken}" 
+    <a href="${process.env.BASE_URL}verify-email/${verificationToken}" 
         style="display: inline-block; padding: 15px 30px; background-color: #5d6544; color: white; font-size: 16px; text-decoration: none; border-radius: 50px; box-shadow: 0 4px 10px rgba(93, 101, 68, 0.3); transition: background-color 0.3s ease;"
        onmouseover="this.style.backgroundColor='#4a5238'; this.style.transform='scale(1.05)';" 
        onmouseout="this.style.backgroundColor='#5d6544'; this.style.transform='scale(1)';">
@@ -65,12 +65,6 @@ const sendVerificationEmail = async (user) => {
     from: process.env.EMAIL_USER,
     to: user.email,
     subject: "Welcome To Foodigo! 👩‍🍳",
-    // text: `Welcome to Foodigo – your ultimate companion for discovering, creating, and sharing delicious recipes! We're thrilled to have you as part of our community. Before you dive into the world of tasty recipes and personalized meal planning, please take a moment to verify your email.
-
-    // Just click the link below to confirm your account and start exploring all that Foodigo has to offer!
-    // ${process.env.BASE_URL}/verify?token=${verificationToken}
-
-    // Bon Appétit, and happy cooking! 🍲`,
     html: htmlContent,
   };
 
@@ -142,7 +136,7 @@ export const signup = async (req, res) => {
     res.status(201).json({
       success: true,
       user: newUser,
-      message: "Please check your email to verify your account",
+      message: "Welcome to Foodigo! 🍲",
     });
   } catch (error) {
     console.log("Error in signup controller:", error);
@@ -174,6 +168,7 @@ export const login = async (req, res) => {
     //     message: "Please verify your email before logging in",
     //   });
     // }
+
     if (!(await user.matchPassword(password))) {
       return res.status(401).json({
         success: false,
@@ -343,7 +338,7 @@ export const forgotPassword = async (req, res) => {
   const resetTokenEntry = new PasswordResetToken({
     userId: user._id,
     token: resetToken,
-    expiresAt: Date.now() + 3600000,
+    expiresAt: Date.now() + 3600000, // 1 hour in milliseconds
   });
 
   await resetTokenEntry.save();

@@ -126,7 +126,7 @@ const Favorites = () => {
     return matchesSearch && matchesCategories;
   });
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white">
       {/* Header Section */}
       <div className="bg-[#5d6544] text-white">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
@@ -149,10 +149,9 @@ const Favorites = () => {
       </div>
 
       {/* Search and Category Filter Section */}
-      <div className="border-b bg-white shadow-sm sticky top-0 z-10">
+      <div className="border-b bg-gradient-to-b from-[#FFFAF5] to-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4">
           <div className="py-4 flex items-center space-x-4">
-            {/* Search Input */}
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input

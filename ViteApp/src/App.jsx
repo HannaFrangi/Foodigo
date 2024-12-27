@@ -12,6 +12,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useRecipeStore } from "./store/useRecipeStore";
 import TagManager from "react-gtm-module";
 import ChefHatSpinner from "./utils/ChefHatSpinner";
+import gsap from "gsap";
 
 // Lazy load the components
 const RecipeDetails = lazy(() => import("./pages/Recipe/RecipeDetails"));
@@ -21,12 +22,12 @@ const AddRecipe = lazy(() => import("./pages/AddRecipe/AddRecipe"));
 const GrocceryList = lazy(() => import("./pages/Groccery/GrocceryList"));
 
 function App() {
-  const lenis = useLenis(({ scroll }) => {
-    // Called every scroll
-  });
-
-  const { checkAuth, authUser, loading } = useAuthStore();
+  const { checkAuth, authUser } = useAuthStore();
   const { fetchCategories } = useRecipeStore();
+
+  const lenis = useLenis(({ scroll }) => {
+    // called every scroll
+  });
 
   useEffect(() => {
     checkAuth();
@@ -55,7 +56,7 @@ function App() {
   return (
     <>
       <Toaster />
-      <ReactLenis root>
+      <ReactLenis options={{ duration: 2 }} root>
         <PageLayout authUser={authUser}>
           <Routes>
             <Route path="/" element={<Homepage />} />
