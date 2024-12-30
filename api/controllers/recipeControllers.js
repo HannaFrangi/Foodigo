@@ -8,6 +8,7 @@ import {
   deleteObject,
 } from "firebase/storage";
 import { storage } from "../config/firebase.js";
+import mongoose from "mongoose";
 
 export const createRecipe = async (req, res) => {
   try {
@@ -80,6 +81,13 @@ export const createRecipe = async (req, res) => {
 
 export const getRecipeById = async (req, res) => {
   try {
+    if (mongoose.Types.ObjectId.isValid(req.params.id) === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid recipe ID",
+      });
+    }
+
     const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) {

@@ -1,12 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Avatar } from "antd";
-import { ArrowLeft, Heart, Share2, Globe } from "lucide-react";
+import {
+  ArrowLeft,
+  Heart,
+  Share2,
+  Globe,
+  Pen,
+  Trash2,
+  Video,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "/src/store/useAuthStore";
 import toast from "react-hot-toast";
 import useGetAreaByid from "/src/hooks/useGetAreaByid";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
+import useDeleteRecipe from "/src/hooks/useDeleteRecipe";
+import useEditRecipe from "/src/hooks/useEditRecipe";
 
 export const RecipeHeader = ({
   recipeTitle,
@@ -14,15 +24,40 @@ export const RecipeHeader = ({
   authorInfo,
   recipeId,
   recipeArea,
+  recipeVideoTutorial,
 }) => {
   const navigate = useNavigate();
-  const { toggleFavorite, getFavorites } = useAuthStore();
+  const { toggleFavorite, getFavorites, authUser } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
-  const { area, loading, error, fetchIngredientAreaByIds } = useGetAreaByid();
+  const {
+    area,
+    loading: areaLoading,
+    fetchIngredientAreaByIds,
+  } = useGetAreaByid();
+  const [isOwner, setIsOwner] = useState(false);
+  const {
+    deleteRecipe,
+    loading: deleteLoading,
+    error: deleteError,
+    success: deleteSuccess,
+  } = useDeleteRecipe();
+
+  const {
+    editRecipe,
+    loading: editLoading,
+    error: editError,
+    success: editSuccess,
+  } = useEditRecipe();
+
+  useEffect(() => {
+    if (authUser) {
+      setIsOwner(authUser?._id === authorInfo?._id);
+    }
+  }, [authUser, authorInfo]);
 
   useEffect(() => {
     fetchIngredientAreaByIds(recipeArea);
-  }, []);
+  }, [recipeArea, fetchIngredientAreaByIds]);
 
   useEffect(() => {
     const initializeCard = () => {
@@ -30,7 +65,17 @@ export const RecipeHeader = ({
       setIsLiked(favorites.includes(recipeId));
     };
     initializeCard();
-  }, [getFavorites]);
+  }, [getFavorites, recipeId]);
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      toast.success("Recipe deleted successfully");
+      navigate("/");
+    }
+    if (deleteError) {
+      toast.error(deleteError.message || "Failed to delete recipe");
+    }
+  }, [deleteSuccess, deleteError, navigate]);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -38,6 +83,7 @@ export const RecipeHeader = ({
     try {
       await toggleFavorite(recipeId);
       setIsLiked((prev) => !prev);
+      toast.success(isLiked ? "Removed from favorites" : "Added to favorites");
     } catch (error) {
       console.error("Error toggling favorite:", error);
       toast.error("Failed to update favorites");
@@ -53,17 +99,68 @@ export const RecipeHeader = ({
         });
         toast.success("Recipe link shared!");
       } catch (error) {
-        console.error("Error sharing URL:", error);
-        toast.error("Failed to share recipe");
+        if (error.name !== "AbortError") {
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast.success("Recipe link copied to clipboard!");
+          } catch (clipboardError) {
+            toast.error("Failed to share or copy recipe link");
+          }
+        }
       }
     } else {
-      toast.error("Sharing not supported in this browser");
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Recipe link copied to clipboard!");
+      } catch (error) {
+        toast.error("Failed to copy recipe link");
+      }
     }
   };
 
-  if (loading) {
+  const handleEdit = async () => {
+    navigate(`/edit/${recipeId}`);
+    await editRecipe(recipeId);
+  };
+
+  const handleDelete = async () => {
+    await deleteRecipe(recipeId);
+    navigate("/");
+  };
+
+  if (areaLoading || deleteLoading || editLoading) {
     return <ChefHatSpinner />;
   }
+
+  const ownerActionsButton = isOwner && (
+    <motion.div className="flex items-center gap-3">
+      <motion.button
+        onClick={handleEdit}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="inline-flex items-center px-4 py-2 rounded-full
+          bg-olive text-white space-x-2 hover:bg-olive/90 
+          transition-colors shadow-sm hover:shadow-md"
+        disabled={deleteLoading}
+      >
+        <Pen className="w-4 h-4" />
+        <span>Edit Recipe</span>
+      </motion.button>
+
+      <motion.button
+        onClick={handleDelete}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="inline-flex items-center px-4 py-2 rounded-full
+          bg-red-500 text-white space-x-2 hover:bg-red-600 
+          transition-colors shadow-sm hover:shadow-md"
+        disabled={deleteLoading}
+      >
+        <Trash2 className={`w-4 h-4 ${deleteLoading ? "animate-spin" : ""}`} />
+        <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
+      </motion.button>
+    </motion.div>
+  );
 
   return (
     <motion.div
@@ -80,27 +177,21 @@ export const RecipeHeader = ({
         animate={{
           scale: 1,
           opacity: 1,
-          transition: {
-            duration: 1,
-            ease: "easeOut",
-          },
+          transition: { duration: 1, ease: "easeOut" },
         }}
       />
+
+      {/* Top Navigation */}
       <div className="absolute top-4 left-4 right-4 flex justify-between">
         <motion.button
           onClick={() => navigate(-1)}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           className="group relative inline-flex items-center justify-center 
-            w-10 h-10 sm:w-11 sm:h-11 
-            rounded-full 
-            bg-white/80 hover:bg-white 
-            backdrop-blur-sm 
-            border border-gray-200/50 
-            shadow-sm hover:shadow-md 
-            transition-all duration-300 
-            focus:outline-none 
-            active:scale-95"
+            w-10 h-10 sm:w-11 sm:h-11 rounded-full 
+            bg-white/80 hover:bg-white backdrop-blur-sm 
+            border border-gray-200/50 shadow-sm hover:shadow-md 
+            transition-all duration-300 focus:outline-none active:scale-95"
         >
           <ArrowLeft className="w-6 h-6 text-olive transition" />
         </motion.button>
@@ -112,39 +203,18 @@ export const RecipeHeader = ({
             whileTap={{ scale: 0.95 }}
             aria-label={isLiked ? "Unlike recipe" : "Like recipe"}
             className="group relative inline-flex items-center justify-center 
-              w-10 h-10 sm:w-11 sm:h-11 
-              rounded-full 
-              bg-white/80 hover:bg-white 
-              backdrop-blur-sm 
-              border border-gray-200/50 
-              shadow-sm hover:shadow-md 
-              transition-all duration-300 
-              focus:outline-none 
-              active:scale-95"
+              w-10 h-10 sm:w-11 sm:h-11 rounded-full 
+              bg-white/80 hover:bg-white backdrop-blur-sm 
+              border border-gray-200/50 shadow-sm hover:shadow-md 
+              transition-all duration-300 focus:outline-none active:scale-95"
           >
-            <motion.svg
-              className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300 
-                ${
-                  isLiked
-                    ? "text-red-500 fill-current"
-                    : "text-gray-600 group-hover:text-red-400"
-                }`}
-              fill={isLiked ? "currentColor" : "none"}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              animate={{
-                scale: isLiked ? [1, 1.2, 1] : 1,
-                rotate: isLiked ? [0, 20, -20, 0] : 0,
-              }}
-              transition={{ duration: 0.3 }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </motion.svg>
+            <Heart
+              className={`w-5 h-5 sm:w-6 sm:h-6 ${
+                isLiked
+                  ? "text-red-500 fill-current"
+                  : "text-gray-600 group-hover:text-red-400"
+              }`}
+            />
           </motion.button>
 
           <motion.button
@@ -152,33 +222,23 @@ export const RecipeHeader = ({
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="group relative inline-flex items-center justify-center 
-              w-10 h-10 sm:w-11 sm:h-11 
-              rounded-full 
-              bg-white/80 hover:bg-white 
-              backdrop-blur-sm 
-              border border-gray-200/50 
-              shadow-sm hover:shadow-md 
-              transition-all duration-300 
-              focus:outline-none 
-              active:scale-95"
+              w-10 h-10 sm:w-11 sm:h-11 rounded-full 
+              bg-white/80 hover:bg-white backdrop-blur-sm 
+              border border-gray-200/50 shadow-sm hover:shadow-md 
+              transition-all duration-300 focus:outline-none active:scale-95"
           >
             <Share2 className="w-5 h-5 sm:w-6 sm:h-6 text-olive transition" />
           </motion.button>
         </div>
       </div>
 
+      {/* Content */}
       <div className="p-6 space-y-4">
         <motion.h1
           className="text-4xl font-bold text-olive tracking-tight"
           initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: {
-              duration: 0.5,
-              delay: 0.2,
-            },
-          }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           {recipeTitle}
         </motion.h1>
@@ -186,57 +246,52 @@ export const RecipeHeader = ({
         <motion.div
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           initial={{ opacity: 0, y: 20 }}
-          animate={{
-            opacity: 1,
-            y: 0,
-            transition: {
-              duration: 0.5,
-              delay: 0.3,
-            },
-          }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <motion.div
-            className="flex items-center space-x-3"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{
-              opacity: 1,
-              x: 0,
-              transition: {
-                duration: 0.5,
-                delay: 0.4,
-              },
-            }}
-          >
+          <motion.div className="flex items-center space-x-3">
             <Avatar
               src={authorInfo?.ProfilePicURL || "/src/assets/logo.png"}
               alt={authorInfo?.name || "Foodigo Team"}
               className="border-2 border-[#5d6544] shadow-sm shadow-olive"
               size={50}
             />
-            <p className="text-olive font-semibold text-lg">
-              {authorInfo?.name || "Foodigo Team"}
-            </p>
+            <div>
+              <p className="text-olive font-semibold text-lg">
+                {authorInfo?.name || "Foodigo Team"}
+              </p>
+              {isOwner && (
+                <p className="text-gray-500 text-sm">Recipe Creator</p>
+              )}
+            </div>
           </motion.div>
+
+          {ownerActionsButton}
+        </motion.div>
+
+        <motion.div className="flex flex-wrap gap-3">
+          {recipeVideoTutorial && (
+            <motion.a
+              href={recipeVideoTutorial}
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center px-4 py-2 rounded-full
+                bg-white text-olive space-x-2 hover:bg-gray-50 
+                transition-colors shadow-sm hover:shadow-md
+                border border-olive/10"
+            >
+              <Video className="w-4 h-4" />
+              <span>Watch Tutorial</span>
+            </motion.a>
+          )}
 
           {area?.data?.name && (
             <motion.div
               className="flex items-center space-x-2 bg-white/90 backdrop-blur-sm 
                 rounded-full px-4 py-2 shadow-sm border border-olive/10"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                transition: {
-                  duration: 0.5,
-                  delay: 0.5,
-                },
-              }}
-              whileHover={{
-                scale: 1.05,
-                transition: {
-                  duration: 0.2,
-                },
-              }}
+              whileHover={{ scale: 1.05 }}
             >
               <Globe className="w-5 h-5 text-olive" />
               <span className="text-olive font-medium">{area.data.name}</span>
@@ -247,3 +302,5 @@ export const RecipeHeader = ({
     </motion.div>
   );
 };
+
+export default RecipeHeader;

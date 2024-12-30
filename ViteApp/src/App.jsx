@@ -12,47 +12,36 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useRecipeStore } from "./store/useRecipeStore";
 import TagManager from "react-gtm-module";
 import ChefHatSpinner from "./utils/ChefHatSpinner";
-import gsap from "gsap";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
-
-// Lazy load the components
+import RecipeHeader from "./components/RecipeDetails/RecipeHeader";
 
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
 const AddRecipe = lazy(() => import("./pages/AddRecipe/AddRecipe"));
 const GrocceryList = lazy(() => import("./pages/Groccery/GrocceryList"));
+const EditRecipePage = lazy(() => import("./pages/Recipe/EditRecipePage"));
 
 function App() {
   const { checkAuth, authUser, loading } = useAuthStore();
   const { fetchCategories } = useRecipeStore();
 
-  const lenis = useLenis(({ scroll }) => {
-    // called every scroll
-  });
+  const lenis = useLenis(({ scroll }) => {});
 
   useEffect(() => {
     checkAuth();
     if (authUser && !authUser.isVerified) {
       toast("Don't forget to verify your account!", {
         icon: "⚠",
-        style: {
-          borderRadius: "10px",
-          zIndex: 300,
-        },
+        style: { borderRadius: "10px", zIndex: 300 },
       });
     }
-
     fetchCategories();
   }, [checkAuth]);
 
   useEffect(() => {
-    const tagManagerArgs = {
-      gtmId: "GTM-PXV2ZMZW",
-    };
+    const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
   }, []);
-
-  // if (loading) return null; majd ferm l dene
 
   return (
     <>
@@ -68,6 +57,15 @@ function App() {
             <Route path="/recipe" element={<RecipePage />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/recipe/:id" element={<RecipeDetails />} />
+            <Route path="/recipe/:recipeId" element={<RecipeHeader />} />
+            <Route
+              path="/edit/:recipeId"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <EditRecipePage />
+                </Suspense>
+              }
+            />
             <Route
               path="/reset-password/:token"
               element={

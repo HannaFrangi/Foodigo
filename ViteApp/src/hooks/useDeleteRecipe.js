@@ -1,6 +1,5 @@
 import { axiosInstance } from "../lib/axios";
-
-const { useState } = require("react");
+import { useState } from "react";
 
 const useDeleteRecipe = () => {
   const [loading, setLoading] = useState(false);
@@ -21,9 +20,6 @@ const useDeleteRecipe = () => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    deleteRecipe();
-  }, []);
 
   return { loading, error, success, deleteRecipe };
 };

@@ -73,7 +73,7 @@ const AddRecipe = () => {
 
         await addRecipe(recipeData);
         toast.success("Recipe added successfully!");
-        // navigate("/recipe");
+        navigate("/");
       } catch (err) {
         console.error(err);
         toast.error(err.message || "Failed to add recipe");
