@@ -221,6 +221,13 @@ const standardizeQuantity = (quantityStr) => {
       piece: "pcs",
       pieces: "pcs",
       pcs: "pcs",
+      // Miscellaneous
+      large: "large",
+      grated: "grated",
+      diced: "diced",
+      sliced: "sliced",
+      chopped: "chopped",
+      small: "small",
     };
 
     const standardUnit = unitMap[unit.toLowerCase()];
@@ -252,11 +259,22 @@ const standardizeQuantity = (quantityStr) => {
         return null;
       }
     }
-    // Handle piece counts
-    else if (standardUnit === "pcs") {
+    // Handle piece counts and miscellaneous units
+    else if (
+      [
+        "pcs",
+        "large",
+        "piece",
+        "small ",
+        "grated",
+        "diced",
+        "sliced",
+        "chopped",
+      ].includes(standardUnit)
+    ) {
       return {
         value: numValue,
-        unit: "pcs",
+        unit: standardUnit,
       };
     } else {
       return null;
@@ -298,8 +316,13 @@ const formatQuantity = (value, unit) => {
         }
         break;
       case "pcs":
+      case "large":
+      case "grated":
+      case "diced":
+      case "sliced":
+      case "chopped":
         displayValue = Math.round(value);
-        displayUnit = "pcs";
+        displayUnit = unit;
         break;
       default:
         return `${value} ${unit}`;

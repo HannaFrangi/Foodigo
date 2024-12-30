@@ -7,6 +7,7 @@ const MEASUREMENT_UNITS = {
     { value: "g", label: "Grams (g)" },
     { value: "ml", label: "Milliliters (ml)" },
     { value: "cup", label: "Cups" },
+    { value: "tbs", label: "Tablespoons" },
     { value: "tbsp", label: "Tablespoons" },
     { value: "tsp", label: "Teaspoons" },
     { value: "pcs", label: "Pieces" },
@@ -27,6 +28,7 @@ const MEASUREMENT_UNITS = {
     { value: "can", label: "Can" },
     { value: "package", label: "Package" },
     { value: "handful", label: "Handful" },
+    { value: "Large", label: "Large" },
   ],
 };
 
@@ -42,6 +44,7 @@ export const useAddToGroceryList = () => {
   // Helper function to format quantity
   const formatQuantity = (quantity) => {
     // Handle null, undefined, or empty string
+
     if (!quantity) {
       return "1 pcs";
     }

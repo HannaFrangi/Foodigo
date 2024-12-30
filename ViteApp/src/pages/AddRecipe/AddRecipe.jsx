@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Input, Button, Tooltip } from "@nextui-org/react";
+import { Input, Button, Upload, Tooltip, Spin } from "antd";
 import { Image, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import useAddRecipe from "/src/hooks/useAddRecipe";
@@ -121,20 +121,25 @@ const AddRecipe = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Recipe Basics */}
           <div className="grid md:grid-cols-2 gap-4">
-            <Input
-              label="Recipe Title"
-              variant="bordered"
-              value={formData.recipeTitle}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  recipeTitle: e.target.value,
-                }))
-              }
-              className="w-full"
-              isInvalid={!!errors.recipeTitle}
-              errorMessage={errors.recipeTitle}
-            />
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-olive">Recipe Title</p>
+              <Input
+                value={formData.recipeTitle}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    recipeTitle: e.target.value,
+                  }))
+                }
+                status={errors.recipeTitle ? "error" : ""}
+                className="w-full"
+              />
+              {errors.recipeTitle && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.recipeTitle}
+                </p>
+              )}
+            </div>
 
             <RecipeArea
               formData={formData}
@@ -142,18 +147,21 @@ const AddRecipe = () => {
               errors={errors}
             />
           </div>
-          <Input
-            label="Recipe Video Tutorial (Optional)"
-            variant="bordered"
-            value={formData.recipeVideoTutorial}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                recipeVideoTutorial: e.target.value,
-              }))
-            }
-            className="w-full"
-          />
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-olive">
+              Recipe Video Tutorial (Optional)
+            </p>
+            <Input
+              value={formData.recipeVideoTutorial}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  recipeVideoTutorial: e.target.value,
+                }))
+              }
+              className="w-full"
+            />
+          </div>
 
           {/* Categories and Image */}
           <div className="grid md:grid-cols-2 gap-4">

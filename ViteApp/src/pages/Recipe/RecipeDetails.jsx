@@ -8,14 +8,12 @@ import RecipeDetailsLoading from "../../components/RecipeDetails/RecipeDetailsLo
 import useGetRecipeById from "../../hooks/useGetRecipebyId";
 import useGetIngredientNamesById from "../../hooks/useGetIngredientNameById";
 import useGetUserInfoById from "../../hooks/useGetUserInfoById";
-import { useAuthStore } from "/src/store/useAuthStore"; // Assuming you have this hook to get auth user
+
 import useGetReviewsById from "../../hooks/useGetReviewsById"; // Import the reviews hook
 
 const RecipeDetails = () => {
   const { id } = useParams();
   const [processedIngredients, setProcessedIngredients] = useState([]);
-
-  const { authUser } = useAuthStore();
 
   const {
     Recipe,
@@ -109,7 +107,7 @@ const RecipeDetails = () => {
         </div>
       </div>
     );
-  }
+  } //Majd
 
   if (!Recipe || !Recipe.data) {
     return (
@@ -147,7 +145,7 @@ const RecipeDetails = () => {
         </div>
       </div>
     );
-  }
+  } //Majd
 
   const {
     recipeTitle,

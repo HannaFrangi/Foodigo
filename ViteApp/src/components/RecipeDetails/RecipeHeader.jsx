@@ -95,7 +95,7 @@ export const RecipeHeader = ({
       try {
         await navigator.share({
           url: window.location.href,
-          title: recipeTitle,
+          title: { recipeTitle },
         });
         toast.success("Recipe link shared!");
       } catch (error) {
@@ -124,8 +124,9 @@ export const RecipeHeader = ({
   };
 
   const handleDelete = async () => {
-    await deleteRecipe(recipeId);
-    navigate("/");
+    if (window.confirm("Are you sure you want to delete this recipe?")) {
+      await deleteRecipe(recipeId);
+    }
   };
 
   if (areaLoading || deleteLoading || editLoading) {

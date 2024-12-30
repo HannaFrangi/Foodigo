@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Select, Button, Tooltip, Spin, Input, Typography, Alert } from "antd";
+import { Select, Button, Tooltip, Input, Typography, Alert } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
   InfoCircleOutlined,
   SearchOutlined,
   CheckCircleFilled,
-  ClockCircleOutlined,
 } from "@ant-design/icons";
 import useGetAllIngredients from "/src/hooks/useGetAllIngredients";
-
+import { Spinner } from "@nextui-org/react";
 const { Text } = Typography;
 
 const MEASUREMENT_UNITS = {
@@ -17,7 +16,6 @@ const MEASUREMENT_UNITS = {
     { value: "g", label: "Grams (g)" },
     { value: "ml", label: "Milliliters (ml)" },
     { value: "cup", label: "Cups" },
-    { value: "tbs", label: "Tablespoons" },
     { value: "tbsp", label: "Tablespoons" },
     { value: "tsp", label: "Teaspoons" },
     { value: "pcs", label: "Pieces" },
@@ -41,8 +39,8 @@ const MEASUREMENT_UNITS = {
   ],
 };
 
-const RecipeIngredient = ({ formData, setFormData, errors }) => {
-  const { loading, ingredientNames, error, fetchAllIngrediants } =
+const EditIngredient = ({ formData, setFormData, errors }) => {
+  const { loading, ingredientNames, fetchAllIngrediants } =
     useGetAllIngredients();
   const [recentlyAdded, setRecentlyAdded] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -54,10 +52,6 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
     ],
     []
   );
-
-  useEffect(() => {
-    fetchAllIngrediants();
-  }, []);
 
   const validateQuantity = (value) => {
     if (!value) return false;
@@ -71,7 +65,7 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
       ...prev,
       recipeIngredients: [
         ...prev.recipeIngredients,
-        { ingredientName: "", quantity: "", unit: "g" },
+        { ingredientName: "", quantity: "", unit: "" },
       ],
     }));
     setRecentlyAdded(newIndex);
@@ -86,40 +80,62 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
   };
 
   const handleIngredientChange = (value, index, field) => {
+    if (field === "quantity") {
+      // Extract just the number from the combined quantity string if it exists
+      const quantityMatch = value.match(/[\d.]+/);
+      value = quantityMatch ? quantityMatch[0] : value;
+    }
+
     setFormData((prev) => ({
       ...prev,
-      recipeIngredients: prev.recipeIngredients.map((ing, i) =>
-        i === index ? { ...ing, [field]: value } : ing
-      ),
+      recipeIngredients: prev.recipeIngredients.map((ing, i) => {
+        if (i !== index) return ing;
+
+        const updatedIng = { ...ing, [field]: value };
+
+        // If the field being changed is either quantity or unit,
+        // update the combined quantity field
+        if (field === "quantity" || field === "unit") {
+          const numericQuantity = updatedIng.quantity || "";
+          const unit = updatedIng.unit || "";
+          updatedIng.displayQuantity = `${numericQuantity}${
+            unit ? ` ${unit}` : ""
+          }`;
+        }
+
+        return updatedIng;
+      }),
     }));
   };
 
-  const isIngredientComplete = (ingredient) => {
-    return (
-      ingredient.ingredientId && // Changed from ingredientName to ingredientId
-      validateQuantity(ingredient.quantity) &&
-      ingredient.unit
-    );
+  const parseInitialIngredient = (ingredient) => {
+    if (ingredient.quantity && typeof ingredient.quantity === "string") {
+      const parts = ingredient.quantity.split(" ");
+      if (parts.length > 1) {
+        return {
+          ...ingredient,
+          quantity: parts[0],
+          unit: parts[1],
+          displayQuantity: ingredient.quantity,
+        };
+      }
+    }
+    return ingredient;
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-40">
-        <Spin size="large" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchAllIngrediants();
 
-  if (error) {
-    return (
-      <Alert
-        message="Error Loading Ingredients"
-        description="There was a problem loading the ingredient list. Please try again later."
-        type="error"
-        showIcon
-      />
-    );
-  }
+    // Parse any existing ingredients when component mounts
+    if (formData.recipeIngredients) {
+      setFormData((prev) => ({
+        ...prev,
+        recipeIngredients: prev.recipeIngredients.map(parseInitialIngredient),
+      }));
+    }
+  }, []);
+
+  if (loading) return <Spinner />;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -128,10 +144,6 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
           <h2 className="text-2xl font-semibold text-gray-800">
             Recipe Ingredients
           </h2>
-          <Text className="text-gray-500">
-            {formData.recipeIngredients.filter(isIngredientComplete).length} of{" "}
-            {formData.recipeIngredients.length} ingredients completed
-          </Text>
         </div>
         <Button
           type="primary"
@@ -150,18 +162,13 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
               key={index}
               className={`p-4 transition-all duration-300 ease-in-out flex flex-wrap sm:flex-nowrap gap-4
                 ${hoveredIndex === index ? "bg-gray-50" : "bg-white"}
-                ${recentlyAdded === index ? "animate-fade-in" : ""}
-              `}
+                ${recentlyAdded === index ? "animate-fade-in" : ""}`}
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 <div className="flex-shrink-0">
-                  {isIngredientComplete(ingredient) ? (
-                    <CheckCircleFilled className="text-green-500" />
-                  ) : (
-                    <ClockCircleOutlined className="text-gray-400" />
-                  )}
+                  <CheckCircleFilled className="text-green-500" />
                 </div>
               </div>
 
@@ -175,14 +182,13 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
                       <span>Search ingredients...</span>
                     </div>
                   }
-                  value={ingredient.ingredientId} // Changed from ingredientName to ingredientId
-                  onChange={
-                    (value) =>
-                      handleIngredientChange(value, index, "ingredientId") // Changed to ingredientId
+                  value={ingredient.ingredientName}
+                  onChange={(value) =>
+                    handleIngredientChange(value, index, "ingredientName")
                   }
                   status={
-                    errors?.recipeIngredients?.[index]?.ingredientId
-                      ? "error" // Changed to ingredientId
+                    errors?.recipeIngredients?.[index]?.ingredientName
+                      ? "error"
                       : ""
                   }
                   optionFilterProp="label"
@@ -190,8 +196,8 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
                     option?.label?.toLowerCase().includes(input.toLowerCase())
                   }
                   options={ingredientNames.map((ing) => ({
-                    value: ing.id, // Use the ingredient id here
-                    label: ing.name, // Use the ingredient name here
+                    value: ing.id,
+                    label: ing.name,
                   }))}
                   popupClassName="rounded-lg shadow-lg"
                 />
@@ -281,4 +287,4 @@ const RecipeIngredient = ({ formData, setFormData, errors }) => {
   );
 };
 
-export default RecipeIngredient;
+export default EditIngredient;
