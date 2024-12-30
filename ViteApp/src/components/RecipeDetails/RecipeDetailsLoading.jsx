@@ -3,7 +3,7 @@ import React from "react";
 
 const RecipeDetailsLoading = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-transparent">
       <div className="text-center">
         <ChefHatSpinner size={64} />
         <h2 className="text-2xl font-semibold text-gray-700 mb-2">

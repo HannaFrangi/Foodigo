@@ -20,7 +20,6 @@ import {
 } from "../controllers/recipeControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 import multer from "multer";
-import { cacheMiddleware } from "../config/cache.js";
 
 const router = express.Router();
 

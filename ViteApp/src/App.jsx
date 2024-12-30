@@ -13,16 +13,17 @@ import { useRecipeStore } from "./store/useRecipeStore";
 import TagManager from "react-gtm-module";
 import ChefHatSpinner from "./utils/ChefHatSpinner";
 import gsap from "gsap";
+import RecipeDetails from "./pages/Recipe/RecipeDetails";
 
 // Lazy load the components
-const RecipeDetails = lazy(() => import("./pages/Recipe/RecipeDetails"));
+
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
 const AddRecipe = lazy(() => import("./pages/AddRecipe/AddRecipe"));
 const GrocceryList = lazy(() => import("./pages/Groccery/GrocceryList"));
 
 function App() {
-  const { checkAuth, authUser } = useAuthStore();
+  const { checkAuth, authUser, loading } = useAuthStore();
   const { fetchCategories } = useRecipeStore();
 
   const lenis = useLenis(({ scroll }) => {
@@ -57,7 +58,7 @@ function App() {
     <>
       <Toaster />
       <ReactLenis options={{ duration: 2 }} root>
-        <PageLayout authUser={authUser}>
+        <PageLayout authUser={authUser} loading={loading}>
           <Routes>
             <Route path="/" element={<Homepage />} />
             <Route
@@ -66,14 +67,7 @@ function App() {
             />
             <Route path="/recipe" element={<RecipePage />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route
-              path="/recipe/:id"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <RecipeDetails />
-                </Suspense>
-              }
-            />
+            <Route path="/recipe/:id" element={<RecipeDetails />} />
             <Route
               path="/reset-password/:token"
               element={

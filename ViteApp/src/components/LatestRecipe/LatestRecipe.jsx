@@ -172,7 +172,7 @@ const LatestRecipe = () => {
                 ref={titleRef}
                 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
               >
-                Latest Recipes
+                Latest <span className="text-olive">Recipes</span>
               </h2>
             </div>
             {renderLoadingState}
@@ -192,7 +192,7 @@ const LatestRecipe = () => {
               ref={titleRef}
               className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
             >
-              Latest Recipes
+              Latest <span className="text-olive">Recipes</span>
             </h2>
           </div>
           {renderNoRecipesState}
@@ -209,7 +209,7 @@ const LatestRecipe = () => {
             ref={titleRef}
             className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight"
           >
-            Latest Recipes
+            Latest <span className="text-olive">Recipes</span>
           </h2>
           <div className="hidden md:flex space-x-3">
             {Array.from({ length: totalPages }).map((_, index) => (

@@ -326,7 +326,9 @@ export const getRandomRecipe = async (req, res) => {
   try {
     const count = await Recipe.countDocuments();
     const randomIndex = Math.floor(Math.random() * count);
-    const randomRecipe = await Recipe.findOne().skip(randomIndex);
+    const randomRecipe = await Recipe.findOne()
+      .skip(randomIndex)
+      .select("_id recipeTitle recipeImage categories");
 
     if (!randomRecipe) {
       return res.status(404).json({

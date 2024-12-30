@@ -20,6 +20,9 @@ const MEASUREMENT_UNITS = {
     { value: "tbsp", label: "Tablespoons" },
     { value: "tsp", label: "Teaspoons" },
     { value: "pcs", label: "Pieces" },
+    { value: "bunch", label: "Bunch" },
+    { value: "clove", label: "Clove" },
+    { value: "slice", label: "Slice" },
   ],
   other: [
     { value: "kg", label: "Kilograms (kg)" },
@@ -28,9 +31,14 @@ const MEASUREMENT_UNITS = {
     { value: "lb", label: "Pounds (lb)" },
     { value: "pinch", label: "Pinch" },
     { value: "whole", label: "Whole" },
+    { value: "dash", label: "Dash" },
+    { value: "drop", label: "Drop" },
+    { value: "stick", label: "Stick" },
+    { value: "can", label: "Can" },
+    { value: "package", label: "Package" },
+    { value: "handful", label: "Handful" },
   ],
 };
-
 const RecipeIngredient = ({ formData, setFormData, errors }) => {
   const { loading, ingredientNames, error, fetchAllIngrediants } =
     useGetAllIngredients();

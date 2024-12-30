@@ -4,8 +4,8 @@ import { axiosInstance } from "../lib/axios";
 import { toast } from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
-  authUser: JSON.parse(localStorage.getItem("user-info")) || null,
   loading: false,
+  authUser: null,
 
   checkAuth: async () => {
     try {
@@ -16,10 +16,8 @@ export const useAuthStore = create((set) => ({
       delete user.password;
 
       set({ authUser: user });
-      localStorage.setItem("user-info", JSON.stringify(user));
     } catch (error) {
       set({ authUser: null });
-      localStorage.removeItem("user-info");
       console.error(error?.response?.data?.message || "Authentication failed");
     } finally {
       set({ loading: false });
@@ -49,7 +47,6 @@ export const useAuthStore = create((set) => ({
     try {
       const { data } = await axiosInstance.post("/auth/signup", userData);
       set({ authUser: data.user });
-      localStorage.setItem("user-info", JSON.stringify(data.user));
       toast.success("Signup successful! Welcome.");
     } catch (error) {
       console.error(error);
@@ -62,9 +59,7 @@ export const useAuthStore = create((set) => ({
       const { data } = await axiosInstance.post("/auth/login", loginData);
       const { user } = data;
       delete user.password;
-
       set({ authUser: user });
-      localStorage.setItem("user-info", JSON.stringify(user));
       toast.success("Logged in successfully");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Something went wrong");
@@ -75,7 +70,6 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
-      localStorage.removeItem("user-info");
       Cookies.remove("jwt_token");
       toast.success("Logged out successfully");
     } catch (error) {
