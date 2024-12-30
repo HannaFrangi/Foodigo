@@ -20,7 +20,7 @@ const RecipeArea = ({ formData, setFormData, errors }) => {
   }
 
   if (error) {
-    return <div className="text-red-500 text-sm">Failed to load areas</div>;
+    return <div className="text-red-500 text-sm">Failed to load areas⚠️</div>;
   }
 
   return (

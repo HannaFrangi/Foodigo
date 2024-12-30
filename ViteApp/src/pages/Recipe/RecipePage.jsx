@@ -16,6 +16,7 @@ import { useRecipeStore } from "/src/store/useRecipeStore";
 import toast from "react-hot-toast";
 import RecipeResults from "/src/components/RecipeCard/RecipeResults";
 import useGetRecipeByIngrediants from "/src/hooks/useGetRecipeByIngrediants";
+import { MapPin } from "lucide-react";
 
 const { Option } = Select;
 
@@ -269,8 +270,8 @@ export default function RecipePage() {
 
           {/* Recipe Name Search */}
           <SearchCard
-            icon={BookOpen}
-            title="Recipe Name"
+            icon={MapPin}
+            title="Recipe Area"
             className="md:col-span-2 lg:col-span-1"
           >
             <Input
@@ -286,7 +287,7 @@ export default function RecipePage() {
               className="w-full bg-olive text-white hover:bg-olive/90 transition-all h-10"
               disabled={Searching}
             >
-              {Searching ? <LoadingSpinner /> : "Search by Name"}
+              {Searching ? <LoadingSpinner /> : "Search by Area"}
             </Button>
           </SearchCard>
         </div>
