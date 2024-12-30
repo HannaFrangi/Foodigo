@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import RecipeResults from "/src/components/RecipeCard/RecipeResults";
 import useGetRecipeByIngrediants from "/src/hooks/useGetRecipeByIngrediants";
 import { MapPin } from "lucide-react";
+import { UtensilsCrossed } from "lucide-react";
 
 const { Option } = Select;
 
@@ -319,7 +320,7 @@ export default function RecipePage() {
         <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-xl">
           <div className="flex items-center gap-3 mb-6 sm:mb-8">
             <div className="p-2 sm:p-3 bg-olive/10 rounded-xl">
-              <Soup className="w-6 h-6 text-olive" />
+              <UtensilsCrossed className="w-6 h-6 text-olive" />
             </div>
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">
               Recipes Based on Ingredients
