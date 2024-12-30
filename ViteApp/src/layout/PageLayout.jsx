@@ -339,6 +339,12 @@ const PageLayout = ({ children, authUser }) => {
             height: 25,
           },
           {
+            // chips
+            src: "https://media.istockphoto.com/id/1142980215/photo/chips-on-white.jpg?s=612x612&w=0&k=20&c=nD58V-Rwz7zr01Un57cZJLqQnosv_MQdeU57GyMC-vg=",
+            width: 25,
+            height: 25,
+          },
+          {
             // Lettuce
             src: "https://media.istockphoto.com/id/181072765/photo/lettuce-isolated-isolated-on-white-background.jpg?s=612x612&w=0&k=20&c=axHLN2tckTBwUBZEsd1-LNhnQZ_LMWEGmMBLRVe1qwQ=",
             width: 25,
@@ -425,12 +431,6 @@ const PageLayout = ({ children, authUser }) => {
           {
             // Soda
             src: "https://media.istockphoto.com/id/655123574/photo/soft-drinks-splashing.jpg?s=612x612&w=0&k=20&c=iZcaMSEuzxLRy2lpnUw9NhnTcOhYNgxA3poBbjCsSSc=",
-            width: 25,
-            height: 25,
-          },
-          {
-            // Chips
-            src: "https://media.istockphoto.com/id/1136738223/photo/freshly-cooked-potato-chips.jpg?s=612x612&w=0&k=20&c=5OaAeBvtiQ2Avl4V9l_9P03L1D5mn7Eq7cp1OeojZtQ=",
             width: 25,
             height: 25,
           },
