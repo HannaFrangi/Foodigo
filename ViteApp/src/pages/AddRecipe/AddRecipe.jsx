@@ -22,6 +22,8 @@ const AddRecipe = () => {
     navigate("/");
   }
 
+  document.title = " Foodigo | Add Recipe ";
+
   const [formData, setFormData] = useState({
     recipeTitle: "",
     area: "",
@@ -132,7 +134,7 @@ const AddRecipe = () => {
                   }))
                 }
                 status={errors.recipeTitle ? "error" : ""}
-                className="w-full"
+                className="w-full "
               />
               {errors.recipeTitle && (
                 <p className="text-sm text-red-500 mt-1">

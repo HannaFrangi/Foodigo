@@ -462,6 +462,7 @@ const PageLayout = ({ children, authUser }) => {
         out_mode: "out",
       },
     },
+    zIndex: -20,
   };
 
   return (

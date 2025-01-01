@@ -326,3 +326,7 @@
 .ant-btn-link:hover {
   background-color: rgb(128, 128, 0, 0.8) !important;
 }
+canvas.particles-js-canvas-el {
+  z-index: -2; /* or another value based on your layout */
+  position: absolute; /* Ensure proper stacking context */
+}

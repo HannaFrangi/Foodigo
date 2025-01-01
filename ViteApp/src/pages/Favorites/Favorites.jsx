@@ -128,7 +128,7 @@ const Favorites = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white">
       {/* Header Section */}
-      <div className="bg-[#5d6544] text-white">
+      <div className="bg-[#5d6544] text-white ">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
           <div className="flex items-center justify-between">
             <div>
@@ -149,7 +149,7 @@ const Favorites = () => {
       </div>
 
       {/* Search and Category Filter Section */}
-      <div className="border-b bg-gradient-to-b from-[#FFFAF5] to-white shadow-sm sticky top-0 z-10">
+      <div className="border-b bg-gradient-to-b from-[#FFFAF5] to-white shadow-sm sticky top-0 ">
         <div className="max-w-7xl mx-auto px-4">
           <div className="py-4 flex items-center space-x-4">
             <div className="relative flex-grow">

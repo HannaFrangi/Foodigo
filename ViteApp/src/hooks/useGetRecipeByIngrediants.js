@@ -2,29 +2,32 @@ import { useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-const useGetRecipeByIngrediants = () => {
+const useGetRecipeByIngredients = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [recipe, setRecipe] = useState([]);
 
-  const getRecipeByIngrediants = async (ingrediants) => {
-    if (!ingrediants || ingrediants.trim().length === 0) {
-      toast.error("Ingredients cannot be empty");
+  const getRecipeByIngredients = async (ingredients) => {
+    if (!ingredients || ingredients.length === 0) {
+      toast.error("Please select at least one ingredient");
       return;
     }
 
     setLoading(true);
     setError(null);
     try {
+      // Convert array of ingredients into a comma-separated string
+      const ingredientQuery = ingredients.join(",");
       const response = await axiosInstance.get(
-        `/recipe/search_ingredient?ingredients=${ingrediants}`
+        `/recipe/search_ingredient?ingredients=${ingredientQuery}`
       );
 
       const data = response?.data?.data || [];
       setRecipe(data);
-
       if (data.length === 0) {
-        toast.error("No recipes found for the given ingredients");
+        toast.error("No recipes found for the selected ingredients");
+      } else {
+        toast.success(`${data.length} recipe(s) found!`);
       }
     } catch (err) {
       setError(err);
@@ -38,7 +41,7 @@ const useGetRecipeByIngrediants = () => {
     }
   };
 
-  return { loading, error, recipe, getRecipeByIngrediants };
+  return { loading, error, recipe, getRecipeByIngredients };
 };
 
-export default useGetRecipeByIngrediants;
+export default useGetRecipeByIngredients;

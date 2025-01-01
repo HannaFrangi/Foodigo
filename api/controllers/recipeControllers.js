@@ -361,9 +361,7 @@ export const getRandomRecipe = async (req, res) => {
 export const getRecipesByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const recipes = await Recipe.find({ categories: categoryId }).populate(
-      "categories"
-    );
+    const recipes = await Recipe.find({ categories: categoryId });
 
     if (!recipes.length) {
       return res.status(404).json({
@@ -372,7 +370,9 @@ export const getRecipesByCategory = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true, data: recipes });
+    res
+      .status(200)
+      .json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
     console.error("Error fetching recipes by category:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -402,8 +402,8 @@ export const getRecipesByArea = async (req, res) => {
 
     // Find all recipes for this area with populated categories
     const recipes = await Recipe.find({ area: areaId })
-      .populate("area")
-      .populate("categories")
+      // .populate("area")
+      // .populate("categories")
       .select("-reviews") // Exclude reviews for better performance
       .sort({ createdAt: -1 }); // Sort by newest first
 
