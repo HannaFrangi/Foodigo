@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ArrowDown,
   HeartPulse,
+  ArrowRightCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -101,17 +102,42 @@ const LoadingResults = () => (
   </div>
 );
 
-const NoRecipesFound = () => (
+const NoRecipesFound = ({ recipeResults, category }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     className="flex flex-col items-center justify-center py-12 text-gray-500"
   >
-    <HeartPulse className="w-16 h-16 mb-4 text-olive/50" />
-    <h3 className="text-xl font-medium mb-2">No Recipes Found</h3>
-    <p className="text-gray-400 text-center max-w-md">
-      Try adjusting your search criteria or explore different ingredients
+    <HeartPulse className="w-16 h-16 mb-4 text-olive/50 animate-pulse" />
+
+    <p className="text-gray-400 text-center max-w-md mb-6">
+      {recipeResults.length === 0 && category === "" ? (
+        <>🍴 Hey there! Feeling hungry? Start by searching for a recipe!</>
+      ) : recipeResults.length === 0 && !category ? (
+        <>
+          🤔 No recipes found for the selected category. Why not try a different
+          one?
+        </>
+      ) : (
+        <>🛠️ Oops! Something went wrong. Please try again.</>
+      )}
     </p>
+
+    <motion.div
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="mt-8 text-sm text-gray-400"
+    >
+      🔥 Check out{" "}
+      <span
+        className="text-olive font-bold cursor-pointer"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      >
+        Popular Recipes
+      </span>{" "}
+      or refine your search.
+    </motion.div>
   </motion.div>
 );
 
@@ -621,7 +647,10 @@ export default function RecipePage() {
                   ))}
                 </motion.div>
               ) : (
-                <NoRecipesFound />
+                <NoRecipesFound
+                  recipeResults={recipeResults}
+                  category={category}
+                />
               )}
             </AnimatePresence>
           </div>
