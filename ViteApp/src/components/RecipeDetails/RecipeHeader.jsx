@@ -79,6 +79,30 @@ export const RecipeHeader = ({
       toast.error(deleteError.message || "Failed to delete recipe");
     }
   }, [deleteSuccess, deleteError, navigate]);
+  useEffect(() => {
+    try {
+      const storedCategories = JSON.parse(
+        localStorage.getItem("categories") || "[]"
+      );
+      const categoryIds = Array.isArray(recipeCategories)
+        ? recipeCategories
+        : [recipeCategories];
+
+      const names = categoryIds
+        .map((categoryId) => {
+          const category = storedCategories.find(
+            (cat) => cat._id === categoryId
+          );
+          return category?.name || null;
+        })
+        .filter(Boolean);
+
+      setCategoryNames(names.length > 0 ? names : ["Unknown"]);
+    } catch (error) {
+      console.error("Error processing categories:", error);
+      setCategoryNames(["Unknown"]);
+    }
+  }, [recipeCategories]);
 
   const handleLike = async (e) => {
     e.preventDefault();
@@ -135,30 +159,6 @@ export const RecipeHeader = ({
   if (areaLoading || deleteLoading || editLoading) {
     return <ChefHatSpinner />;
   }
-  useEffect(() => {
-    try {
-      const storedCategories = JSON.parse(
-        localStorage.getItem("categories") || "[]"
-      );
-      const categoryIds = Array.isArray(recipeCategories)
-        ? recipeCategories
-        : [recipeCategories];
-
-      const names = categoryIds
-        .map((categoryId) => {
-          const category = storedCategories.find(
-            (cat) => cat._id === categoryId
-          );
-          return category?.name || null;
-        })
-        .filter(Boolean);
-
-      setCategoryNames(names.length > 0 ? names : ["Unknown"]);
-    } catch (error) {
-      console.error("Error processing categories:", error);
-      setCategoryNames(["Unknown"]);
-    }
-  }, [recipeCategories]);
 
   const ownerActionsButton = isOwner && (
     <motion.div className="flex items-center gap-3">
