@@ -8,6 +8,7 @@ import {
   Pen,
   Trash2,
   Video,
+  Map,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "/src/store/useAuthStore";
@@ -25,8 +26,10 @@ export const RecipeHeader = ({
   recipeId,
   recipeArea,
   recipeVideoTutorial,
+  recipeCategories,
 }) => {
   const navigate = useNavigate();
+  const [categoryNames, setCategoryNames] = useState([]);
   const { toggleFavorite, getFavorites, authUser } = useAuthStore();
   const [isLiked, setIsLiked] = useState(false);
   const {
@@ -132,6 +135,30 @@ export const RecipeHeader = ({
   if (areaLoading || deleteLoading || editLoading) {
     return <ChefHatSpinner />;
   }
+  useEffect(() => {
+    try {
+      const storedCategories = JSON.parse(
+        localStorage.getItem("categories") || "[]"
+      );
+      const categoryIds = Array.isArray(recipeCategories)
+        ? recipeCategories
+        : [recipeCategories];
+
+      const names = categoryIds
+        .map((categoryId) => {
+          const category = storedCategories.find(
+            (cat) => cat._id === categoryId
+          );
+          return category?.name || null;
+        })
+        .filter(Boolean);
+
+      setCategoryNames(names.length > 0 ? names : ["Unknown"]);
+    } catch (error) {
+      console.error("Error processing categories:", error);
+      setCategoryNames(["Unknown"]);
+    }
+  }, [recipeCategories]);
 
   const ownerActionsButton = isOwner && (
     <motion.div className="flex items-center gap-3">
@@ -296,7 +323,21 @@ export const RecipeHeader = ({
               <span>Watch Tutorial</span>
             </motion.a>
           )}
-
+          {recipeCategories && (
+            <motion.div
+              target="_blank"
+              rel="noreferrer"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center px-4 py-2 rounded-full
+                bg-white text-olive space-x-2 hover:bg-gray-50 
+                transition-colors shadow-sm hover:shadow-md
+                border border-olive/10"
+            >
+              <Map className="w-4 h-4" />
+              <span className="text-olive font-medium">{categoryNames}</span>
+            </motion.div>
+          )}
           {area?.data?.name && (
             <motion.div
               className="flex items-center space-x-2 bg-white/90 backdrop-blur-sm 

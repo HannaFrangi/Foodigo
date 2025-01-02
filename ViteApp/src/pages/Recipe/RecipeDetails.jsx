@@ -153,6 +153,7 @@ const RecipeDetails = () => {
     recipeInstructions,
     area,
     recipeVideoTutorial,
+    categories,
   } = Recipe.data;
 
   const recipeSteps = recipeInstructions
@@ -173,6 +174,7 @@ const RecipeDetails = () => {
           recipeId={id}
           recipeArea={area}
           recipeVideoTutorial={recipeVideoTutorial}
+          recipeCategories={categories}
         />
         <div className="p-6 space-y-6">
           <IngredientsSection ingredients={processedIngredients} />
