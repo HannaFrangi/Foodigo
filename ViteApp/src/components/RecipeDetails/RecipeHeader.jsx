@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Avatar } from "antd";
 import {
   ArrowLeft,
   Heart,
@@ -17,6 +16,7 @@ import useGetAreaByid from "/src/hooks/useGetAreaByid";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 import useDeleteRecipe from "/src/hooks/useDeleteRecipe";
 import useEditRecipe from "/src/hooks/useEditRecipe";
+import { Avatar } from "antd";
 
 export const RecipeHeader = ({
   recipeTitle,
@@ -251,12 +251,21 @@ export const RecipeHeader = ({
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <motion.div className="flex items-center space-x-3">
-            <Avatar
-              src={authorInfo?.ProfilePicURL || "/src/assets/logo.png"}
-              alt={authorInfo?.name || "Foodigo Team"}
-              className="border-2 border-[#5d6544] shadow-sm shadow-olive"
-              size={50}
-            />
+            {authorInfo.ProfilePicURL ? (
+              <Avatar
+                src={authorInfo.ProfilePicURL}
+                className="border-2 border-[#5d6544] shadow-sm"
+                size={40}
+              />
+            ) : (
+              <Avatar
+                size={40}
+                className="bg-gradient-to-r from-[#5d6544] to-[#7a8c5a] flex items-center justify-center shadow-sm"
+              >
+                {authorInfo.name.charAt(0).toUpperCase()}
+              </Avatar>
+            )}
+
             <div>
               <p className="text-olive font-semibold text-lg">
                 {authorInfo?.name || "Foodigo Team"}
