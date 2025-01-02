@@ -128,7 +128,7 @@ const Favorites = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFFAF5] to-white">
       {/* Header Section */}
-      <div className="bg-[#5d6544] text-white ">
+      <div className="bg-[#5d6544] text-white relative z-50">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
           <div className="flex items-center justify-between">
             <div>
