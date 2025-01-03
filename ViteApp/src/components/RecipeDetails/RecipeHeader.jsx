@@ -157,7 +157,15 @@ export const RecipeHeader = ({
   };
 
   if (areaLoading || deleteLoading || editLoading) {
-    return <ChefHatSpinner />;
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <RecipeHeaderSkeleton />
+      </motion.div>
+    );
   }
 
   const ownerActionsButton = isOwner && (
@@ -278,20 +286,7 @@ export const RecipeHeader = ({
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           <motion.div className="flex items-center space-x-3">
-            {authorInfo.ProfilePicURL ? (
-              <Avatar
-                src={authorInfo.ProfilePicURL}
-                className="border-2 border-[#5d6544] shadow-sm"
-                size={40}
-              />
-            ) : (
-              <Avatar
-                size={40}
-                className="bg-gradient-to-r from-[#5d6544] to-[#7a8c5a] flex items-center justify-center shadow-sm"
-              >
-                {authorInfo.name.charAt(0).toUpperCase()}
-              </Avatar>
-            )}
+            <UserAvatar authorInfo={authorInfo} />
 
             <div>
               <p className="text-olive font-semibold text-lg">
@@ -355,3 +350,64 @@ export const RecipeHeader = ({
 };
 
 export default RecipeHeader;
+
+const RecipeHeaderSkeleton = () => (
+  <div className="relative overflow-hidden animate-pulse">
+    {/* Image skeleton */}
+    <div className="w-full h-[400px] bg-gray-200" />
+
+    {/* Top Navigation skeleton */}
+    <div className="absolute top-4 left-4 right-4 flex justify-between">
+      <div className="w-11 h-11 rounded-full bg-white/80" />
+      <div className="flex space-x-2">
+        <div className="w-11 h-11 rounded-full bg-white/80" />
+        <div className="w-11 h-11 rounded-full bg-white/80" />
+      </div>
+    </div>
+
+    {/* Content skeleton */}
+    <div className="p-6 space-y-4">
+      {/* Title skeleton */}
+      <div className="h-10 bg-gray-200 rounded-lg w-3/4" />
+
+      {/* Author info skeleton */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200" />
+          <div className="space-y-2">
+            <div className="h-5 bg-gray-200 rounded w-32" />
+            <div className="h-4 bg-gray-200 rounded w-24" />
+          </div>
+        </div>
+      </div>
+
+      {/* Tags skeleton */}
+      <div className="flex flex-wrap gap-3">
+        <div className="h-10 bg-gray-200 rounded-full w-32" />
+        <div className="h-10 bg-gray-200 rounded-full w-40" />
+        <div className="h-10 bg-gray-200 rounded-full w-36" />
+      </div>
+    </div>
+  </div>
+);
+
+const UserAvatar = ({ authorInfo }) => {
+  console.log(authorInfo.name.charAt(0).toUpperCase());
+  return (
+    <Avatar
+      src={authorInfo?.ProfilePicURL || undefined}
+      style={{
+        backgroundColor: !authorInfo?.ProfilePicURL ? "#5d6544" : undefined,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      className={`shadow-sm ${
+        authorInfo?.ProfilePicURL ? "border-2 border-[#5d6544]" : ""
+      }`}
+      size={40}
+    >
+      {authorInfo?.name ? authorInfo.name.charAt(0).toUpperCase() : "F"}
+    </Avatar>
+  );
+};
