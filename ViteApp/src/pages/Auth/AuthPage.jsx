@@ -67,7 +67,7 @@ const AuthPage = () => {
     );
     gsap.fromTo(
       modalContentRef.current,
-      { y: 50, opacity: 0, rotation: -5 },
+      { y: 50, opacity: 0, rotation: 10000 },
       {
         y: 0,
         opacity: 1,

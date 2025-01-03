@@ -4,7 +4,8 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import { gsap } from "gsap";
 import { Lock, Eye, EyeOff, ChevronRight } from "lucide-react";
-
+import { useAuthStore } from "../../store/useAuthStore";
+import { use } from "react";
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -21,8 +22,16 @@ const ResetPassword = () => {
   const buttonRef = useRef(null);
   const logoRef = useRef(null);
 
+  const { authUser } = useAuthStore();
   useEffect(() => {
     // Initial page load animation
+    if (authUser) {
+      toast.error("You are already logged in");
+      navigate("/");
+    }
+    if (!token) {
+      navigate("/");
+    }
     const tl = gsap.timeline();
 
     tl.fromTo(

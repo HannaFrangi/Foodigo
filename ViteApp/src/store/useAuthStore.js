@@ -58,7 +58,7 @@ export const useAuthStore = create((set) => ({
     try {
       const { data } = await axiosInstance.post("/auth/login", loginData);
       const { user } = data;
-      delete user.password;
+      //delete user.password;
       set({ authUser: user });
       toast.success("Logged in successfully");
     } catch (error) {

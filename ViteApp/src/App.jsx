@@ -37,7 +37,7 @@ function App() {
     }
     fetchCategories();
   }, [checkAuth]);
-
+  //check how many times the user has visited the site
   useEffect(() => {
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
