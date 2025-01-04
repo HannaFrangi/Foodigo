@@ -392,7 +392,6 @@ const RecipeHeaderSkeleton = () => (
 );
 
 const UserAvatar = ({ authorInfo }) => {
-  console.log(authorInfo.name.charAt(0).toUpperCase());
   return (
     <Avatar
       src={authorInfo?.ProfilePicURL || undefined}
