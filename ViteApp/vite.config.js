@@ -7,30 +7,83 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
-      manifest: {
-        name: "Foodigo Your Recipe Finder",
-        short_name: "Foodigo",
-        description: "Foodigo Your Recipe Finder Website",
-        theme_color: "#5d6544",
-        icons: [
+      workbox: {
+        // Cache page navigations (html) with a Network First strategy
+        navigateFallback: "index.html",
+        navigateFallbackDenylist: [/^\/api\//],
+
+        runtimeCaching: [
+          // Cache API calls
           {
-            src: "pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
+            urlPattern: /^https?:\/\/api\.your-domain\.com\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 24 * 60 * 60, // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
           },
+
+          // Cache static assets (images, fonts, etc)
           {
-            src: "pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "assets-cache",
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
           },
+
+          // Cache Google Fonts stylesheets
           {
-            src: "pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "any maskable",
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "google-fonts-stylesheets",
+            },
+          },
+
+          // Cache Google Fonts webfont files
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "google-fonts-webfonts",
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          },
+
+          // Cache CSS and JavaScript files
+          {
+            urlPattern: /\.(?:js|css)$/i,
+            handler: "StaleWhileRevalidate",
+            options: {
+              cacheName: "static-resources",
+            },
           },
         ],
+
+        // Don't precache sourcemaps
+        globIgnores: ["**/*.map"],
+
+        // Skip waiting and clients claim
+        skipWaiting: true,
+        clientsClaim: true,
+
+        // Enable navigation preload
+        navigationPreload: true,
       },
     }),
   ],

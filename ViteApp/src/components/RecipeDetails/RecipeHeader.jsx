@@ -122,7 +122,7 @@ export const RecipeHeader = ({
       try {
         await navigator.share({
           url: window.location.href,
-          title: { recipeTitle },
+          title: recipeTitle + " On Foodigo!",
         });
         toast.success("Recipe link shared!");
       } catch (error) {
