@@ -20,7 +20,7 @@ const EmailVerification = () => {
     const verifyEmailAutomatically = async () => {
       if (token) {
         try {
-          console.log(token);
+          // console.log(token);
           await axiosInstance.post("/auth/verify", {
             token,
           });

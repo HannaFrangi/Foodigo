@@ -212,7 +212,7 @@ export default function RecipePage() {
       }
     } catch (error) {
       toast.error(randomError || error || "Failed to fetch random recipe");
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -224,14 +224,10 @@ export default function RecipePage() {
 
     setCategoryLoading(true);
     try {
-      console.log("Selected category ID:", category?._id);
-
       // Fetch recipes directly
       const recipes = await getRecipesByCat(category?._id);
-      console.log(recipes.data);
 
       if (recipes?.data?.length > 0) {
-        console.log("Category Recipes:", recipes);
         // Update local state or perform actions
         setRecipeResults(recipes.data);
         scrollToResults();
@@ -264,9 +260,8 @@ export default function RecipePage() {
       // Check if the recipe state is updated before using it
 
       if (recipesByIngrediants.length > 0) {
-        console.log(recipesByIngrediants);
         setRecipeResults(recipesByIngrediants); // Update state with fetched recipes
-        console.log(recipeResults);
+
         scrollToResults(); // Scroll to the results section
       }
       // else {
@@ -297,11 +292,7 @@ export default function RecipePage() {
     }
 
     try {
-      console.log(`Fetching recipes for area ID: ${selectedArea}`);
       await getRecipesByArea(selectedArea);
-      console.log("Recipes after search:", RecipesByArea);
-      console.log("Recipe count after search:", RecipesByArea);
-
       setRecipeResults(RecipesByArea);
       scrollToResults();
     } catch (error) {

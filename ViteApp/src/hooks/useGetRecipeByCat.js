@@ -16,8 +16,9 @@ const useGetRecipeByCat = () => {
     try {
       const response = await axiosInstance.get(`/recipe/category/${category}`);
       const data = response?.data || [];
+
       setCatRecipes(data); // Update state
-      toast.success(`${response.data} recipe(s) found!`);
+      toast.success(`${response.data.count} recipe(s) found!`);
       return data; // Return data directly
     } catch (err) {
       const errorMessage =

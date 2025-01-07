@@ -17,9 +17,9 @@ const useGetRecipeByArea = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log(`Fetching recipes for area ID: ${areaId}`);
+      // console.log(`Fetching recipes for area ID: ${areaId}`);
       const response = await axiosInstance.get(`/recipe/area/${areaId}`);
-      console.log("API Response:", response);
+      // console.log("API Response:", response);
 
       const recipeCount = response?.data?.count || 0;
       const recipeData = response?.data?.data || [];

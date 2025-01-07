@@ -178,10 +178,9 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
         <div className="flex flex-wrap gap-2 mt-4 items-center">
           {categoryNames.map((categoryName, idx) => (
             <span
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log(categoryName);
-              }}
+              // onClick={(e) => {
+              //   e.stopPropagation();
+              // }}
               key={`${categoryName}-${idx}`}
               className={`${getTagColors(categoryName)} 
            py-2 px-4 sm:py-3 sm:px-6 rounded-full 
