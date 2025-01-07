@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import { Select, Spin } from "antd";
+import { useEffect } from "react";
+import { Select } from "antd";
 import useGetAllAreas from "/src/hooks/useGetAllAreas";
+import { Spinner } from "@nextui-org/react";
 
 const EditArea = ({ formData, setFormData, errors }) => {
   const { area, loading, error, fetchALlAreas } = useGetAllAreas();
@@ -17,7 +18,7 @@ const EditArea = ({ formData, setFormData, errors }) => {
   };
 
   if (loading) {
-    return <Spin size="small" />;
+    return <Spinner size={32} color="#ffffff" />;
   }
 
   if (error) {

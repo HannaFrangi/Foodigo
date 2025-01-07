@@ -9,9 +9,7 @@ import {
   LucideCookingPot,
   MapPin,
   AlertCircle,
-  ArrowDown,
-  HeartPulse,
-  ArrowRightCircle,
+  ChefHatIcon,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,6 +22,7 @@ import useGetRecipeByCat from "/src/hooks/useGetRecipeByCat";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 import useGetAllAreas from "/src/hooks/useGetAllAreas";
 import useGetRecipeByArea from "/src/hooks/useGetRecipeByArea";
+import { Spinner } from "@nextui-org/react";
 
 const { Option } = Select;
 
@@ -108,7 +107,7 @@ const NoRecipesFound = ({ recipeResults, category }) => (
     animate={{ opacity: 1 }}
     className="flex flex-col items-center justify-center py-12 text-gray-500"
   >
-    <HeartPulse className="w-16 h-16 mb-4 text-olive/50 animate-pulse" />
+    <ChefHatIcon className="w-16 h-16 mb-4 text-darkolive animate-pulse" />
 
     <p className="text-gray-400 text-center max-w-md mb-6">
       {recipeResults.length === 0 && category === "" ? (
@@ -338,7 +337,7 @@ export default function RecipePage() {
     document.title = " Foodigo | Recipes ";
   }, []);
 
-  const LoadingSpinner = () => <Loader className="w-4 h-4 animate-spin" />;
+  const LoadingSpinner = () => <ChefHatSpinner size={32} />;
   return (
     <div className="min-h-screen bg-gradient-to-br from-olive/5 via-white to-olive/10">
       {/* Hero Section */}
@@ -580,15 +579,15 @@ export default function RecipePage() {
             <Button
               onClick={handleRandomClick}
               disabled={randomLoading}
-              className="group w-full sm:w-auto bg-olive hover:bg-olive/90 text-white text-base sm:text-lg px-6 sm:px-12 py-4 sm:py-6 h-auto rounded-full shadow-lg hover:shadow-xl transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+              className="flex items-center justify-center w-full sm:w-auto bg-olive hover:bg-darkolive text-white text-base sm:text-lg px-6 sm:px-12 py-4 sm:py-6 h-auto rounded-full shadow-lg hover:shadow-xl transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {randomLoading ? (
                 <LoadingSpinner />
               ) : (
-                <>
-                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:scale-110 mx-2" />
-                  <span className="whitespace-nowrap">Surprise Me!</span>
-                </>
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <span>Surprise Me!</span>
+                </div>
               )}
             </Button>
           </ConfigProvider>
