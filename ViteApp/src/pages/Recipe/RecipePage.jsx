@@ -22,7 +22,6 @@ import useGetRecipeByCat from "/src/hooks/useGetRecipeByCat";
 import ChefHatSpinner from "/src/utils/ChefHatSpinner";
 import useGetAllAreas from "/src/hooks/useGetAllAreas";
 import useGetRecipeByArea from "/src/hooks/useGetRecipeByArea";
-import { Spinner } from "@nextui-org/react";
 
 const { Option } = Select;
 

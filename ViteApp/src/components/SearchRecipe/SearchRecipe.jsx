@@ -1,11 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Search,
-  Sparkles,
-  ChefHat,
-  AlertTriangle,
-  RefreshCw,
-} from "lucide-react";
+import { Search, Sparkles, ChefHat, AlertTriangle } from "lucide-react";
 import { useRecipeStore } from "../../store/useRecipeStore";
 import RecipeResults from "../../components/RecipeCard/RecipeResults";
 import { Input } from "antd";
