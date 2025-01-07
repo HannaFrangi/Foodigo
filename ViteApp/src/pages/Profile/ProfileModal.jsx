@@ -36,7 +36,10 @@ const ProfileModal = ({ visible, onCancel }) => {
   const uploadProps = {
     beforeUpload: (file) => {
       const isValidType =
-        file.type === "image/jpeg" || file.type === "image/png";
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/jpg" ||
+        file.type === "image/gif";
       if (!isValidType) {
         toast.error("You can only upload JPG/PNG files!");
         return false;

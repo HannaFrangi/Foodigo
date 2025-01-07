@@ -39,6 +39,12 @@ const MEASUREMENT_UNITS = {
   ],
 };
 
+// Create a map of all valid units for quick lookup
+const ALL_UNITS = new Set([
+  ...MEASUREMENT_UNITS.common.map((u) => u.value),
+  ...MEASUREMENT_UNITS.other.map((u) => u.value),
+]);
+
 const EditIngredient = ({ formData, setFormData, errors }) => {
   const { loading, ingredientNames, fetchAllIngrediants } =
     useGetAllIngredients();
@@ -57,6 +63,29 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
     if (!value) return false;
     const num = parseFloat(value);
     return !isNaN(num) && num > 0;
+  };
+
+  const parseInitialIngredient = (ingredient) => {
+    if (!ingredient.quantity) return ingredient;
+
+    // Match number followed by optional space and any non-digit characters
+    const match = ingredient.quantity.match(/^([\d.]+)\s*(.*)$/);
+
+    if (match) {
+      const [_, numericQuantity, unitPart] = match;
+      const unit = unitPart.trim();
+
+      // Check if the parsed unit is in our valid units list
+      const validUnit = ALL_UNITS.has(unit) ? unit : "";
+
+      return {
+        ...ingredient,
+        quantity: numericQuantity,
+        unit: validUnit,
+        displayQuantity: ingredient.quantity,
+      };
+    }
+    return ingredient;
   };
 
   const handleAddIngredient = () => {
@@ -80,12 +109,6 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
   };
 
   const handleIngredientChange = (value, index, field) => {
-    if (field === "quantity") {
-      // Extract just the number from the combined quantity string if it exists
-      const quantityMatch = value.match(/[\d.]+/);
-      value = quantityMatch ? quantityMatch[0] : value;
-    }
-
     setFormData((prev) => ({
       ...prev,
       recipeIngredients: prev.recipeIngredients.map((ing, i) => {
@@ -98,29 +121,12 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
         if (field === "quantity" || field === "unit") {
           const numericQuantity = updatedIng.quantity || "";
           const unit = updatedIng.unit || "";
-          updatedIng.displayQuantity = `${numericQuantity}${
-            unit ? ` ${unit}` : ""
-          }`;
+          updatedIng.quantity = `${numericQuantity}${unit ? ` ${unit}` : ""}`;
         }
 
         return updatedIng;
       }),
     }));
-  };
-
-  const parseInitialIngredient = (ingredient) => {
-    if (ingredient.quantity && typeof ingredient.quantity === "string") {
-      const parts = ingredient.quantity.split(" ");
-      if (parts.length > 1) {
-        return {
-          ...ingredient,
-          quantity: parts[0],
-          unit: parts[1],
-          displayQuantity: ingredient.quantity,
-        };
-      }
-    }
-    return ingredient;
   };
 
   useEffect(() => {
@@ -207,7 +213,7 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
                 type="text"
                 placeholder="Amount"
                 className="w-full sm:w-24"
-                value={ingredient.quantity}
+                value={ingredient.quantity.split(" ")[0]} // Show only the numeric part
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^0-9.]/g, "");
                   handleIngredientChange(value, index, "quantity");
@@ -223,7 +229,7 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
               <Select
                 className="w-full sm:w-36"
                 showSearch
-                value={ingredient.unit}
+                value={ingredient.quantity.split(" ")[1] || undefined} // Get unit part
                 onChange={(value) =>
                   handleIngredientChange(value, index, "unit")
                 }
@@ -231,6 +237,7 @@ const EditIngredient = ({ formData, setFormData, errors }) => {
                 status={errors?.recipeIngredients?.[index]?.unit ? "error" : ""}
                 popupClassName="rounded-lg shadow-lg"
                 placement="bottomLeft"
+                placeholder="Unit"
               />
 
               <Tooltip title="Remove Ingredient">

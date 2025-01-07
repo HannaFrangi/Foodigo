@@ -194,7 +194,7 @@ export const ReviewSection = ({ recipeId }) => {
               loading={addLoading || updateLoading}
               onClick={handleOpenModal}
               style={{ color: "white" }}
-              className="relative w-full bg-olive hover:bg-olive/80 text-white py-4 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30"
+              className="relative w-full bg-olive hover:bg-darkolive text-white py-4 px-6 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30"
               icon={<PenIcon className="mr-2" size={18} />}
             >
               {userHasWrittenReview ? "Edit Review" : "Write a Review"}

@@ -73,7 +73,7 @@ export default function EditRecipePage() {
       try {
         await editRecipe(recipeId, formData);
         toast.success("Recipe updated successfully!");
-        navigate("/");
+        navigate(`/recipe/${recipeId}`);
       } catch (err) {
         toast.error(err.message || "Failed to update recipe");
       }
@@ -155,7 +155,6 @@ export default function EditRecipePage() {
               errors={errors}
             />
           </div>
-
           <div className="space-y-2">
             <p className="text-sm font-medium text-olive">
               Recipe Video Tutorial (Optional)
@@ -171,7 +170,6 @@ export default function EditRecipePage() {
               className="w-full"
             />
           </div>
-
           <div className="grid md:grid-cols-2 gap-4">
             <RecipeCat
               formData={formData}
@@ -220,7 +218,6 @@ export default function EditRecipePage() {
               )}
             </div>
           </div>
-
           <EditIngredient
             formData={formData}
             setFormData={setFormData}
@@ -234,7 +231,6 @@ export default function EditRecipePage() {
               errors={errors}
             />
           )}
-
           <Button
             type="primary"
             htmlType="submit"
