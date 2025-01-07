@@ -5,7 +5,6 @@ import { axiosInstance } from "../../lib/axios";
 import { gsap } from "gsap";
 import { Lock, Eye, EyeOff, ChevronRight } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
-import { use } from "react";
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

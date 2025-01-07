@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Upload, message, Avatar, Tooltip } from "antd";
+import { Modal, Form, Input, Upload, Avatar, Tooltip } from "antd";
 import {
   UserOutlined,
-  UploadOutlined,
   CameraOutlined,
   EditOutlined,
   CheckCircleOutlined,

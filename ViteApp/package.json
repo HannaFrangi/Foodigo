@@ -12,14 +12,14 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.22.1",
-    "@nextui-org/react": "^2.6.10",
+    "@nextui-org/react": "^2.6.11",
     "@studio-freight/react-lenis": "^0.0.47",
-    "antd": "^5.22.7",
+    "antd": "^5.23.0",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "foodigo": "file:..",
-    "framer-motion": "^11.15.0",
+    "framer-motion": "^11.16.0",
     "gsap": "^3.12.5",
     "js-cookie": "^3.0.5",
     "lucide-react": "^0.469.0",
@@ -35,7 +35,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "tsparticles": "^2.12.0",
-    "zustand": "^4.5.5"
+    "zustand": "^4.5.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

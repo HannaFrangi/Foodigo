@@ -10,8 +10,6 @@ TODO :
 
 # Create Favorites Page
 
-# Badna F0oter @majdChbat ????? W about us ?????
-
 ### Setup .env file
 
 ```bash
