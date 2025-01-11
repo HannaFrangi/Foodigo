@@ -51,7 +51,8 @@ function App() {
 
           // Get FCM Token
           const token = await getToken(messaging, {
-            vapidKey: "YOUR_VAPID_KEY",
+            vapidKey:
+              "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ",
           });
           if (token) {
             console.log("FCM Token:", token);

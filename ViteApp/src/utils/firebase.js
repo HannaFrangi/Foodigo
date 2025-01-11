@@ -38,14 +38,8 @@ const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
 
 // Register the service worker
-navigator.serviceWorker
-  .register("/firebase-messaging-sw.js")
-  .then((registration) => {
-    messaging.useServiceWorker(registration);
-    console.log("Service Worker registered successfully:", registration);
-  })
-  .catch((error) => {
-    console.error("Service Worker registration failed:", error);
-  });
+navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+  type: "module",
+});
 
 export { messaging, app };
