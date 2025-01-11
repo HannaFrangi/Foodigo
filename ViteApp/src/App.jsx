@@ -1,4 +1,4 @@
-import React, { useEffect, lazy, Suspense } from "react";
+import React, { useEffect, lazy, Suspense, useState } from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes, Navigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -15,7 +15,8 @@ import TagManager from "react-gtm-module";
 import ChefHatSpinner from "./utils/ChefHatSpinner";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import RecipeHeader from "./components/RecipeDetails/RecipeHeader";
-import { messaging } from "./utils/firebase";
+
+import { requestForToken } from "./utils/firebase";
 
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
@@ -26,6 +27,7 @@ const EditRecipePage = lazy(() => import("./pages/Recipe/EditRecipePage"));
 function App() {
   const { checkAuth, authUser, loading } = useAuthStore();
   const { fetchCategories } = useRecipeStore();
+  const [token, setToken] = useState("");
 
   const lenis = useLenis(({ scroll }) => {});
 
@@ -40,50 +42,23 @@ function App() {
     }
   }, [checkAuth, fetchCategories, authUser]);
 
-  // Function to request notification permissions and handle the FCM token
-  const requestNotificationPermission = async () => {
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        console.log("Notification permission granted.");
-
-        // Get FCM Token
-        const token = await getToken(messaging, {
-          vapidKey:
-            "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ",
-        });
-        if (token) {
-          console.log("FCM Token:", token);
-          // Send this token to your server to subscribe to notifications
-        }
-      } else {
-        console.error("Notification permission not granted.");
-      }
-    } catch (error) {
-      console.error("Error getting notification permission:", error);
-    }
-  };
-
   useEffect(() => {
     // Initialize Google Tag Manager
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
-    // Request Notification Permission
-    requestNotificationPermission();
 
-    // Listen for foreground messages
-    const unsubscribe = onMessage(messaging, (payload) => {
-      console.log("Message received in foreground: ", payload);
+    const getToken = async () => {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        const token = await requestForToken();
+        if (token) {
+          setToken(token);
+          console.log(token);
+        }
+      }
+    };
 
-      // Use toast to show the notification instead of alert
-      toast(payload.notification.body, {
-        icon: "🔔", // You can customize this as needed
-        style: { borderRadius: "10px", zIndex: 300 },
-      });
-    });
-
-    // Clean up the listener when the component unmounts
-    return () => unsubscribe();
+    getToken();
   }, []);
 
   return (

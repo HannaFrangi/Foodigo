@@ -4,7 +4,8 @@ import { getAnalytics } from "firebase/analytics";
 import { getMessaging, getToken, onMessage } from "firebase/messaging";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
+
+export const firebaseConfig = {
   apiKey: "AIzaSyCYUIfiZEdqmr2XbdSP0tdtMrAiAeL6IaM",
   authDomain: "hdarne-3d2b6.firebaseapp.com",
   projectId: "hdarne-3d2b6",
@@ -19,31 +20,30 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
 
-// Request FCM token for foreground notifications
-export const requestPermissionAndGetToken = async () => {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      const token = await getToken(messaging, {
-        vapidKey:
-          "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ",
-      });
-      console.log("FCM Token:", token);
-      return token;
-    } else {
-      console.error("Notification permission denied.");
-    }
-  } catch (error) {
-    console.error("Error getting notification token:", error);
-  }
+export const FIREBASE_VAPID_KEY =
+  "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ";
+
+export const requestForToken = () => {
+  return getToken(messaging, { vapidKey: FIREBASE_VAPID_KEY })
+    .then((currentToken) => {
+      if (currentToken) {
+        return currentToken;
+      } else {
+        alert(
+          "No registration token available. Request permission to generate one."
+        );
+        return null;
+      }
+    })
+    .catch((err) => {
+      alert("An error occurred while retrieving token - " + err);
+      return null;
+    });
 };
 
-// Foreground message handler (when the app is in the foreground)
-onMessage(messaging, (payload) => {
-  console.log("Foreground message received: ", payload);
-  // Handle the notification (showing an alert for demonstration)
-  const { title, body } = payload.notification;
-  alert(`${title}: ${body}`);
+onMessage(messaging, ({ notification }) => {
+  new Notification(notification.title, {
+    body: notification.body,
+    icon: notification.icon,
+  });
 });
-
-export { messaging, app };
