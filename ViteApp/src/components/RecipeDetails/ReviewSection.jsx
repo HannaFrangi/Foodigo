@@ -231,14 +231,20 @@ export const ReviewSection = ({ recipeId }) => {
                       whileHover={{ scale: 1.1 }}
                       className="relative"
                     >
-                      <Avatar
-                        src={
-                          review.user.ProfilePicURL || "/src/assets/logo.png"
-                        }
-                        alt={review.user.name}
-                        size={50}
-                        className="border-2 border-olive shadow-sm"
-                      />
+                      {review.user.ProfilePicURL ? (
+                        <Avatar
+                          src={review.user.ProfilePicURL}
+                          className="border-2 border-[#5d6544] shadow-sm"
+                          size={40}
+                        />
+                      ) : (
+                        <Avatar
+                          size={40}
+                          className="bg-gradient-to-r from-[#5d6544] to-[#7a8c5a] flex items-center justify-center shadow-sm"
+                        >
+                          {review.user.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      )}
                       <div className="absolute -bottom-1 -right-1 bg-olive rounded-full p-1" />
                     </motion.div>
                     <div className="flex-1">
