@@ -4,7 +4,9 @@ import { protectRoute } from "../middleware/auth.js";
 import {
   AddToFavorites,
   AddtoGroceryList,
+  GetGroceryList,
   getUserInfoByID,
+  RemoveFromGroceryList,
   togglePurchasedStatus,
   updateProfile,
 } from "../controllers/userControllers.js";
@@ -25,13 +27,18 @@ const upload = multer({
 });
 
 router.get("/getUserInfoByID/:id", getUserInfoByID);
+router.get("/getgroccerylist", protectRoute, GetGroceryList);
 router.put(
   "/update-profile",
   protectRoute,
   upload.single("profilePic"),
   updateProfile
 );
-
+router.delete(
+  "/removefromgrocerylist/:id",
+  protectRoute,
+  RemoveFromGroceryList
+);
 router.put("/addtofavorites/", protectRoute, AddToFavorites);
 
 router.post("/addToGroceryList/", protectRoute, AddtoGroceryList);

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Upload, message, Avatar, Tooltip } from "antd";
+import { Modal, Form, Input, Upload, Avatar, Tooltip } from "antd";
 import {
   UserOutlined,
-  UploadOutlined,
   CameraOutlined,
   EditOutlined,
   CheckCircleOutlined,
@@ -36,7 +35,10 @@ const ProfileModal = ({ visible, onCancel }) => {
   const uploadProps = {
     beforeUpload: (file) => {
       const isValidType =
-        file.type === "image/jpeg" || file.type === "image/png";
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/jpg" ||
+        file.type === "image/gif";
       if (!isValidType) {
         toast.error("You can only upload JPG/PNG files!");
         return false;

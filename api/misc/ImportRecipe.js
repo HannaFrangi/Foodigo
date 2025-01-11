@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import Recipe from "../models/Recipe.js";
 import Category from "../models/Category.js";
 import Area from "../models/Area.js";
-import Ingredient from "../models/Ingredient.js"; // Import Ingredient model
+import Ingredient from "../models/Ingredient.js";
 
 dotenv.config();
 
@@ -32,14 +32,22 @@ const createAreaIfNotExists = async (areaName) => {
   }
 };
 
-// Updated function to use "ingredients" collection
+// Function to format ingredient name (first letter capitalized, rest lowercase)
+const formatIngredientName = (name) => {
+  if (!name) return "";
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+};
+
 const createIngredientIfNotExists = async (ingredientName) => {
   try {
-    let ingredient = await Ingredient.findOne({ name: ingredientName });
+    // Format the ingredient name before searching or creating
+    const formattedName = formatIngredientName(ingredientName);
+
+    let ingredient = await Ingredient.findOne({ name: formattedName });
     if (!ingredient) {
-      ingredient = new Ingredient({ name: ingredientName }); // Use Ingredient model
+      ingredient = new Ingredient({ name: formattedName });
       await ingredient.save();
-      console.log(`Created new ingredient: ${ingredientName}`);
+      console.log(`Created new ingredient: ${formattedName}`);
     }
     return ingredient._id;
   } catch (error) {
@@ -130,6 +138,7 @@ const fetchAndSaveRecipes = async () => {
               recipeIngredients: recipeIngredients,
               recipeImage: recipe.strMealThumb,
               recipeVideoTutorial: recipe.strYoutube || "",
+              userId: "675afaab143c11f684324a06",
               area: areaId,
               recipeInstructions: recipe.strInstructions,
               categories: categoryIds,

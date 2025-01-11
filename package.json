@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/server.js",
-    "build": "npm install && npm install --prefix viteApp && npm run build --prefix viteApp",
+    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp",
     "start": "node api/server.js"
   },
   "keywords": [],
@@ -13,22 +13,22 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
-    "cloudinary": "^2.5.0",
     "convert-units": "^2.3.4",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.0",
-    "firebase": "^11.0.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.7.0",
+    "mongoose": "^8.9.3",
     "multer": "^1.4.5-lts.1",
+    "node-cache": "^5.1.2",
     "nodemailer": "^6.9.16",
-    "socket.io": "^4.8.0"
+    "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.9"
   }
 }

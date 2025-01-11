@@ -1,8 +1,94 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import SearchRecipe from "../components/SearchRecipe/SearchRecipe";
-// import { Carouselle } from "./Home/Carouselle";
 import LatestRecipe from "../components/LatestRecipe/LatestRecipe";
+
+const Homepage = () => {
+  const latestRef = useRef(null);
+  const searchRef = useRef(null);
+  const CarouselleRef = useRef(null);
+  const footerRef = useRef(null);
+
+  useEffect(() => {
+    // Make sure all refs are available before creating the animation
+    if (!latestRef.current || !searchRef.current) return;
+
+    const tl = gsap.timeline({
+      defaults: { duration: 1, ease: "power3.out" },
+    });
+
+    // Create the animation sequence
+    tl.from(latestRef.current, {
+      opacity: 0,
+      y: 100,
+      immediateRender: true,
+    }).from(
+      searchRef.current,
+      {
+        opacity: 0,
+        y: 100,
+        immediateRender: true,
+      },
+      "-=0.8"
+    );
+
+    // Only animate CarouselleRef if it exists
+    if (CarouselleRef.current) {
+      tl.from(
+        CarouselleRef.current,
+        {
+          opacity: 0,
+          y: 100,
+          immediateRender: true,
+        },
+        "-=0.8"
+      );
+    }
+
+    // Only animate footerRef if it exists
+    if (footerRef.current) {
+      tl.from(
+        footerRef.current,
+        {
+          opacity: 0,
+          y: 50,
+          immediateRender: true,
+        },
+        "-=0.8"
+      );
+    }
+    document.title = "Foodigo | Home";
+    window.scrollTo(0, 0);
+
+    // Clean up the animation when component unmounts
+    return () => {
+      tl.kill();
+    };
+  }, []); // Empty dependency array means this runs once on mount
+
+  return (
+    <div className="min-h-screen flex flex-col ">
+      <main className="flex-grow">
+        <div ref={latestRef}>
+          <LatestRecipe />
+        </div>
+        <div ref={searchRef}>
+          <SearchRecipe />
+        </div>
+        {/* Uncomment these when you're ready to use them
+        <div ref={CarouselleRef}>
+          <Carouselle />
+        </div>
+         */}
+        <div ref={footerRef}>
+          <Footer />
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default Homepage;
 
 const Footer = () => {
   return (
@@ -16,7 +102,8 @@ const Footer = () => {
             </h3>
             <p className="text-white-400 leading-relaxed">
               Discover delicious recipes and cooking inspiration for every meal,
-              crafted with love for food enthusiasts worldwide.
+              crafted with love for food enthusiasts worldwide. They Not Like
+              us.
             </p>
           </div>
 
@@ -115,7 +202,7 @@ const Footer = () => {
                       <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                     </svg>
                   </span>
-                  Twitter
+                  X
                 </a>
               </li>
             </ul>
@@ -127,39 +214,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-const Homepage = () => {
-  const latestRef = useRef(null);
-  const searchRef = useRef(null);
-  const CarouselleRef = useRef(null);
-  const footerRef = useRef(null);
-
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { duration: 1, ease: "power3.out" } });
-    tl.from(latestRef.current, { opacity: 0, y: 100 })
-      .from(searchRef.current, { opacity: 0, y: 100 }, "-=0.8")
-      .from(CarouselleRef.current, { opacity: 0, y: 100 }, "-=0.8")
-      .from(footerRef.current, { opacity: 0, y: 50 }, "-=0.8");
-  }, []);
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow">
-        <div ref={latestRef}>
-          <LatestRecipe />
-        </div>
-        <div ref={searchRef}>
-          <SearchRecipe />
-        </div>
-        {/* <div ref={heroRef}>
-          <Hero />
-        </div> */}
-      </main>
-      <div ref={footerRef}>
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
-export default Homepage;

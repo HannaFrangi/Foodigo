@@ -1,22 +1,93 @@
 import Area from "../models/Area.js";
 import Recipe from "../models/Recipe.js";
 import Ingredient from "../models/Ingredient.js";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { storage } from "../config/firebase.js";
+import mongoose from "mongoose";
 
 export const createRecipe = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required. Please log in.",
+      });
+    }
+
+    const recipeData = { ...req.body };
+
+    if (req.file) {
+      // Generate filename using userId and timestamp for uniqueness
+      const fileExtension = req.file.originalname.split(".").pop();
+      const fileName = `${req.user._id}_${Date.now()}.${fileExtension}`;
+
+      const metadata = {
+        contentType: req.file.mimetype,
+        customMetadata: {
+          userId: req.user._id.toString(),
+          recipeTitle: recipeData.recipeTitle,
+        },
+      };
+
+      // Create storage reference
+      const storageRef = ref(storage, `recipes/${fileName}`);
+
+      // Upload file
+      const snapshot = await uploadBytes(storageRef, req.file.buffer, metadata);
+
+      // Get download URL
+      const downloadURL = await getDownloadURL(
+        ref(storage, snapshot.metadata.fullPath)
+      );
+
+      // Update recipe data with the image URL
+      recipeData.recipeImage = downloadURL;
+    }
+
+    // Create recipe in database
     const newRecipe = await Recipe.create({
-      ...req.body,
+      ...recipeData,
       userId: req.user._id,
     });
-    res.status(201).json({ success: true, data: newRecipe });
+
+    if (!newRecipe) {
+      return res.status(404).json({
+        success: false,
+        message: "Failed to create recipe",
+      });
+    }
+
+    // Return created recipe info
+    res.status(201).json({
+      success: true,
+      message: "Recipe created successfully",
+      recipe: newRecipe,
+    });
   } catch (error) {
-    console.error("Error in createRecipe:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error creating recipe:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating recipe",
+      error: error.message,
+    });
   }
 };
 
 export const getRecipeById = async (req, res) => {
   try {
+    if (mongoose.Types.ObjectId.isValid(req.params.id) === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid recipe ID",
+      });
+    }
+
     const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) {
@@ -62,6 +133,7 @@ export const getRecipesByName = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      count: recipes.length, // majd added this (wahesh Ya Chbat)
       data: recipes,
     });
   } catch (error) {
@@ -76,7 +148,7 @@ export const getRecipesByName = async (req, res) => {
 export const getAllRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find();
-    res.json({ success: true, data: recipes });
+    res.json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
     console.error("Error in getAllRecipes:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -111,23 +183,46 @@ export const updateRecipe = async (req, res) => {
 
 export const deleteRecipe = async (req, res) => {
   try {
+    // Find the recipe by ID
     const recipe = await Recipe.findById(req.params.id);
     if (!recipe) {
       return res
         .status(404)
         .json({ success: false, message: "Recipe not found" });
     }
+
+    // Check if the user is authorized to delete the recipe
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized to delete this recipe",
       });
     }
+
+    // Check if the recipe has an image URL and delete it from Firebase Storage
+    if (recipe.recipeImage) {
+      const imageRef = ref(storage, recipe.recipeImage);
+      try {
+        await deleteObject(imageRef);
+      } catch (error) {
+        console.error("Error deleting image from Firebase Storage:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Failed to delete recipe image from storage",
+          error: error.message,
+        });
+      }
+    }
+
+    // Delete the recipe from the database
     await Recipe.findByIdAndDelete(req.params.id);
+
     res.json({ success: true, message: "Recipe deleted successfully" });
   } catch (error) {
     console.error("Error in deleteRecipe:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
@@ -239,7 +334,9 @@ export const getRandomRecipe = async (req, res) => {
   try {
     const count = await Recipe.countDocuments();
     const randomIndex = Math.floor(Math.random() * count);
-    const randomRecipe = await Recipe.findOne().skip(randomIndex);
+    const randomRecipe = await Recipe.findOne()
+      .skip(randomIndex)
+      .select("_id recipeTitle recipeImage categories");
 
     if (!randomRecipe) {
       return res.status(404).json({
@@ -264,9 +361,7 @@ export const getRandomRecipe = async (req, res) => {
 export const getRecipesByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const recipes = await Recipe.find({ categories: categoryId }).populate(
-      "categories"
-    );
+    const recipes = await Recipe.find({ categories: categoryId });
 
     if (!recipes.length) {
       return res.status(404).json({
@@ -275,7 +370,9 @@ export const getRecipesByCategory = async (req, res) => {
       });
     }
 
-    res.status(200).json({ success: true, data: recipes });
+    res
+      .status(200)
+      .json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
     console.error("Error fetching recipes by category:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -305,8 +402,8 @@ export const getRecipesByArea = async (req, res) => {
 
     // Find all recipes for this area with populated categories
     const recipes = await Recipe.find({ area: areaId })
-      .populate("area")
-      .populate("categories")
+      // .populate("area")
+      // .populate("categories")
       .select("-reviews") // Exclude reviews for better performance
       .sort({ createdAt: -1 }); // Sort by newest first
 
@@ -490,6 +587,34 @@ export const getRecipesByIngredientsId = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to retrieve recipes due to server error",
+    });
+  }
+};
+
+export const getReviewsByRecipeId = async (req, res) => {
+  try {
+    const recipe = await Recipe.findById(req.params.id).populate(
+      "reviews.user",
+      "name ProfilePicURL email"
+    );
+
+    if (!recipe) {
+      return res.status(404).json({
+        success: false,
+        message: "Recipe not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      reviews: recipe.reviews,
+    });
+  } catch (error) {
+    console.error("Error fetching reviews by recipe ID:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve reviews due to server error",
+      error: error.message,
     });
   }
 };

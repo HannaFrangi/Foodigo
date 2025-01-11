@@ -4,9 +4,10 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import { gsap } from "gsap";
 import { Lock, Eye, EyeOff, ChevronRight } from "lucide-react";
-
+import { useAuthStore } from "../../store/useAuthStore";
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -20,8 +21,16 @@ const ResetPassword = () => {
   const buttonRef = useRef(null);
   const logoRef = useRef(null);
 
+  const { authUser } = useAuthStore();
   useEffect(() => {
     // Initial page load animation
+    if (authUser) {
+      toast.error("You are already logged in");
+      navigate("/");
+    }
+    if (!token) {
+      navigate("/");
+    }
     const tl = gsap.timeline();
 
     tl.fromTo(
@@ -62,6 +71,7 @@ const ResetPassword = () => {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -99,6 +109,8 @@ const ResetPassword = () => {
       setTimeout(() => navigate("/"), 2500);
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,7 +149,7 @@ const ResetPassword = () => {
           )}
 
           {success && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative">
+            <div className="bg-green-100 border border-olive text-green-700 px-4 py-3 rounded-lg relative">
               Password reset successfully. Redirecting to login...
             </div>
           )}
@@ -152,7 +164,7 @@ const ResetPassword = () => {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10 w-full py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d6544]"
+                className="pl-10 pr-10 w-full py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5d6544] shadow-lg shadow-olive"
                 placeholder="Enter new password"
                 required
               />
@@ -160,6 +172,7 @@ const ResetPassword = () => {
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                loading={loading}
               >
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
               </button>

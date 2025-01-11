@@ -14,6 +14,7 @@ import { Avatar } from "antd";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import logo from "/src/assets/logo.png";
 
 const AuthPage = () => {
   const { signup, login, forgotPassword } = useAuthStore();
@@ -66,7 +67,7 @@ const AuthPage = () => {
     );
     gsap.fromTo(
       modalContentRef.current,
-      { y: 50, opacity: 0, rotation: -5 },
+      { y: 50, opacity: 0, rotation: 10000 },
       {
         y: 0,
         opacity: 1,
@@ -190,7 +191,7 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-4 relative">
+    <div className="min-h-screen bg-[#FFFAF5] flex items-center justify-center p-5 relative">
       {/* Forgot Password Modal */}
       <div
         ref={modalRef}
@@ -273,14 +274,13 @@ const AuthPage = () => {
         <ArrowLeft className="w-6 h-6 text-olive" />
       </button>
 
-      <div className="max-w-md w-full space-y-8 relative">
-        {/* Decorative food-themed elements */}
+      <div className="max-w-md w-full space-y-8 relative mt-24 sm:mt-16">
         <div
           ref={logoRef}
-          className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
+          className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-red-900/5 rounded-full transition-all duration-300 hover:scale-105"
         >
           <div className="relative">
-            <Avatar src="/src/assets/logo.png" size={150} />
+            <Avatar src={logo} size={150} />
             <Sparkles className="absolute -top-2 -right-2 text-olive animate-pulse" />
           </div>
         </div>
@@ -455,11 +455,17 @@ const AuthPage = () => {
           {!isLogin && (
             <p className="text-center text-sm text-zinc-500 mt-4">
               By creating an account, you agree to our{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
+              <button
+                className="text-red-900 hover:text-red-900 underline bold"
+                onClick={() => navigate("/terms")}
+              >
                 Terms of Service
               </button>{" "}
               and{" "}
-              <button className="text-red-900 hover:text-red-900 underline bold">
+              <button
+                className="text-red-900 hover:text-red-900 underline bold"
+                onClick={() => navigate("/privacy")}
+              >
                 Privacy Policy
               </button>
             </p>

@@ -21,6 +21,18 @@ const getTagColors = (categoryName) => {
       return "bg-[#F9E0E0] text-[#C62828]";
     case "vegan":
       return "bg-[#E0F4E0] text-[#388E3C]";
+    case "pizza":
+      return "bg-[#FFDDC1] text-[#FF5733]";
+    case "salad":
+      return "bg-[#DFF6E1] text-[#76B041]";
+    case "soup":
+      return "bg-[#F1F8F6] text-[#1E824C]";
+    case "pasta":
+      return "bg-[#FFE0B2] text-[#FF5722]";
+    case "side":
+      return "bg-[#E8F8F5] text-[#0288D1]";
+    case "lamb":
+      return "bg-[#F5E6D1] text-[#8B4513]";
     default:
       return "bg-[#FFE5E5] text-[#FF4646]";
   }
@@ -32,14 +44,11 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
   const { toggleFavorite, getFavorites, authUser } = useAuthStore();
   const navigate = useNavigate();
 
-  // Initialize liked state and category names
   useEffect(() => {
     const initializeCard = () => {
-      // Check favorites status
       const favorites = getFavorites();
       setIsLiked(favorites.includes(recipe._id));
 
-      // Get category names
       try {
         const storedCategories = JSON.parse(
           localStorage.getItem("categories") || "[]"
@@ -93,7 +102,6 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
       }}
       onClick={() => navigate(`/recipe/${recipe._id}`)}
     >
-      {/* Shine effect overlay */}
       {/* Shine effect overlay */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -170,13 +178,16 @@ export const RecipeCard = ({ recipe, index, showUnfavorite = false }) => {
         <div className="flex flex-wrap gap-2 mt-4 items-center">
           {categoryNames.map((categoryName, idx) => (
             <span
+              // onClick={(e) => {
+              //   e.stopPropagation();
+              // }}
               key={`${categoryName}-${idx}`}
               className={`${getTagColors(categoryName)} 
-              py-2 px-4 sm:py-3 sm:px-6 rounded-full 
-              uppercase tracking-widest text-[10px] sm:text-xs font-semibold
-              transform transition-all duration-500 
-              active:scale-95 sm:group-hover:scale-105 
-              sm:hover:shadow-md`}
+           py-2 px-4 sm:py-3 sm:px-6 rounded-full 
+           uppercase tracking-widest text-[10px] sm:text-xs font-semibold
+           transform transition-all duration-500 
+           active:scale-95 sm:group-hover:scale-105 
+           sm:hover:shadow-md`}
             >
               {categoryName}
             </span>

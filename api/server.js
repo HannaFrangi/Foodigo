@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import cors from "cors"; // Adding CORS support
-
+import cors from "cors";
+import path from "path";
 // routes
 import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
@@ -16,22 +16,13 @@ dotenv.config(); // Load environment variables
 
 // Initialize Express app
 const app = express();
+const __dirname = path.resolve();
 const PORT = process.env.PORT || 5001;
-
-// // Create server with http and integrate socket.io
-// const server = http.createServer(app);
-// const io = new Server(server, {
-//   cors: {
-//     origin: "http://localhost:5173", // Allow requests from Vite's development server
-//     credentials: true, // Allow cookies to be sent with requests
-//   },
-// });
 
 app.use(
   cors({
-    // origin: "http://192.168.1.15:5173",
     origin: "http://localhost:5173",
-    credentials: true, // Allow cookies to be sent with requests
+    credentials: true,
   })
 );
 
@@ -47,7 +38,7 @@ app.get("/api", (req, res) => {
   res.send("Hi! Welcome to Foodigo API.");
 });
 
-// Route middleware
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/area", areaRoutes);
@@ -55,26 +46,26 @@ app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
 
-// Listen for socket connections
-// io.on("connection", (socket) => {
-//   console.log("A user connected with socket ID:", socket.id);
-
-//   // You can access the query parameter (userId) here if needed
-//   const userId = socket.handshake.query.userId;
-//   console.log("User ID from query:", userId);
-
-//   // Listen for disconnect events
-//   socket.on("disconnect", () => {
-//     console.log(`User with ID ${userId} disconnected`);
-//   });
-// });
+// Production setup
 if (process.env.NODE_ENV === "production") {
+  // Serve static files
   app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
 
+  // Handle client-side routes in production
   app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "ViteApp", "dist", "index.html"));
+    // Don't serve index.html for API routes
+    if (req.path.startsWith("/api")) {
+      return res.status(404).send("API route not found");
+    }
+    res.sendFile(path.join(__dirname, "/ViteApp/dist/index.html"));
   });
 }
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Server error occurred");
+});
 
 // Start Server
 app.listen(PORT, () => {

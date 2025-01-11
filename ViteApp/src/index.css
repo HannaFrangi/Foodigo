@@ -294,7 +294,39 @@
     transform: rotate(360deg);
   }
 }
-.ant-steps-item-title,
-.ant-steps-item-description {
-  color: black !important;
+.review-modal .ant-modal-content {
+  @apply bg-gradient-to-br from-white to-gray-50;
+}
+
+.review-modal .ant-modal-header {
+  @apply bg-transparent border-b-0 pb-4;
+}
+
+.review-modal .ant-modal-body {
+  @apply py-6;
+}
+
+.review-modal .ant-modal-footer {
+  @apply border-t-0 pt-4;
+}
+
+.ant-btn-primary:not(.ant-btn-dangerous):hover {
+  background-color: rgb(
+    128,
+    128,
+    0,
+    0.8
+  ) !important; /* olive with 80% opacity */
+}
+
+.ant-btn-primary:not(.ant-btn-dangerous):focus {
+  background-color: rgb(128, 128, 0) !important; /* olive */
+}
+
+.ant-btn-link:hover {
+  background-color: rgb(128, 128, 0, 0.8) !important;
+}
+canvas.particles-js-canvas-el {
+  z-index: -2; /* or another value based on your layout */
+  position: absolute; /* Ensure proper stacking context */
 }
