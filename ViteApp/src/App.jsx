@@ -47,15 +47,20 @@ function App() {
 
   // Initialize and fetch the token
   useEffect(() => {
-    checkAuth();
-    fetchCategories();
-    if (authUser && !authUser.isVerified) {
-      toast("Don't forget to verify your account!", {
-        icon: "⚠",
-        style: { borderRadius: "10px", zIndex: 300 },
-      });
-    }
-  }, [fetchCategories]);
+    const initialize = async () => {
+      await checkAuth(); // Ensure this only runs once unless necessary
+      await fetchCategories(); // Avoid re-fetching unnecessarily
+      if (authUser && !authUser.isVerified) {
+        toast("Don't forget to verify your account!", {
+          icon: "⚠",
+          style: { borderRadius: "10px", zIndex: 300 },
+        });
+      }
+    };
+
+    initialize();
+    // Dependency array should include everything used inside the effect
+  }, [checkAuth, fetchCategories, authUser]);
 
   useEffect(() => {
     // Initialize Google Tag Manager

@@ -68,7 +68,7 @@ app.use("/api/ingredients", ingredientsRoutes);
 
 // FCM Route
 app.post("/api/send-notification", async (req, res) => {
-  const { title, body } = req.body;
+  const { title, body, image } = req.body;
 
   // Ensure that all required fields are present
   if (!title || !body) {
@@ -94,8 +94,7 @@ app.post("/api/send-notification", async (req, res) => {
       notification: {
         title, // Title of the notification
         body, // Body of the notification
-        image:
-          "https://firebasestorage.googleapis.com/v0/b/foodigo-2b5b1.appspot.com/o/foodingo-logo.png?alt=media&token=7a3a4f9a-0a2f-4a5c-9e8f-3f7d4c5d0e6f",
+        image,
       },
       tokens, // Array of all tokens to send the message to
     };
@@ -114,13 +113,13 @@ app.post("/api/send-notification", async (req, res) => {
   }
 });
 
-// Production setup for serving static files
 if (process.env.NODE_ENV === "production") {
-  // Serve static files from the Vite app's build folder
+  // Serve static files
   app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
 
   // Handle client-side routes in production
   app.get("*", (req, res) => {
+    // Don't serve index.html for API routes
     if (req.path.startsWith("/api")) {
       return res.status(404).send("API route not found");
     }
