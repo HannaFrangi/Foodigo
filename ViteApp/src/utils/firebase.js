@@ -4,7 +4,7 @@ import { initializeApp } from "firebase/app";
 
 import { getAnalytics } from "firebase/analytics";
 
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, onBackgroundMessage } from "firebase/messaging";
 
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -47,7 +47,7 @@ onBackgroundMessage(messaging, (payload) => {
   const { title, body } = payload.notification;
   const notificationOptions = {
     body: body,
-    icon: "/firebase-logo.png",
+    icon: "/logo.png",
   };
 
   self.registration.showNotification(title, notificationOptions);

@@ -31,108 +31,123 @@ function App() {
 
   useEffect(() => {
     checkAuth();
+    fetchCategories();
     if (authUser && !authUser.isVerified) {
       toast("Don't forget to verify your account!", {
         icon: "⚠",
         style: { borderRadius: "10px", zIndex: 300 },
       });
     }
-    fetchCategories();
-  }, [checkAuth]);
-  //check how many times the user has visited the site
+  }, [checkAuth, fetchCategories, authUser]);
+
+  // Function to request notification permissions and handle the FCM token
+  const requestNotificationPermission = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission === "granted") {
+        console.log("Notification permission granted.");
+
+        // Get FCM Token
+        const token = await getToken(messaging, {
+          vapidKey:
+            "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ",
+        });
+        if (token) {
+          console.log("FCM Token:", token);
+          // Send this token to your server to subscribe to notifications
+        }
+      } else {
+        console.error("Notification permission not granted.");
+      }
+    } catch (error) {
+      console.error("Error getting notification permission:", error);
+    }
+  };
+
   useEffect(() => {
+    // Initialize Google Tag Manager
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
-    const requestPermission = async () => {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
 
-          // Get FCM Token
-          const token = await getToken(messaging, {
-            vapidKey:
-              "BHeUXSawvudM9P0Ei0ON4luJSTttFSiyihWHF7F-9jK1P2o9I4XYHaCHT2_mw8BbHgABaWgfrEhadFIX7KVjzCQ",
-          });
-          if (token) {
-            console.log("FCM Token:", token);
-            // Send this token to your server to subscribe to notifications
-          }
-        } else {
-          console.error("Notification permission not granted.");
-        }
-      } catch (error) {
-        console.error("Error getting notification permission:", error);
-      }
-    };
-
-    requestPermission();
+    // Request Notification Permission
+    requestNotificationPermission();
 
     // Listen for foreground messages
-    onMessage(messaging, (payload) => {
+    const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Message received in foreground: ", payload);
-      alert(payload.notification.body);
+      alert(payload.notification.body); // You might want to replace alert with a toast or modal
     });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
+
+  const renderPageLayout = () => (
+    <PageLayout authUser={authUser} loading={loading}>
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route
+          path="/auth"
+          element={authUser ? <Navigate to="/" /> : <AuthPage />}
+        />
+        <Route path="/recipe" element={<RecipePage />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/recipe/:id" element={<RecipeDetails />} />
+        <Route path="/recipe/:recipeId" element={<RecipeHeader />} />
+        <Route
+          path="/edit/:recipeId"
+          element={
+            <Suspense fallback={<ChefHatSpinner size={258} />}>
+              <EditRecipePage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+            <Suspense fallback={<ChefHatSpinner size={258} />}>
+              <ResetPassword />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/verify-email/:token"
+          element={
+            <Suspense fallback={<ChefHatSpinner size={258} />}>
+              <VerifyEmail />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/recipes/new"
+          element={
+            <Suspense fallback={<ChefHatSpinner size={258} />}>
+              <AddRecipe />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/groccery"
+          element={
+            <Suspense fallback={<ChefHatSpinner size={258} />}>
+              <GrocceryList />
+            </Suspense>
+          }
+        />
+        <Route path="/*" element={<Error />} />
+      </Routes>
+    </PageLayout>
+  );
 
   return (
     <>
       <Toaster />
       <ReactLenis options={{ duration: 2 }} root>
-        <PageLayout authUser={authUser} loading={loading}>
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route
-              path="/auth"
-              element={authUser ? <Navigate to="/" /> : <AuthPage />}
-            />
-            <Route path="/recipe" element={<RecipePage />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/recipe/:id" element={<RecipeDetails />} />
-            <Route path="/recipe/:recipeId" element={<RecipeHeader />} />
-            <Route
-              path="/edit/:recipeId"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <EditRecipePage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/reset-password/:token"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <ResetPassword />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/verify-email/:token"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <VerifyEmail />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/recipes/new"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <AddRecipe />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/groccery"
-              element={
-                <Suspense fallback={<ChefHatSpinner size={258} />}>
-                  <GrocceryList />
-                </Suspense>
-              }
-            />
-            <Route path="/*" element={<Error />} />
-          </Routes>
-        </PageLayout>
+        {loading ? (
+          <ChefHatSpinner size={258} /> // Display a loading spinner if still checking auth
+        ) : (
+          renderPageLayout()
+        )}
       </ReactLenis>
     </>
   );
