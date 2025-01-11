@@ -2,9 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import admin from "firebase-admin";
 import path from "path";
-import { fileURLToPath } from "url";
 // routes
 import authRoutes from "./routes/authRoutes.js";
 import recipeRoutes from "./routes/recipeRoutes.js";
@@ -14,34 +12,16 @@ import areaRoutes from "./routes/areaRoutes.js";
 import ingredientsRoutes from "./routes/ingredientsRoutes.js";
 import { connectDB } from "./config/db.js";
 
-// Load environment variables
-dotenv.config();
+dotenv.config(); // Load environment variables
 
 // Initialize Express app
 const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.resolve();
 const PORT = process.env.PORT || 5001;
 
-// Import Firebase service account JSON
-import User from "./models/Users.js";
-
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url); // Load Firebase service account JSON using fs
-const serviceAccount = require("./config/foodigo.json");
-
-import { getMessaging, Messaging } from "firebase-admin/messaging";
-
-// Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-const messaging = admin.messaging();
-
-// Enable CORS and other middlewares
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Use environment variable for client URL
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -66,53 +46,7 @@ app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
 
-// FCM Route
-app.post("/api/send-notification", async (req, res) => {
-  const { title, body, image } = req.body;
-
-  // Ensure that all required fields are present
-  if (!title || !body) {
-    return res
-      .status(400)
-      .send({ success: false, error: "Missing required fields" });
-  }
-
-  try {
-    // Fetch all users' tokens from the database
-    const users = await User.find({}); // Assuming you have a User model
-    const tokens = users
-      .filter((user) => user.fcmToken) // Only take users who have an FCM token
-      .map((user) => user.fcmToken);
-
-    // If no tokens are available, return an error
-    if (tokens.length === 0) {
-      return res.status(404).send({ success: false, error: "No tokens found" });
-    }
-    console.log(tokens);
-    // Prepare the message to send
-    const message = {
-      notification: {
-        title, // Title of the notification
-        body, // Body of the notification
-        image,
-      },
-      tokens, // Array of all tokens to send the message to
-    };
-
-    // Send the notification to all tokens
-    const response = await getMessaging().sendEachForMulticast(message);
-    // Return success response
-    res.status(200).send({
-      success: true,
-      messageId: response.successCount,
-      failedCount: response.failureCount,
-    });
-  } catch (error) {
-    console.error("Error sending notification:", error);
-    res.status(500).send({ success: false, error: error.message });
-  }
-});
-
+// Production setup
 if (process.env.NODE_ENV === "production") {
   // Serve static files
   app.use(express.static(path.join(__dirname, "/ViteApp/dist")));
