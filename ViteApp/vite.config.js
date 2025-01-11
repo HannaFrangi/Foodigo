@@ -7,7 +7,6 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["firebase-messaging-sw.js"], // Keep this to include the service worker in the build
       workbox: {
         // Cache page navigations (html) with a Network First strategy
         navigateFallback: "index.html",
@@ -91,7 +90,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: ["http://localhost:5001", "https://foodigo.onrender.com/"],
+        // target: "http://192.168.1.15:5001",
+        target: "http://localhost:5001",
         changeOrigin: true, // Adjust for virtual host
         secure: false, // If using HTTP for development
         rewrite: (path) => path.replace(/^\/api/, ""),

@@ -55,7 +55,7 @@ function App() {
         style: { borderRadius: "10px", zIndex: 300 },
       });
     }
-  }, [checkAuth, fetchCategories]);
+  }, [fetchCategories]);
 
   useEffect(() => {
     // Initialize Google Tag Manager
