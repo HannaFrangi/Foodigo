@@ -1,10 +1,9 @@
 // Import the Firebase scripts for the service worker
-importScripts(
-  "https://www.gstatic.com/firebasejs/9.5.0/firebase-app-compat.js"
-);
-importScripts(
-  "https://www.gstatic.com/firebasejs/9.5.0/firebase-messaging-compat.js"
-);
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import {
+  getMessaging,
+  onBackgroundMessage,
+} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -18,13 +17,13 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Messaging
-const messaging = firebase.messaging();
+const messaging = getMessaging(app);
 
 // Handle background messages
-messaging.onBackgroundMessage((payload) => {
+onBackgroundMessage(messaging, (payload) => {
   console.log(
     "[firebase-messaging-sw.js] Received background message:",
     payload
