@@ -19,12 +19,12 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url)); // To resolve the __dirname in ES modules
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 5001;
 
 // Import Firebase service account JSON
-import serviceAccount from "./config/foodigo.json" assert { type: "json" };
 import User from "./models/Users.js";
+import serviceAccount from "./config/foodigo.json";
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 
 // Initialize Firebase Admin SDK
