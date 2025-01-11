@@ -1,8 +1,7 @@
-import React, { useEffect, lazy, Suspense, useState } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes, Navigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { getToken, onMessage } from "firebase/messaging";
 import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
 import PageLayout from "./layout/PageLayout";
@@ -16,9 +15,6 @@ import ChefHatSpinner from "./utils/ChefHatSpinner";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import RecipeHeader from "./components/RecipeDetails/RecipeHeader";
 
-import { requestForToken } from "./utils/firebase";
-import { axiosInstance } from "./lib/axios";
-
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
 const AddRecipe = lazy(() => import("./pages/AddRecipe/AddRecipe"));
@@ -28,68 +24,24 @@ const EditRecipePage = lazy(() => import("./pages/Recipe/EditRecipePage"));
 function App() {
   const { checkAuth, authUser, loading } = useAuthStore();
   const { fetchCategories } = useRecipeStore();
-  const [token, setToken] = useState("");
 
   const lenis = useLenis(({ scroll }) => {});
 
-  // Function to add token to the backend
-  const addToken = async (token) => {
-    try {
-      await axiosInstance.post("/auth/update-fcm", {
-        token: token,
-        userId: authUser._id.toString(),
+  useEffect(() => {
+    checkAuth();
+    if (authUser && !authUser.isVerified) {
+      toast("Don't forget to verify your account!", {
+        icon: "⚠",
+        style: { borderRadius: "10px", zIndex: 300 },
       });
-      console.log("FCM token added to backend");
-    } catch (error) {
-      console.error("Error adding FCM token:", error);
     }
-  };
-
-  // Initialize and fetch the token
+    fetchCategories();
+  }, [checkAuth]);
+  //check how many times the user has visited the site
   useEffect(() => {
-    const initialize = async () => {
-      await checkAuth(); // Ensure this only runs once unless necessary
-      await fetchCategories(); // Avoid re-fetching unnecessarily
-      if (authUser && !authUser.isVerified) {
-        toast("Don't forget to verify your account!", {
-          icon: "⚠",
-          style: { borderRadius: "10px", zIndex: 300 },
-        });
-      }
-    };
-
-    initialize();
-    // Dependency array should include everything used inside the effect
-  }, [checkAuth, fetchCategories, authUser]);
-
-  useEffect(() => {
-    // Initialize Google Tag Manager
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
-
-    const getTokenAndAdd = async () => {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === "granted") {
-          const token = await requestForToken();
-          if (token) {
-            setToken(token);
-            console.log("FCM Token:", token);
-            // Add the token to the backend
-            if (authUser) {
-              addToken(token);
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error retrieving FCM token:", error);
-      }
-    };
-
-    if (authUser) {
-      getTokenAndAdd();
-    }
-  }, [authUser]);
+  }, []);
 
   return (
     <>

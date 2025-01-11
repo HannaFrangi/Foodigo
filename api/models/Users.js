@@ -59,10 +59,6 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
   groceryList: [groceryListItemSchema],
-  fcmToken: {
-    type: String, // Store the FCM token here
-    default: "",
-  },
 });
 
 // Only hash password if it's modified
@@ -85,20 +81,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   } catch (error) {
     throw new Error("Error comparing passwords");
   }
-};
-
-// Add methods for FCM token management
-
-// Update FCM token
-userSchema.methods.updateFcmToken = async function (newToken) {
-  this.fcmToken = newToken;
-  await this.save();
-};
-
-// Remove FCM token
-userSchema.methods.removeFcmToken = async function () {
-  this.fcmToken = "";
-  await this.save();
 };
 
 const User = mongoose.model("User", userSchema);
