@@ -17,6 +17,7 @@ import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import RecipeHeader from "./components/RecipeDetails/RecipeHeader";
 
 import { requestForToken } from "./utils/firebase";
+import { axiosInstance } from "./lib/axios";
 
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
@@ -31,6 +32,20 @@ function App() {
 
   const lenis = useLenis(({ scroll }) => {});
 
+  // Function to add token to the backend
+  const addToken = async (token) => {
+    try {
+      await axiosInstance.post("/auth/update-fcm", {
+        token: token,
+        userId: authUser._id.toString(),
+      });
+      console.log("FCM token added to backend");
+    } catch (error) {
+      console.error("Error adding FCM token:", error);
+    }
+  };
+
+  // Initialize and fetch the token
   useEffect(() => {
     checkAuth();
     fetchCategories();
@@ -40,26 +55,36 @@ function App() {
         style: { borderRadius: "10px", zIndex: 300 },
       });
     }
-  }, [checkAuth, fetchCategories, authUser]);
+  }, [checkAuth, fetchCategories]);
 
   useEffect(() => {
     // Initialize Google Tag Manager
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
 
-    const getToken = async () => {
-      const permission = await Notification.requestPermission();
-      if (permission === "granted") {
-        const token = await requestForToken();
-        if (token) {
-          setToken(token);
-          console.log(token);
+    const getTokenAndAdd = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          const token = await requestForToken();
+          if (token) {
+            setToken(token);
+            console.log("FCM Token:", token);
+            // Add the token to the backend
+            if (authUser) {
+              addToken(token);
+            }
+          }
         }
+      } catch (error) {
+        console.error("Error retrieving FCM token:", error);
       }
     };
 
-    getToken();
-  }, []);
+    if (authUser) {
+      getTokenAndAdd();
+    }
+  }, [authUser]);
 
   return (
     <>
