@@ -24,7 +24,12 @@ const PORT = process.env.PORT || 5001;
 
 // Import Firebase service account JSON
 import User from "./models/Users.js";
-import serviceAccount from "./config/foodigo.json";
+
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url); // Load Firebase service account JSON using fs
+const serviceAccount = require("./config/foodigo.json");
+
 import { getMessaging, Messaging } from "firebase-admin/messaging";
 
 // Initialize Firebase Admin SDK
