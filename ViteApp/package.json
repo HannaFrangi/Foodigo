@@ -19,6 +19,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "foodigo": "file:..",
+    "firebase": "9.0.0",
     "framer-motion": "^11.16.0",
     "gsap": "^3.12.5",
     "js-cookie": "^3.0.5",

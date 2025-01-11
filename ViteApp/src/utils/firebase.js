@@ -37,9 +37,19 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
 
-// Register the service worker
-navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-  type: "module",
-});
+onBackgroundMessage(messaging, (payload) => {
+  console.log(
+    "[firebase-messaging-sw.js] Received background message: ",
+    payload
+  );
 
+  // Customize notification here
+  const { title, body } = payload.notification;
+  const notificationOptions = {
+    body: body,
+    icon: "/firebase-logo.png",
+  };
+
+  self.registration.showNotification(title, notificationOptions);
+});
 export { messaging, app };
