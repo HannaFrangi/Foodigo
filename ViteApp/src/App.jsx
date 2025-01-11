@@ -68,14 +68,18 @@ function App() {
     // Initialize Google Tag Manager
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
-
     // Request Notification Permission
     requestNotificationPermission();
 
     // Listen for foreground messages
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log("Message received in foreground: ", payload);
-      alert(payload.notification.body); // You might want to replace alert with a toast or modal
+
+      // Use toast to show the notification instead of alert
+      toast(payload.notification.body, {
+        icon: "🔔", // You can customize this as needed
+        style: { borderRadius: "10px", zIndex: 300 },
+      });
     });
 
     // Clean up the listener when the component unmounts

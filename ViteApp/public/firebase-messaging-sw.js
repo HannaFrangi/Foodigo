@@ -1,9 +1,6 @@
-// Import the Firebase scripts for the service worker
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import {
-  getMessaging,
-  onBackgroundMessage,
-} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-messaging.js";
+// Import the necessary Firebase modules for the service worker
+import { initializeApp } from "firebase/app";
+import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -18,21 +15,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Messaging
 const messaging = getMessaging(app);
 
-// Handle background messages
+// Handle background messages when the app is not in the foreground
 onBackgroundMessage(messaging, (payload) => {
   console.log(
-    "[firebase-messaging-sw.js] Received background message:",
+    "[firebase-messaging-sw.js] Background message received:",
     payload
   );
 
   const { title, body } = payload.notification;
   const notificationOptions = {
     body,
-    icon: "/logo.png", // You can replace with your own icon
+    icon: "/logo.png", // Customize the icon here
   };
 
   // Show the notification
