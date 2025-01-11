@@ -7,6 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      includeAssets: ["firebase-messaging-sw.js"],
       workbox: {
         // Cache page navigations (html) with a Network First strategy
         navigateFallback: "index.html",

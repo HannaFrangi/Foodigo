@@ -2,6 +2,7 @@ import React, { useEffect, lazy, Suspense } from "react";
 import ReactLenis, { useLenis } from "@studio-freight/react-lenis";
 import { Route, Routes, Navigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { getToken, onMessage } from "firebase/messaging";
 import AuthPage from "./pages/Auth/AuthPage";
 import RecipePage from "./pages/Recipe/RecipePage";
 import PageLayout from "./layout/PageLayout";
@@ -14,6 +15,7 @@ import TagManager from "react-gtm-module";
 import ChefHatSpinner from "./utils/ChefHatSpinner";
 import RecipeDetails from "./pages/Recipe/RecipeDetails";
 import RecipeHeader from "./components/RecipeDetails/RecipeHeader";
+import { messaging } from "./utils/firebase";
 
 const ResetPassword = lazy(() => import("./pages/Auth/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/Auth/VerifyEmail"));
@@ -41,6 +43,35 @@ function App() {
   useEffect(() => {
     const tagManagerArgs = { gtmId: "GTM-PXV2ZMZW" };
     TagManager.initialize(tagManagerArgs);
+    const requestPermission = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          console.log("Notification permission granted.");
+
+          // Get FCM Token
+          const token = await getToken(messaging, {
+            vapidKey: "YOUR_VAPID_KEY",
+          });
+          if (token) {
+            console.log("FCM Token:", token);
+            // Send this token to your server to subscribe to notifications
+          }
+        } else {
+          console.error("Notification permission not granted.");
+        }
+      } catch (error) {
+        console.error("Error getting notification permission:", error);
+      }
+    };
+
+    requestPermission();
+
+    // Listen for foreground messages
+    onMessage(messaging, (payload) => {
+      console.log("Message received in foreground: ", payload);
+      alert(payload.notification.body);
+    });
   }, []);
 
   return (
