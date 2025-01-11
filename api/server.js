@@ -89,6 +89,8 @@ app.post("/api/send-notification", async (req, res) => {
       notification: {
         title, // Title of the notification
         body, // Body of the notification
+        image:
+          "https://firebasestorage.googleapis.com/v0/b/foodigo-2b5b1.appspot.com/o/foodingo-logo.png?alt=media&token=7a3a4f9a-0a2f-4a5c-9e8f-3f7d4c5d0e6f",
       },
       tokens, // Array of all tokens to send the message to
     };
