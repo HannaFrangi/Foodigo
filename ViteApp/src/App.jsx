@@ -86,72 +86,64 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  const renderPageLayout = () => (
-    <PageLayout authUser={authUser} loading={loading}>
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route
-          path="/auth"
-          element={authUser ? <Navigate to="/" /> : <AuthPage />}
-        />
-        <Route path="/recipe" element={<RecipePage />} />
-        <Route path="/favorites" element={<Favorites />} />
-        <Route path="/recipe/:id" element={<RecipeDetails />} />
-        <Route path="/recipe/:recipeId" element={<RecipeHeader />} />
-        <Route
-          path="/edit/:recipeId"
-          element={
-            <Suspense fallback={<ChefHatSpinner size={258} />}>
-              <EditRecipePage />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/reset-password/:token"
-          element={
-            <Suspense fallback={<ChefHatSpinner size={258} />}>
-              <ResetPassword />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/verify-email/:token"
-          element={
-            <Suspense fallback={<ChefHatSpinner size={258} />}>
-              <VerifyEmail />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/recipes/new"
-          element={
-            <Suspense fallback={<ChefHatSpinner size={258} />}>
-              <AddRecipe />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/groccery"
-          element={
-            <Suspense fallback={<ChefHatSpinner size={258} />}>
-              <GrocceryList />
-            </Suspense>
-          }
-        />
-        <Route path="/*" element={<Error />} />
-      </Routes>
-    </PageLayout>
-  );
-
   return (
     <>
       <Toaster />
       <ReactLenis options={{ duration: 2 }} root>
-        {loading ? (
-          <ChefHatSpinner size={258} /> // Display a loading spinner if still checking auth
-        ) : (
-          renderPageLayout()
-        )}
+        <PageLayout authUser={authUser} loading={loading}>
+          <Routes>
+            <Route path="/" element={<Homepage />} />
+            <Route
+              path="/auth"
+              element={authUser ? <Navigate to="/" /> : <AuthPage />}
+            />
+            <Route path="/recipe" element={<RecipePage />} />
+            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/recipe/:id" element={<RecipeDetails />} />
+            <Route path="/recipe/:recipeId" element={<RecipeHeader />} />
+            <Route
+              path="/edit/:recipeId"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <EditRecipePage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/reset-password/:token"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <ResetPassword />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/verify-email/:token"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <VerifyEmail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/recipes/new"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <AddRecipe />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/groccery"
+              element={
+                <Suspense fallback={<ChefHatSpinner size={258} />}>
+                  <GrocceryList />
+                </Suspense>
+              }
+            />
+            <Route path="/*" element={<Error />} />
+          </Routes>
+        </PageLayout>
       </ReactLenis>
     </>
   );

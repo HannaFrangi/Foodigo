@@ -91,7 +91,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5001",
+        target: ["http://localhost:5001", "https://foodigo.onrender.com/"],
         changeOrigin: true, // Adjust for virtual host
         secure: false, // If using HTTP for development
         rewrite: (path) => path.replace(/^\/api/, ""),

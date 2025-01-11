@@ -53,7 +53,6 @@ if (process.env.NODE_ENV === "production") {
 
   // Handle client-side routes in production
   app.get("*", (req, res) => {
-    // Don't serve index.html for API routes
     if (req.path.startsWith("/api")) {
       return res.status(404).send("API route not found");
     }
