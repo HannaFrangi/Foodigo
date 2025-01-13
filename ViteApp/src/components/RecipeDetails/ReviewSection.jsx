@@ -14,7 +14,6 @@ const { TextArea } = Input;
 
 export const ReviewSection = ({ recipeId }) => {
   const { authUser } = useAuthStore();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newReview, setNewReview] = useState({ rating: 0, comment: "" });
 
@@ -81,7 +80,7 @@ export const ReviewSection = ({ recipeId }) => {
         toast.success("Review added successfully!");
       }
       handleCloseModal();
-      await fetchReviews(); // Refresh reviews list after adding/updating
+      await fetchReviews();
     } catch (err) {
       toast.error("Failed to submit review");
     }
@@ -89,15 +88,16 @@ export const ReviewSection = ({ recipeId }) => {
 
   const handleDeleteReview = async () => {
     try {
-      await DeleteRecipeReview(recipeId); // Call delete API
+      await DeleteRecipeReview(recipeId);
       toast.success("Review deleted successfully!");
-      handleCloseModal(); // Close the modal
+      handleCloseModal();
       await fetchReviews();
     } catch (err) {
       toast.error("Failed to delete review");
     }
   };
 
+  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -109,16 +109,64 @@ export const ReviewSection = ({ recipeId }) => {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+  const reviewCardVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: (i) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.5,
+        type: "spring",
+        stiffness: 100,
+      },
+    }),
+    hover: {
+      scale: 1.02,
+      boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+      transition: { duration: 0.3 },
+    },
+  };
+
+  const modalVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.9,
+      y: 50,
+    },
     visible: {
       opacity: 1,
+      scale: 1,
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 200,
-        damping: 20,
+        duration: 0.5,
+        bounce: 0.3,
       },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.9,
+      y: 50,
+      transition: { duration: 0.2 },
+    },
+  };
+
+  const ratingStarVariants = {
+    initial: { scale: 0 },
+    animate: (i) => ({
+      scale: 1,
+      transition: {
+        delay: i * 0.1,
+        type: "spring",
+        stiffness: 200,
+        damping: 10,
+      },
+    }),
+    hover: {
+      scale: 1.2,
+      rotate: 360,
+      transition: { duration: 0.3 },
     },
   };
 
@@ -144,33 +192,6 @@ export const ReviewSection = ({ recipeId }) => {
     },
   };
 
-  // Enhanced modal animations
-  const modalVariants = {
-    hidden: {
-      opacity: 0,
-      scale: 0.9,
-      y: 50,
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        duration: 0.5,
-        bounce: 0.3,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      y: 50,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  };
-
   return (
     <motion.div
       initial="hidden"
@@ -184,19 +205,49 @@ export const ReviewSection = ({ recipeId }) => {
           animate={{ opacity: 1, x: 0 }}
           className="text-2xl font-bold text-olive flex items-center"
         >
-          <MessageSquare className="mr-3 text-olive" size={28} />
+          <motion.div
+            animate={{
+              y: [0, -10, 0],
+              transition: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+            className="mr-3"
+          >
+            <MessageSquare className="text-olive" size={28} />
+          </motion.div>
           Reviews
         </motion.h2>
         {authUser && (
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="ml-auto"
+          >
             <Button
               type="link"
               loading={addLoading || updateLoading}
               onClick={handleOpenModal}
               style={{ color: "white" }}
-              className="relative w-full bg-olive hover:bg-darkolive text-white py-4 px-6 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30"
-              icon={<PenIcon className="mr-2" size={18} />}
+              className="relative bg-olive hover:bg-darkolive text-white py-2 sm:py-4 px-4 sm:px-6 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30 text-sm sm:text-base overflow-hidden"
             >
+              <motion.div
+                animate={{
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+                className="absolute inset-0 bg-gradient-to-r from-olive/20 to-transparent opacity-50"
+              />
+              <PenIcon
+                className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5"
+                size={18}
+              />
               {userHasWrittenReview ? "Edit Review" : "Write a Review"}
             </Button>
           </motion.div>
@@ -204,48 +255,67 @@ export const ReviewSection = ({ recipeId }) => {
       </div>
 
       {reviewsLoading ? (
-        <div className="flex justify-center py-12">
+        <motion.div
+          className="flex justify-center py-12"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
           <ChefHatSpinner />
-        </div>
+        </motion.div>
       ) : (
         <AnimatePresence>
           {reviews?.length === 0 ? (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               className="text-center py-12 text-gray-500"
             >
-              <MessageSquare size={48} className="mx-auto mb-4 text-olive" />
+              <motion.div
+                animate={{
+                  y: [0, -10, 0],
+                  transition: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                }}
+                className="mx-auto mb-4"
+              >
+                <MessageSquare size={48} className="text-olive" />
+              </motion.div>
               <p className="text-lg">No reviews yet. Be the first to review!</p>
             </motion.div>
           ) : (
             <div className="grid gap-6">
-              {reviews?.map((review) => (
+              {reviews?.map((review, index) => (
                 <motion.div
                   key={review._id}
-                  variants={itemVariants}
-                  className=" rounded-lg py-2 "
+                  custom={index}
+                  variants={reviewCardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover="hover"
+                  className="rounded-lg py-4 px-6 bg-white shadow-sm hover:shadow-xl transition-shadow duration-300"
                 >
                   <div className="flex items-start space-x-4">
                     <motion.div
                       whileHover={{ scale: 1.1 }}
                       className="relative"
                     >
-                      {review.user.ProfilePicURL ? (
-                        <Avatar
-                          src={review.user.ProfilePicURL}
-                          className="border-2 border-[#5d6544] shadow-sm"
-                          size={40}
-                        />
-                      ) : (
-                        <Avatar
-                          size={40}
-                          className="bg-gradient-to-r from-[#5d6544] to-[#7a8c5a] flex items-center justify-center shadow-sm"
-                        >
-                          {review.user.name.charAt(0).toUpperCase()}
-                        </Avatar>
-                      )}
-                      <div className="absolute -bottom-1 -right-1 bg-olive rounded-full p-1" />
+                      <Avatar
+                        src={review.user.ProfilePicURL}
+                        className="border-2 border-[#5d6544] shadow-sm"
+                        size={40}
+                      >
+                        {!review.user.ProfilePicURL &&
+                          review.user.name.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="absolute -bottom-1 -right-1 bg-olive rounded-full p-1"
+                      />
                     </motion.div>
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
@@ -253,23 +323,44 @@ export const ReviewSection = ({ recipeId }) => {
                           <h3 className="font-semibold text-lg text-olive">
                             {review.user.name || "Anonymous"}
                           </h3>
-                          <Rate
-                            disabled
-                            value={review.rating}
-                            className="text-amber-400"
-                          />
+                          <div className="flex">
+                            <motion.div
+                              variants={ratingStarVariants}
+                              initial="initial"
+                              animate="animate"
+                              whileHover="hover"
+                            >
+                              <Rate
+                                disabled
+                                value={review.rating}
+                                character={
+                                  <Star
+                                    className="text-amber-400 fill-amber-400"
+                                    size={16}
+                                  />
+                                }
+                                className="text-amber-400"
+                              />
+                            </motion.div>
+                          </div>
                         </div>
-                        <span className="text-sm text-gray-400">
-                          {new Date(review.date).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className="text-sm text-gray-400"
+                        >
+                          {new Date(review.date).toLocaleDateString()}
+                        </motion.span>
                       </div>
-                      <p className="mt-3 text-gray-700 leading-relaxed">
+                      <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="mt-3 text-gray-700 leading-relaxed"
+                      >
                         {review.comment}
-                      </p>
+                      </motion.p>
                     </div>
                   </div>
                 </motion.div>
@@ -378,8 +469,9 @@ export const ReviewSection = ({ recipeId }) => {
               showCount
               placeholder="Share your thoughts about this recipe..."
               value={newReview.comment}
-              className="min-h-[150px] text-base p-3 rounded-xl border-gray-200
-                focus:border-olive focus:ring-1 focus:ring-olive"
+              style={{ resize: "none" }}
+              className="min-h-[150px] h-[150px] text-base p-3 rounded-xl border-olive
+    focus:border-olive focus:ring-1 focus:ring-olive resize-none"
               onChange={(e) =>
                 setNewReview((prev) => ({ ...prev, comment: e.target.value }))
               }
