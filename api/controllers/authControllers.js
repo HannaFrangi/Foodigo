@@ -411,3 +411,52 @@ export const UpdateFCM = async (req, res) => {
     res.status(500).json({ message: "Error updating FCM token", error });
   }
 };
+
+export const AdminLogin = async (req, res) => {
+  let { email, password } = req.body;
+  try {
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "All Fields are Required",
+      });
+    }
+
+    // Search for the user by email and ensure both password and isAdmin fields are available
+    const user = await User.findOne({ email, isAdmin: true }).select(
+      "+password"
+    );
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "No admin user found with this email",
+      });
+    }
+
+    // Validate password
+    if (!(await user.matchPassword(password))) {
+      return res.status(401).json({
+        success: false,
+        message: "Wrong Password 🙁",
+      });
+    }
+
+    // Generate JWT token
+    const token = signToken(user._id);
+    res.cookie("jwt", token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    res.status(200).json({
+      success: true,
+      user,
+      message: "Logged in as admin",
+    });
+  } catch (error) {
+    console.error("Error in AdminLogin Controller:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
