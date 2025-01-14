@@ -10,6 +10,7 @@ import usersRoutes from "./routes/usersRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import areaRoutes from "./routes/areaRoutes.js";
 import ingredientsRoutes from "./routes/ingredientsRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { connectDB } from "./config/db.js";
 
 dotenv.config(); // Load environment variables
@@ -45,6 +46,7 @@ app.use("/api/area", areaRoutes);
 app.use("/api/recipe", recipeRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/ingredients", ingredientsRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Production setup
 if (process.env.NODE_ENV === "production") {
