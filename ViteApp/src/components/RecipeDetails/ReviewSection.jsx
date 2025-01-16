@@ -131,8 +131,8 @@ export const ReviewSection = ({ recipeId }) => {
   const modalVariants = {
     hidden: {
       opacity: 0,
-      scale: 0.9,
-      y: 50,
+      scale: 0.8,
+      y: 0,
     },
     visible: {
       opacity: 1,
@@ -191,7 +191,7 @@ export const ReviewSection = ({ recipeId }) => {
       borderTop: "1px solid #eee",
     },
   };
-
+  console.table(reviews);
   return (
     <motion.div
       initial="hidden"
@@ -224,14 +224,14 @@ export const ReviewSection = ({ recipeId }) => {
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="ml-auto"
+            className="ml-auto px-2"
           >
             <Button
               type="link"
               loading={addLoading || updateLoading}
               onClick={handleOpenModal}
               style={{ color: "white" }}
-              className="relative bg-olive hover:bg-darkolive text-white py-2 sm:py-4 px-4 sm:px-6 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30 text-sm sm:text-base overflow-hidden"
+              className="relative bg-olive hover:bg-darkolive text-white py-2 sm:py-4 px-4 sm:px-6 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-olive/30 text-sm sm:text-base overflow-hidden whitespace-nowrap"
             >
               <motion.div
                 animate={{
@@ -253,7 +253,6 @@ export const ReviewSection = ({ recipeId }) => {
           </motion.div>
         )}
       </div>
-
       {reviewsLoading ? (
         <motion.div
           className="flex justify-center py-12"
@@ -281,7 +280,9 @@ export const ReviewSection = ({ recipeId }) => {
                 }}
                 className="mx-auto mb-4"
               >
-                <MessageSquare size={48} className="text-olive" />
+                <div className="flex justify-center">
+                  <MessageSquare size={48} className="text-olive" />
+                </div>
               </motion.div>
               <p className="text-lg">No reviews yet. Be the first to review!</p>
             </motion.div>
@@ -302,14 +303,20 @@ export const ReviewSection = ({ recipeId }) => {
                       whileHover={{ scale: 1.1 }}
                       className="relative"
                     >
-                      <Avatar
-                        src={review.user.ProfilePicURL}
-                        className="border-2 border-[#5d6544] shadow-sm"
-                        size={40}
-                      >
-                        {!review.user.ProfilePicURL &&
-                          review.user.name.charAt(0).toUpperCase()}
-                      </Avatar>
+                      {review.user.ProfilePicURL ? (
+                        <Avatar
+                          src={review.user.ProfilePicURL}
+                          className="border-2 border-[#5d6544] shadow-sm"
+                          size={40}
+                        />
+                      ) : (
+                        <Avatar
+                          size={40}
+                          className="bg-gradient-to-r from-[#5d6544] to-[#7a8c5a] flex items-center justify-center shadow-sm border-2 border-[#5d6544] "
+                        >
+                          {review.user.name.charAt(0).toUpperCase()}
+                        </Avatar>
+                      )}
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
