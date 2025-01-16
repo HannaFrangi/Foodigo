@@ -20,6 +20,19 @@ import logo from "/src/assets/logo.png";
 import { useAuthStore } from "../store/useAuthStore";
 import ProfileModal from "../pages/Profile/ProfileModal";
 
+const NavbarSkeleton = () => {
+  return (
+    <div className="flex items-center space-x-4 animate-pulse">
+      <div className="hidden md:flex items-center space-x-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-9 w-24 bg-gray-200 rounded-full" />
+        ))}
+      </div>
+      <div className="h-10 w-10 bg-gray-200 rounded-full" />
+    </div>
+  );
+};
+
 const UserAvatar = ({ user, handleLogout, onProfileEdit }) => {
   if (!user) {
     return (
@@ -150,7 +163,7 @@ const NavLink = ({ to, icon: Icon, label, isActive }) => (
   </Link>
 );
 
-const Navbar = ({ user, handleLogout }) => {
+const Navbar = ({ user, handleLogout, loading }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileModalVisible, setIsProfileModalVisible] = useState(false);
   const location = useLocation();
@@ -222,50 +235,58 @@ const Navbar = ({ user, handleLogout }) => {
               </Link>
             </div>
 
-            <div className="hidden md:flex items-center space-x-4">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center space-x-2"
-              >
-                {navItems.map((item) => (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    icon={item.icon}
-                    label={item.label}
-                    isActive={location.pathname === item.path}
+            {loading ? (
+              <NavbarSkeleton />
+            ) : (
+              <>
+                <div className="hidden md:flex items-center space-x-4">
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="flex items-center space-x-2"
+                  >
+                    {navItems.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        icon={item.icon}
+                        label={item.label}
+                        isActive={location.pathname === item.path}
+                      />
+                    ))}
+                  </motion.div>
+
+                  <div>
+                    <UserAvatar
+                      user={user}
+                      handleLogout={handleLogout}
+                      onProfileEdit={handleProfileEdit}
+                      loading={loading}
+                    />
+                  </div>
+                </div>
+
+                <div className="md:hidden flex items-center space-x-2">
+                  <UserAvatar
+                    user={user}
+                    handleLogout={handleLogout}
+                    onProfileEdit={handleProfileEdit}
+                    loading={loading}
                   />
-                ))}
-              </motion.div>
-
-              <div>
-                <UserAvatar
-                  user={user}
-                  handleLogout={handleLogout}
-                  onProfileEdit={handleProfileEdit}
-                />
-              </div>
-            </div>
-
-            <div className="md:hidden flex items-center space-x-2">
-              <UserAvatar
-                user={user}
-                handleLogout={handleLogout}
-                onProfileEdit={handleProfileEdit}
-              />
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
-              >
-                {isMenuOpen ? (
-                  <X className="h-5 w-5 text-gray-800" />
-                ) : (
-                  <MenuIcon className="h-5 w-5 text-gray-800" />
-                )}
-              </button>
-            </div>
+                  <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="p-1.5 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center"
+                  >
+                    {isMenuOpen ? (
+                      <X className="h-5 w-5 text-gray-800" />
+                    ) : (
+                      <MenuIcon className="h-5 w-5 text-gray-800" />
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -299,7 +320,7 @@ const Navbar = ({ user, handleLogout }) => {
   );
 };
 
-const PageLayout = ({ children, authUser }) => {
+const PageLayout = ({ children, authUser, loading }) => {
   const location = useLocation();
   const isAuthPage = location.pathname.startsWith("/auth");
   const isResetPage = location.pathname.startsWith("/reset-password");
@@ -473,7 +494,7 @@ const PageLayout = ({ children, authUser }) => {
         options={particlesConfig}
       />
       {!isAuthPage && !isResetPage && !isVerificationPage && (
-        <Navbar user={authUser} handleLogout={logout} />
+        <Navbar user={authUser} handleLogout={logout} loading={loading} />
       )}
       <main
         ref={mainContentRef}

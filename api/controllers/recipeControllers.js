@@ -330,6 +330,26 @@ export const getLatestRecipe = async (req, res) => {
   }
 };
 
+export const get12RandomRecipes = async (req, res) => {
+  const limit = 12;
+  try {
+    const randomRecipes = await Recipe.aggregate([
+      { $sample: { size: limit } }, // Randomly select 'limit' documents
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: randomRecipes,
+    });
+  } catch (error) {
+    console.error("Error fetching random recipes:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve random recipes due to server error",
+    });
+  }
+};
+
 export const getRandomRecipe = async (req, res) => {
   try {
     const count = await Recipe.countDocuments();

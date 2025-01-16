@@ -120,7 +120,8 @@ export const useRecipeStore = create((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const response = await axiosInstance.get("recipe/latest/");
+      // const response = await axiosInstance.get("recipe/latest/");
+      const response = await axiosInstance.get("recipe/12randomrecipes/");
       const latestRecipes = response.data || [];
       set({
         recipes: latestRecipes,

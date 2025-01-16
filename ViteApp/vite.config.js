@@ -1,21 +1,14 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
-
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        // Cache page navigations (html) with a Network First strategy
         navigateFallback: "index.html",
         navigateFallbackDenylist: [/^\/api\//],
-
         runtimeCaching: [
-          // Cache API calls
           {
-            urlPattern: /^https?:\/\/api\.your-domain\.com\/.*/i,
+            urlPattern: ({ url }) => url.pathname.startsWith("/api/"), // Updated for production API path
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
@@ -29,8 +22,6 @@ export default defineConfig({
               },
             },
           },
-
-          // Cache static assets (images, fonts, etc)
           {
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot)$/,
             handler: "CacheFirst",
@@ -42,8 +33,6 @@ export default defineConfig({
               },
             },
           },
-
-          // Cache Google Fonts stylesheets
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "StaleWhileRevalidate",
@@ -51,8 +40,6 @@ export default defineConfig({
               cacheName: "google-fonts-stylesheets",
             },
           },
-
-          // Cache Google Fonts webfont files
           {
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
@@ -64,8 +51,6 @@ export default defineConfig({
               },
             },
           },
-
-          // Cache CSS and JavaScript files
           {
             urlPattern: /\.(?:js|css)$/i,
             handler: "StaleWhileRevalidate",
@@ -74,15 +59,9 @@ export default defineConfig({
             },
           },
         ],
-
-        // Don't precache sourcemaps
         globIgnores: ["**/*.map"],
-
-        // Skip waiting and clients claim
         skipWaiting: true,
         clientsClaim: true,
-
-        // Enable navigation preload
         navigationPreload: true,
       },
     }),
@@ -90,12 +69,19 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        // target: "http://192.168.1.15:5001",
-        target: "http://localhost:5001",
-        changeOrigin: true, // Adjust for virtual host
-        secure: false, // If using HTTP for development
+        target:
+          process.env.NODE_ENV === "production"
+            ? "http://localhost:5001"
+            : "http://localhost:5001",
+        changeOrigin: true,
+        secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
+  },
+  build: {
+    sourcemap: false,
+    outDir: "dist",
+    emptyOutDir: true,
   },
 });

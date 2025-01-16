@@ -9,6 +9,8 @@ import {
   CheckerificationEmail,
   forgotPassword,
   resetPassword,
+  UpdateFCM,
+  AdminLogin,
 } from "../controllers/authControllers.js";
 import { protectRoute } from "../middleware/auth.js";
 
@@ -16,11 +18,12 @@ const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
+router.post("/adminlogin", AdminLogin);
 router.post("/logout", logout);
 router.post("/verify", CheckerificationEmail);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
-
+router.post("/update-fcm", UpdateFCM);
 router.get("/me", protectRoute, (req, res) => {
   res.send({
     success: true,
