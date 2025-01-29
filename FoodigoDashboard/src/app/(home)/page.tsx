@@ -9,6 +9,8 @@ import { ChatsCard } from "./_components/chats-card";
 import { OverviewCardsGroup } from "./_components/overview-cards";
 import { OverviewCardsSkeleton } from "./_components/overview-cards/skeleton";
 import { RegionLabels } from "./_components/region-labels";
+import { Users } from "./_components/overview-cards/icons";
+import { UsersTable } from "./_components/usersTable";
 
 type PropsType = {
   searchParams: Promise<{
@@ -27,7 +29,7 @@ export default async function Home({ searchParams }: PropsType) {
       </Suspense>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-9 2xl:gap-7.5">
-        <PaymentsOverview
+        {/* <PaymentsOverview
           className="col-span-12 xl:col-span-7"
           key={extractTimeFrame("payments_overview")}
           timeFrame={extractTimeFrame("payments_overview")?.split(":")[1]}
@@ -45,11 +47,12 @@ export default async function Home({ searchParams }: PropsType) {
           timeFrame={extractTimeFrame("used_devices")?.split(":")[1]}
         />
 
-        <RegionLabels />
+        <RegionLabels /> */}
 
         <div className="col-span-12 grid xl:col-span-8">
           <Suspense fallback={<TopChannelsSkeleton />}>
-            <TopChannels />
+            {/* <TopChannels /> */}
+            <UsersTable />
           </Suspense>
         </div>
 

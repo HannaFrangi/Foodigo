@@ -444,7 +444,7 @@ export const AdminLogin = async (req, res) => {
     // Generate JWT token
     const token = signToken(user._id);
     res.cookie("jwt", token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+      maxAge: 60 * 60 * 1000, // 7 days in milliseconds
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV === "production",

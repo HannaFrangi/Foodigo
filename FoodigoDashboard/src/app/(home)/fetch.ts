@@ -8,27 +8,11 @@ export async function getOverviewData() {
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
     const result = await response.json();
-
-    if (!result.success || !result.data) {
-      throw new Error("Invalid data received from the server");
-    }
-
-    // Calculate growth rates (you might want to fetch historical data for actual calculations)
-    // For now, using mock growth rates
-    const mockGrowthRates = {
-      categories: -0.43,
-      ingredients: -4.35,
-      recipes: -2.59,
-      users: -0.95,
-    };
+    console.log("API Response:", result);
 
     // Transform the API data to match the required format
-    return {
+    const transformedData = {
       categories: {
         value: result.data.categories,
         growthRate: 0,
@@ -46,19 +30,22 @@ export async function getOverviewData() {
         growthRate: 0,
       },
     };
+    // console.log("Transformed Data:", transformedData);
+
+    return transformedData;
   } catch (error) {
     console.error("Error fetching overview data:", error);
     // Return default values in case of error
     return {
-      views: {
+      categories: {
         value: 0,
         growthRate: 0,
       },
-      profit: {
+      ingredients: {
         value: 0,
         growthRate: 0,
       },
-      products: {
+      recipes: {
         value: 0,
         growthRate: 0,
       },

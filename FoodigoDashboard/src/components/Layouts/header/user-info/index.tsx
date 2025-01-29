@@ -25,7 +25,6 @@ const NAV_LINKS = [
   },
 ];
 
-// Default avatar path - consider replacing with your actual default avatar
 const DEFAULT_AVATAR = "/images/user/logo.png";
 
 export function UserInfo() {
@@ -33,15 +32,16 @@ export function UserInfo() {
   const [user, setUser] = useState({
     name: "",
     email: "",
-    img: null, // Changed from empty string to null
+    img: null,
   });
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(false);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   const handleLogout = useCallback(async () => {
     try {
       localStorage.removeItem("authUser");
-      setUser({ name: "", email: "", img: null }); // Changed from empty string to null
+      setUser({ name: "", email: "", img: null });
       setIsOpen(false);
     } catch (error) {
       setError("Failed to log out. Please try again.");
@@ -49,20 +49,23 @@ export function UserInfo() {
   }, []);
 
   useEffect(() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("authUser"));
-      console.log(storedUser);
-      if (storedUser?.name) {
-        setUser({
-          name: storedUser.name,
-          email: storedUser.email || "",
-          img: storedUser.ProfilePicURL || null, // Use null instead of empty string
-        });
+    const storedUser = localStorage.getItem("authUser");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser?.name) {
+          setUser({
+            name: parsedUser.name,
+            email: parsedUser.email || "",
+            img: parsedUser.ProfilePicURL || null,
+          });
+        }
+      } catch (error) {
+        setError("Failed to load user data");
+        console.error("Error loading user data:", error);
       }
-    } catch (error) {
-      setError("Failed to load user data");
-      console.error("Error loading user data:", error);
     }
+    setLoading(false); // Set loading to false after trying to fetch user data
   }, []);
 
   const UserAvatar = ({ className = "", size = "size-12" }) => (
@@ -74,7 +77,7 @@ export function UserInfo() {
       )}
     >
       <Image
-        src={user?.img || DEFAULT_AVATAR} // Use default avatar if no image is provided
+        src={user?.img || DEFAULT_AVATAR}
         unoptimized
         className={cn(
           "rounded-full object-cover transition-all duration-300",
@@ -89,7 +92,6 @@ export function UserInfo() {
         onError={(e) => {
           console.error("Image loading error:", e);
           setImageError(true);
-          // Fallback to default avatar on error
           e.target.src = DEFAULT_AVATAR;
         }}
       />
@@ -109,6 +111,10 @@ export function UserInfo() {
       />
     </div>
   );
+
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading state until user data is available
+  }
 
   if (error) {
     return <div className="p-2 text-red-500">{error}</div>;
