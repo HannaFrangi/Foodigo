@@ -30,7 +30,14 @@ export const AdminRoute = async (req, res, next) => {
       });
     }
 
-    // 4. Check if user is admin
+    // 4. Check if user is active
+    if (!currentUser.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized. User is inactive",
+      });
+    }
+    // 5. Check if user is admin
     if (!currentUser.isAdmin) {
       return res.status(401).json({
         success: false,
@@ -38,7 +45,7 @@ export const AdminRoute = async (req, res, next) => {
       });
     }
 
-    // 5. Assign user to the request object
+    // 6. Assign user to the request object
     req.user = currentUser;
     next();
   } catch (error) {

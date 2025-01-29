@@ -29,8 +29,14 @@ export const protectRoute = async (req, res, next) => {
         message: "Not authorized. User not found",
       });
     }
-
-    // 4. Assign user to the request object
+    //4. Check if user is active
+    if (!currentUser.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized. User is inactive",
+      });
+    }
+    // 5. Assign user to the request object
     req.user = currentUser;
     next();
   } catch (error) {

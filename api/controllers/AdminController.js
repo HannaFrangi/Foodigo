@@ -80,3 +80,120 @@ export const getUsersForTable = async (req, res) => {
     });
   }
 };
+
+export const modifyUserAccount = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const updates = req.body;
+
+    // Verify that the requester is an admin
+    if (!req.user?.isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied: Admin privileges required",
+      });
+    }
+
+    // Validate user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Prevent modifying other admin accounts
+    if (user.isAdmin && user._id.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Cannot modify other admin accounts",
+      });
+    }
+
+    // List of fields that can be modified
+    const allowedUpdates = [
+      "name",
+      "email",
+      "isVerified",
+      "isActive",
+      "ProfilePicURL",
+    ];
+
+    // Filter out any unauthorized field updates
+    const sanitizedUpdates = Object.keys(updates)
+      .filter((key) => allowedUpdates.includes(key))
+      .reduce((obj, key) => {
+        obj[key] = updates[key];
+        return obj;
+      }, {});
+
+    // Special handling for password updates
+    if (updates.password) {
+      const salt = await bcrypt.genSalt(10);
+      sanitizedUpdates.password = await bcrypt.hash(updates.password, salt);
+    }
+
+    // Special handling for email updates
+    if (updates.email) {
+      // Check if email is already in use by another user
+      const existingUser = await User.findOne({
+        email: updates.email.toLowerCase(),
+        _id: { $ne: userId },
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already in use",
+        });
+      }
+      sanitizedUpdates.email = updates.email.toLowerCase();
+    }
+
+    // Perform the update with validation
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: sanitizedUpdates,
+      },
+      {
+        new: true,
+        runValidators: true,
+        select: "-password", // Exclude password from response
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "User account updated successfully",
+      data: {
+        user: updatedUser,
+        modifiedFields: Object.keys(sanitizedUpdates),
+      },
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: Object.values(error.errors).map((err) => err.message),
+      });
+    }
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID format",
+      });
+    }
+
+    // Generic error handler
+    return res.status(500).json({
+      success: false,
+      message: "Error modifying user account",
+      error: error.message,
+    });
+  }
+};

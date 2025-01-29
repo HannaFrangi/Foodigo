@@ -162,12 +162,12 @@ export const login = async (req, res) => {
       });
     }
 
-    // if (!user.isVerified) {
-    //   return res.status(401).json({
-    //     success: false,
-    //     message: "Please verify your email before logging in",
-    //   });
-    // }
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "User Not Active!",
+      });
+    }
 
     if (!(await user.matchPassword(password))) {
       return res.status(401).json({
@@ -441,6 +441,13 @@ export const AdminLogin = async (req, res) => {
       });
     }
 
+    // CheckIf user is active
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "User is not active 🙁",
+      });
+    }
     // Generate JWT token
     const token = signToken(user._id);
     res.cookie("jwt", token, {
