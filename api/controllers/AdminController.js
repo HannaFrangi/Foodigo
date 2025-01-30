@@ -26,7 +26,7 @@ export const getStats = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+//stats
 export const getUsersForTable = async (req, res) => {
   try {
     // First get total count of non-admin users
@@ -194,6 +194,80 @@ export const modifyUserAccount = async (req, res) => {
       success: false,
       message: "Error modifying user account",
       error: error.message,
+    });
+  }
+};
+// USers Table
+export const getAllUsersX = async (req, res) => {
+  try {
+    const users = await User.find({ isAdmin: { $in: [false, null] } });
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
+export const NewestRecipesX = async (req, res) => {
+  // const limit = 5;
+  try {
+    const latestRecipes = await Recipe.find()
+      .sort({ createdAt: -1 })
+      // .limit(limit)
+      .populate("userId", "name ProfilePicURL");
+
+    return res.status(200).json({
+      success: true,
+      data: latestRecipes,
+    });
+  } catch (error) {
+    console.error("Error fetching latest recipes:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve the latest recipes due to server error",
+    });
+  }
+};
+
+export const getRecipesByNameX = async (req, res) => {
+  const searchTerm = req.query.recipeTitle;
+  if (!searchTerm) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a search term.",
+    });
+  }
+
+  try {
+    const recipes = await Recipe.find({
+      recipeTitle: { $regex: new RegExp(searchTerm, "i") },
+    }).populate("userId", "name ProfilePicURL");
+
+    if (recipes.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No recipes found with that name.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: recipes.length, // majd added this (wahesh Ya Chbat)
+      data: recipes,
+    });
+  } catch (error) {
+    console.error("Error searching for recipes by name:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search for recipes due to server error",
     });
   }
 };
