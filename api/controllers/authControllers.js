@@ -453,10 +453,13 @@ export const AdminLogin = async (req, res) => {
     const token = signToken(user._id);
 
     // Set JWT cookie using "Set-Cookie" header
-    res.setHeader(
-      "Set-Cookie",
-      `jwt=${token}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=3600`
-    );
+    res.cookie("jwt", token, {
+      maxAge: 60 * 60 * 1000, // 1 hour
+      httpOnly: true,
+      sameSite: "None", // Required for cross-site cookies
+      secure: true, // Must be HTTPS
+      partitioned: true, // NEW: Enables cross-site storage in Chrome
+    });
 
     res.status(200).json({
       success: true,
