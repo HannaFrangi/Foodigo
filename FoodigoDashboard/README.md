@@ -1,67 +1,73 @@
-# Shadcn Admin Dashboard
+# NextAdmin - Next.js Admin Dashboard Template and Components
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+**NextAdmin** is a Free, open-source Next.js admin dashboard toolkit featuring 200+ UI components and templates that come with pre-built elements, components, pages, high-quality design, integrations, and much more to help you create powerful admin dashboards with ease.
 
-![alt text](public/images/shadcn-admin.png)
 
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
+[![nextjs admin template](https://cdn.pimjo.com/nextadmin-2.png)](https://nextadmin.co/)
 
-> This is not a starter project (template) though. I'll probably make one in the future.
 
-## Features
+**NextAdmin** provides you with a diverse set of dashboard UI components, elements, examples and pages necessary for creating top-notch admin panels or dashboards with **powerful** features and integrations. Whether you are working on a complex web application or a basic website, **NextAdmin** has got you covered.
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
-- Global Search Command
-- 10+ pages
-- Extra custom components
+### [✨ Visit Website](https://nextadmin.co/)
+### [🚀 Live Demo](https://demo.nextadmin.co/)
+### [📖 Docs](https://docs.nextadmin.co/)
 
-## Tech Stack
+By leveraging the latest features of **Next.js 14** and key functionalities like **server-side rendering (SSR)**, **static site generation (SSG)**, and seamless **API route integration**, **NextAdmin** ensures optimal performance. With the added benefits of **React 18 advancements** and **TypeScript** reliability, **NextAdmin** is the ultimate choice to kickstart your **Next.js** project efficiently.
 
-**UI:** [ShadcnUI](https://ui.shadcn.com) (TailwindCSS + RadixUI)
+## Installation
 
-**Build Tool:** [Vite](https://vitejs.dev/)
+1. Download/fork/clone the repo and Once you're in the correct directory, it's time to install all the necessary dependencies. You can do this by typing the following command:
 
-**Routing:** [TanStack Router](https://tanstack.com/router/latest)
+```
+npm install
+```
+If you're using **Yarn** as your package manager, the command will be:
 
-**Type Checking:** [TypeScript](https://www.typescriptlang.org/)
-
-**Linting/Formatting:** [Eslint](https://eslint.org/) & [Prettier](https://prettier.io/)
-
-**Icons:** [Tabler Icons](https://tabler.io/icons)
-
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
+```
+yarn install
 ```
 
-Go to the project directory
+2. Okay, you're almost there. Now all you need to do is start the development server. If you're using **npm**, the command is:
 
-```bash
-  cd shadcn-admin
+```
+npm run dev
+```
+And if you're using **Yarn**, it's:
+
+```
+yarn dev
 ```
 
-Install dependencies
+And voila! You're now ready to start developing. **Happy coding**!
 
-```bash
-  pnpm install
-```
+## Highlighted Features
+**200+ Next.js Dashboard Ul Components and Templates** - includes a variety of prebuilt **Ul elements, components, pages, and examples** crafted with a high-quality design.
+Additionally, features seamless **essential integrations and extensive functionalities**.
 
-Start the server
+- A library of over **200** professional dashboard UI components and elements.
+- Five distinctive dashboard variations, catering to diverse use-cases.
+- A comprehensive set of essential dashboard and admin pages.
+- More than **45** **Next.js** files, ready for use.
+- Styling facilitated by **Tailwind CSS** files.
+- A design that resonates premium quality and high aesthetics.
+- A handy UI kit with assets.
+- Over ten web apps complete with examples.
+- Support for both **dark mode** and **light mode**.
+- Essential integrations including - Authentication (**NextAuth**), Database (**Postgres** with **Prisma**), and Search (**Algolia**).
+- Detailed and user-friendly documentation.
+- Customizable plugins and add-ons.
+- **TypeScript** compatibility.
+- Plus, much more!
 
-```bash
-  pnpm run dev
-```
+All these features and more make **NextAdmin** a robust, well-rounded solution for all your dashboard development needs.
 
-## Author
+## Update Logs
 
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
+### Version 1.2.0 - Major Upgrade and UI Improvements - [Jan 27, 2025]
 
-## License
-
-Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
+- Upgraded to Next.js v15 and updated dependencies
+- API integration with loading skeleton for tables and charts.
+- Improved code structure for better readability.
+- Rebuilt components like dropdown, sidebar, and all ui-elements using accessibility practices.
+- Using search-params to store dropdown selection and refetch data.
+- Semantic markups, better separation of concerns and more.

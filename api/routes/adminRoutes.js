@@ -1,33 +1,22 @@
 import express from "express";
-import Category from "../models/Category.js";
-import Ingredient from "../models/Ingredient.js";
-import Recipe from "../models/Recipe.js";
-import Area from "../models/Area.js";
-import User from "../models/Users.js";
+
+import {
+  getUsersForTable,
+  getStats,
+  modifyUserAccount,
+  getAllUsersX,
+  NewestRecipesX,
+  getRecipesByNameX,
+} from "../controllers/AdminController.js";
+import { AdminRoute } from "../middleware/Admin.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-  try {
-    const categories = await Category.countDocuments();
-    const ingredients = await Ingredient.countDocuments();
-    const recipes = await Recipe.countDocuments();
-    const areas = await Area.countDocuments();
-    const users = await User.countDocuments();
-
-    res.status(200).json({
-      success: true,
-      data: {
-        categories: categories,
-        ingredients: ingredients,
-        recipes: recipes,
-        areas: areas,
-        users: users,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+router.get("/", AdminRoute, getStats);
+router.get("/users", AdminRoute, getUsersForTable);
+router.get("/all-users", AdminRoute, getAllUsersX);
+router.get("/recipes", AdminRoute, NewestRecipesX);
+router.get("/recipes/search", AdminRoute, getRecipesByNameX);
+router.patch("/users/:userId", AdminRoute, modifyUserAccount);
 
 export default router;
