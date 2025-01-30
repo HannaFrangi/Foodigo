@@ -451,10 +451,10 @@ export const AdminLogin = async (req, res) => {
     // Generate JWT token
     const token = signToken(user._id);
     res.cookie("jwt", token, {
-      maxAge: 60 * 60 * 1000, // 7 days in milliseconds
+      maxAge: 60 * 60 * 1000, // 1 hour
       httpOnly: true,
-      sameSite: "Lax",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "None", // Allows cross-site requests
+      secure: true, // Required for SameSite=None (must be HTTPS)
     });
 
     res.status(200).json({
