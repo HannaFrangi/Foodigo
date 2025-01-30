@@ -12,9 +12,9 @@ import { usePathname } from "next/navigation";
 
 export function Header() {
   const { toggleSidebar, isMobile } = useSidebarContext();
-    const pathname = usePathname();
+  const pathname = usePathname();
   if (pathname === "/auth/sign-in") {
-    return null
+    return null;
   }
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-5 shadow-1 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
@@ -46,7 +46,7 @@ export function Header() {
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2 min-[375px]:gap-4">
-        <div className="relative w-full max-w-[300px]">
+        {/* <div className="relative w-full max-w-[300px]">
           <input
             type="search"
             placeholder="Search"
@@ -54,11 +54,11 @@ export function Header() {
           />
 
           <SearchIcon className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 max-[1015px]:size-5" />
-        </div>
+        </div> */}
 
         <ThemeToggleSwitch />
 
-        <Notification />
+        {/* <Notification /> */}
 
         <div className="shrink-0">
           <UserInfo />
