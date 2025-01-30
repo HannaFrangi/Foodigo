@@ -453,7 +453,7 @@ export const AdminLogin = async (req, res) => {
     res.cookie("jwt", token, {
       maxAge: 60 * 60 * 1000, // 7 days in milliseconds
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
     });
 
