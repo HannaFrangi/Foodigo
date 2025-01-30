@@ -459,6 +459,7 @@ export const AdminLogin = async (req, res) => {
       sameSite: "None", // Required for cross-site cookies
       secure: true, // Must be HTTPS
       partitioned: true, // NEW: Enables cross-site storage in Chrome
+      domain: "https://foodigo.onrender.com/api",
     });
 
     res.status(200).json({
