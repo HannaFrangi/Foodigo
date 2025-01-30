@@ -40,13 +40,16 @@ interface Recipe {
 
 async function getRecipes() {
   try {
-    const response = await fetch("http://localhost:5001/api/admin/recipes", {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://foodigo.onrender.com/api/admin/recipes",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
     return (await response.json()).data;
   } catch (error) {
     console.error("Error:", error);
@@ -57,7 +60,7 @@ async function getRecipes() {
 async function searchRecipes(query: string) {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/admin/recipes/search?recipeTitle=${encodeURIComponent(query)}`,
+      `https://foodigo.onrender.com/api/admin/recipes/search?recipeTitle=${encodeURIComponent(query)}`,
       {
         method: "GET",
         credentials: "include",
@@ -75,7 +78,7 @@ async function searchRecipes(query: string) {
 
 async function updateRecipe(id: string, data: Partial<Recipe>) {
   const response = await fetch(
-    `http://localhost:5001/api/admin/recipes/${id}`,
+    `https://foodigo.onrender.com/api/admin/recipes/${id}`,
     {
       method: "PUT",
       credentials: "include",

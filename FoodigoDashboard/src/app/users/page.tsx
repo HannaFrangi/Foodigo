@@ -17,13 +17,16 @@ import "react-toastify/dist/ReactToastify.css";
 
 async function getUsers() {
   try {
-    const response = await fetch("http://localhost:5001/api/admin/all-users", {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      "https://foodigo.onrender.com/api/admin/all-users",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
     const result = await response.json();
     console.log(result);
     return result.data;
@@ -36,7 +39,7 @@ async function getUsers() {
 async function updateUser(userId: string, updates: any) {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/admin/users/${userId}`,
+      `https://foodigo.onrender.com/api/admin/users/${userId}`,
       {
         method: "PATCH",
         credentials: "include",
