@@ -34,7 +34,7 @@ export function UserInfo() {
     email: "",
     img: null,
   });
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
   const [loading, setLoading] = useState(true); // Added loading state
 
@@ -92,7 +92,7 @@ export function UserInfo() {
         onError={(e) => {
           console.error("Image loading error:", e);
           setImageError(true);
-          e.target.src = DEFAULT_AVATAR;
+          (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
         }}
       />
       <div

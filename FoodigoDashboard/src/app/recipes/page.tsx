@@ -143,7 +143,7 @@ const RecipeList = () => {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery]);
+  }, [searchQuery, debouncedSearch]);
 
   const handleRecipeClick = (recipe: Recipe) => {
     setSelectedRecipe(recipe);

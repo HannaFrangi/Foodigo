@@ -62,8 +62,14 @@ const formatDate = (dateString: string) => {
     day: "numeric",
   }).format(date);
 };
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}
 
-function Modal({ isOpen, onClose, title, children }) {
+function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -85,8 +91,18 @@ function Modal({ isOpen, onClose, title, children }) {
     </div>
   );
 }
-
-function UserEditModal({ user, onSave, isOpen, onClose }) {
+interface UserEditModalProps {
+  user: {
+    name: string;
+    email: string;
+    isVerified: boolean;
+    isActive: boolean;
+  };
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (updates: any) => Promise<void>;
+}
+function UserEditModal({ user, onSave, isOpen, onClose }: UserEditModalProps) {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
@@ -94,13 +110,13 @@ function UserEditModal({ user, onSave, isOpen, onClose }) {
     isActive: user?.isActive || false,
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await onSave(formData);
       onClose();
       toast.success("User updated successfully");
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
@@ -190,10 +206,20 @@ function UserEditModal({ user, onSave, isOpen, onClose }) {
   );
 }
 
-export function AdminUsersManager() {
+export default function AdminUsersManager() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedUser, setSelectedUser] = useState(null);
+  interface User {
+    _id: string;
+    name: string;
+    email: string;
+    isVerified: boolean;
+    isActive: boolean;
+    ProfilePicURL?: string;
+    createdAt: string;
+  }
+
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -371,5 +397,3 @@ export function AdminUsersManager() {
     </div>
   );
 }
-
-export default AdminUsersManager;
