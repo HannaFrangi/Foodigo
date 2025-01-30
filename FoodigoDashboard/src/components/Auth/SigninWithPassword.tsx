@@ -107,7 +107,7 @@ export default function SigninWithPassword() {
         saveUserToLocalStorage(userData);
 
         toast.success(`Welcome back, ${result.user.name}!`);
-        router.push("/"); // Redirect after successful login
+        router.push("/users"); // Redirect after successful login
       } else {
         setError(result.message);
         toast.error(result.message);
