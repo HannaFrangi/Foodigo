@@ -12,7 +12,8 @@ import areaRoutes from './routes/areaRoutes.js';
 import ingredientsRoutes from './routes/ingredientsRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { connectDB } from './config/db.js';
-import cron from './config/Cron.js';
+
+import cron from './config/cron.js';
 
 dotenv.config(); // Load environment variables
 
@@ -23,15 +24,14 @@ const PORT = process.env.PORT || 5001;
 
 app.use(
   cors({
-    origin: [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'https://foodigo-tau.vercel.app',
-    ],
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
   })
 );
 
+cron.start();
+
+// Start cron job
 cron.start();
 
 // Middleware
