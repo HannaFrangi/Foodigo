@@ -12,6 +12,7 @@ import areaRoutes from './routes/areaRoutes.js';
 import ingredientsRoutes from './routes/ingredientsRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import { connectDB } from './config/db.js';
+
 import cron from './config/cron.js';
 
 dotenv.config(); // Load environment variables
@@ -28,8 +29,7 @@ app.use(
   })
 );
 
-// Connect to MongoDB
-connectDB();
+cron.start();
 
 // Start cron job
 cron.start();
@@ -74,6 +74,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`Server started at port ${PORT}`);
 });

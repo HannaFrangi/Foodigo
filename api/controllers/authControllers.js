@@ -441,20 +441,24 @@ export const AdminLogin = async (req, res) => {
       });
     }
 
-    // CheckIf user is active
+    // Check if user is active
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
         message: "User is not active 🙁",
       });
     }
+
     // Generate JWT token
     const token = signToken(user._id);
+
+    // Set JWT cookie using "Set-Cookie" header
     res.cookie("jwt", token, {
-      maxAge: 60 * 60 * 1000, // 7 days in milliseconds
+      maxAge: 60 * 60 * 1000, // 1 hour
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: "None", // Required for cross-site cookies
+      secure: true, // Must be HTTPS
+      partitioned: true, // Enables cross-site storage in Chrome
     });
 
     res.status(200).json({

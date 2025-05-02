@@ -15,16 +15,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 async function getUsers() {
   try {
-    const response = await fetch(
-      "https://foodigo.onrender.com/api/admin/users",
-      {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const response = await fetch("http://localhost:5001/api/admin/users", {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+    });
 
     const result = await response.json();
     return result.data;

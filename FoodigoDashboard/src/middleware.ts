@@ -3,7 +3,8 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   // Retrieve the JWT token from cookies
-  const token = request.cookies.get("jwt"); // Ensure 'jwt' matches your actual cookie name
+  const token = request.cookies.get("jwt"); // This will retrieve the cookie from the request
+  // Ensure 'jwt' matches your actual cookie name
   const signInPath = "/auth/sign-in"; // Path to the sign-in page
   const dashboardPath = "/"; // Path to the dashboard or home page after login
 
