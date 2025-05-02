@@ -219,6 +219,7 @@ export const getAllUsersX = async (req, res) => {
 export const NewestRecipesX = async (req, res) => {
   // const limit = 5;
   try {
+    console.log("Fetching latest recipes...");
     const latestRecipes = await Recipe.find()
       .sort({ createdAt: -1 })
       // .limit(limit)

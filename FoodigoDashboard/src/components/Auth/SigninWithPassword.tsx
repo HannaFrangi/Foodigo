@@ -82,7 +82,7 @@ export default function SigninWithPassword() {
 
     try {
       const response = await fetch(
-        "https://foodigo.onrender.com/api/auth/adminlogin",
+        "http://localhost:5001/api/auth/adminlogin",
         {
           method: "POST",
           headers: {

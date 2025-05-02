@@ -32,10 +32,7 @@ app.use(
   })
 );
 
-// Connect to MongoDB
-connectDB();
-
-cron.start(); // Start the cron job
+cron.start();
 
 // Middleware
 app.use(express.json());
@@ -77,6 +74,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await connectDB();
   console.log(`Server started at port ${PORT}`);
 });

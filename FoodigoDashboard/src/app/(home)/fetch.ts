@@ -1,6 +1,6 @@
 export async function getOverviewData() {
   try {
-    const response = await fetch("https://foodigo.onrender.com/api/admin", {
+    const response = await fetch("http://localhost:5001/api/admin", {
       method: "GET",
       credentials: "include", // Include cookies for authentication
       headers: {
