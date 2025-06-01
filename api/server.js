@@ -29,10 +29,8 @@ app.use(
   })
 );
 
-cron.start();
-
 // Start cron job
-cron.start();
+// cron.start();
 
 // Middleware
 app.use(express.json());
