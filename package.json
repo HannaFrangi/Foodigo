@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/server.js",
-    "build": "npm install && npm install --legacy-peer-deps --prefix ViteApp && npm run build --prefix ViteApp",
+    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp",
     "start": "node api/server.js"
   },
   "keywords": [],
@@ -13,25 +13,25 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.7.9",
-    "bcryptjs": "^2.4.3",
+    "axios": "^1.10.0",
+    "bcryptjs": "^3.0.2",
     "convert-units": "^2.3.4",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "firebase": "^11.1.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "firebase": "^11.9.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.3",
-    "multer": "^1.4.5-lts.1",
-    "next": "^15.1.6",
+    "mongoose": "^8.16.0",
+    "multer": "^2.0.1",
+    "next": "^15.3.3",
     "node-cache": "^5.1.2",
-    "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.16",
+    "node-cron": "^4.1.0",
+    "nodemailer": "^7.0.3",
     "path": "^0.12.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.10"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
