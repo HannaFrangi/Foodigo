@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/server.js",
-    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp",
+    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp && npm install --legacy-peer-deps --prefix FoodigoDashboard && npm run build --prefix FoodigoDashboard",
     "start": "node api/server.js"
   },
   "keywords": [],
@@ -28,6 +28,7 @@
     "node-cache": "^5.1.2",
     "node-cron": "^4.1.0",
     "nodemailer": "^7.0.3",
+    "p-limit": "^7.1.1",
     "path": "^0.12.7"
   },
   "devDependencies": {
