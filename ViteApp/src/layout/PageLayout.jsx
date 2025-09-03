@@ -440,12 +440,12 @@ const PageLayout = ({ children, authUser, loading }) => {
             width: 25,
             height: 25,
           },
-          {
-            // Popcorn
-            src: 'https://media.istockphoto.com/id/1479561029/vector/popcorn-flakes-flying-to-bucket-realistic-popcorn.jpg?s=612x612&w=0&k=20&c=RY0uoxuqkysSSL0CI3bS8HOiIdT_OgAkTDpPKzJx-eA=',
-            width: 25,
-            height: 25,
-          },
+          // {
+          //   // Popcorn
+          //   src: 'https://media.istockphoto.com/id/1479561029/vector/popcorn-flakes-flying-to-bucket-realistic-popcorn.jpg?s=612x612&w=0&k=20&c=RY0uoxuqkysSSL0CI3bS8HOiIdT_OgAkTDpPKzJx-eA=',
+          //   width: 25,
+          //   height: 25,
+          // },
           {
             //corn
             src: 'https://media.istockphoto.com/id/1317520435/photo/corn-isolated-on-a-white-background.jpg?s=612x612&w=0&k=20&c=n-nRK2IGhLXhirMYqtwc9GEOH_X2QeOrM7Uk6dmo_aE=',

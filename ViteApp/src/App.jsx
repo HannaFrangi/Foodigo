@@ -25,39 +25,32 @@ const EditRecipePage = lazy(() => import('./pages/Recipe/EditRecipePage'));
 const PageLayout = lazy(() => import('./layout/PageLayout'));
 
 // Dynamic imports for stores (load only when needed)
-const useAuthStore = lazy(() =>
-  import('./store/useAuthStore').then((m) => ({ default: m.useAuthStore }))
-);
-const useRecipeStore = lazy(() =>
-  import('./store/useRecipeStore').then((m) => ({ default: m.useRecipeStore }))
-);
+import { useAuthStore } from './store/useAuthStore';
+import { useRecipeStore } from './store/useRecipeStore';
 
 function App() {
   // Move heavy operations to lazy chunks
+  // get store actions/state via hooks (don't lazy-load hooks)
+  const checkAuth = useAuthStore((s) => s.checkAuth);
+  const authUser = useAuthStore((s) => s.authUser);
+  const fetchCategories = useRecipeStore((s) => s.fetchCategories);
+
   useEffect(() => {
     // Lazy load GTM
     import('react-gtm-module').then((TagManager) => {
       TagManager.default.initialize({ gtmId: 'GTM-PXV2ZMZW' });
     });
 
-    // Lazy load stores and execute
-    Promise.all([
-      import('./store/useAuthStore'),
-      import('./store/useRecipeStore'),
-    ]).then(([authStore, recipeStore]) => {
-      const { checkAuth, authUser } = authStore.useAuthStore();
-      const { fetchCategories } = recipeStore.useRecipeStore();
+    // call store actions
+    if (typeof checkAuth === 'function') checkAuth();
+    if (typeof fetchCategories === 'function') fetchCategories();
 
-      checkAuth();
-      fetchCategories();
-
-      if (authUser && !authUser.isVerified) {
-        toast("Don't forget to verify your account!", {
-          icon: '⚠',
-          style: { borderRadius: '10px', zIndex: 300 },
-        });
-      }
-    });
+    if (authUser && !authUser.isVerified) {
+      toast("Don't forget to verify your account!", {
+        icon: '⚠',
+        style: { borderRadius: '10px', zIndex: 300 },
+      });
+    }
   }, []);
 
   return (
