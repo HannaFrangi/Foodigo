@@ -6,7 +6,10 @@ import Area from '../models/Area.js';
 import Ingredient from '../models/Ingredient.js';
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import pLimit from 'p-limit'; // <-- Add this line
+import pLimit from 'p-limit';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // --- Configuration and Initialization ---
 const firebaseConfig = {
@@ -22,8 +25,9 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);
 
-const mongoDBUri = '';
-const spoonacularApiKey = '';
+const mongoDBUri =
+  'mongodb+srv://majdchbat:tSvXdHgpIdEbb45G@cluster0.knx1g.mongodb.net/foodigo_db?retryWrites=true&w=majority&appName=Cluster0';
+const spoonacularApiKey = '3a94fe777d824d258f341e5cdaae925c';
 const userIdPlaceholder = '675afaab143c11f684324a06';
 
 const CONCURRENCY_LIMIT = 10; // Tune this based on your API/db limits
