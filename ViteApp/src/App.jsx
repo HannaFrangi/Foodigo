@@ -53,10 +53,18 @@ function App() {
     }
   }, []);
 
+  const Loading = () => {
+    return (
+      <div>
+        <ChefHatSpinner size={258} />
+      </div>
+    );
+  };
+
   return (
     <>
       <Toaster />
-      <Suspense fallback={<ChefHatSpinner size={258} />}>
+      <Suspense fallback={<Loading />}>
         <ReactLenis options={{ duration: 2 }} root>
           <Suspense fallback={<ChefHatSpinner size={100} />}>
             <PageLayout>
@@ -64,7 +72,7 @@ function App() {
                 <Route
                   path='/'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <Homepage />
                     </Suspense>
                   }
@@ -72,7 +80,7 @@ function App() {
                 <Route
                   path='/auth'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <AuthPage />
                     </Suspense>
                   }
@@ -80,7 +88,7 @@ function App() {
                 <Route
                   path='/recipe'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <RecipePage />
                     </Suspense>
                   }
@@ -88,7 +96,7 @@ function App() {
                 <Route
                   path='/favorites'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <Favorites />
                     </Suspense>
                   }
@@ -96,7 +104,7 @@ function App() {
                 <Route
                   path='/recipe/:id'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <RecipeDetails />
                     </Suspense>
                   }
@@ -104,7 +112,7 @@ function App() {
                 <Route
                   path='/recipe/:recipeId'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <RecipeHeader />
                     </Suspense>
                   }
@@ -112,7 +120,7 @@ function App() {
                 <Route
                   path='/edit/:recipeId'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <EditRecipePage />
                     </Suspense>
                   }
@@ -120,7 +128,7 @@ function App() {
                 <Route
                   path='/reset-password/:token'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <ResetPassword />
                     </Suspense>
                   }
@@ -128,7 +136,7 @@ function App() {
                 <Route
                   path='/verify-email/:token'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <VerifyEmail />
                     </Suspense>
                   }
@@ -136,7 +144,7 @@ function App() {
                 <Route
                   path='/recipes/new'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <AddRecipe />
                     </Suspense>
                   }
@@ -144,7 +152,7 @@ function App() {
                 <Route
                   path='/groccery'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <GrocceryList />
                     </Suspense>
                   }
@@ -152,7 +160,7 @@ function App() {
                 <Route
                   path='/*'
                   element={
-                    <Suspense fallback={<div>Loading...</div>}>
+                    <Suspense fallback={<Loading />}>
                       <Error />
                     </Suspense>
                   }

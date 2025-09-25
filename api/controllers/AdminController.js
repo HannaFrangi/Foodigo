@@ -1,8 +1,8 @@
-import Category from "../models/Category.js";
-import Ingredient from "../models/Ingredient.js";
-import Recipe from "../models/Recipe.js";
-import Area from "../models/Area.js";
-import User from "../models/Users.js";
+import Category from '../models/Category.js';
+import Ingredient from '../models/Ingredient.js';
+import Recipe from '../models/Recipe.js';
+import Area from '../models/Area.js';
+import User from '../models/Users.js';
 
 export const getStats = async (req, res) => {
   try {
@@ -49,12 +49,12 @@ export const getUsersForTable = async (req, res) => {
           createdAt: 1,
           groceriesCount: {
             $size: {
-              $ifNull: ["$groceryList", []],
+              $ifNull: ['$groceryList', []],
             },
           },
           favoritesCount: {
             $size: {
-              $ifNull: ["$recipeFavorites", []],
+              $ifNull: ['$recipeFavorites', []],
             },
           },
         },
@@ -91,7 +91,7 @@ export const modifyUserAccount = async (req, res) => {
     if (!req.user?.isAdmin) {
       return res.status(403).json({
         success: false,
-        message: "Access denied: Admin privileges required",
+        message: 'Access denied: Admin privileges required',
       });
     }
 
@@ -100,7 +100,7 @@ export const modifyUserAccount = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
 
@@ -108,17 +108,17 @@ export const modifyUserAccount = async (req, res) => {
     if (user.isAdmin && user._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Cannot modify other admin accounts",
+        message: 'Cannot modify other admin accounts',
       });
     }
 
     // List of fields that can be modified
     const allowedUpdates = [
-      "name",
-      "email",
-      "isVerified",
-      "isActive",
-      "ProfilePicURL",
+      'name',
+      'email',
+      'isVerified',
+      'isActive',
+      'ProfilePicURL',
     ];
 
     // Filter out any unauthorized field updates
@@ -146,7 +146,7 @@ export const modifyUserAccount = async (req, res) => {
       if (existingUser) {
         return res.status(400).json({
           success: false,
-          message: "Email already in use",
+          message: 'Email already in use',
         });
       }
       sanitizedUpdates.email = updates.email.toLowerCase();
@@ -161,38 +161,38 @@ export const modifyUserAccount = async (req, res) => {
       {
         new: true,
         runValidators: true,
-        select: "-password", // Exclude password from response
+        select: '-password', // Exclude password from response
       }
     );
 
     return res.status(200).json({
       success: true,
-      message: "User account updated successfully",
+      message: 'User account updated successfully',
       data: {
         user: updatedUser,
         modifiedFields: Object.keys(sanitizedUpdates),
       },
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: 'Validation error',
         errors: Object.values(error.errors).map((err) => err.message),
       });
     }
 
-    if (error.name === "CastError") {
+    if (error.name === 'CastError') {
       return res.status(400).json({
         success: false,
-        message: "Invalid user ID format",
+        message: 'Invalid user ID format',
       });
     }
 
     // Generic error handler
     return res.status(500).json({
       success: false,
-      message: "Error modifying user account",
+      message: 'Error modifying user account',
       error: error.message,
     });
   }
@@ -210,65 +210,96 @@ export const getAllUsersX = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Something went wrong",
+      message: 'Something went wrong',
       error: error.message,
     });
   }
 };
 
 export const NewestRecipesX = async (req, res) => {
-  // const limit = 5;
   try {
-    console.log("Fetching latest recipes...");
-    const latestRecipes = await Recipe.find()
-      .sort({ createdAt: -1 })
-      // .limit(limit)
-      .populate("userId", "name ProfilePicURL");
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    console.log('Fetching latest recipes...');
+
+    const [latestRecipes, total] = await Promise.all([
+      Recipe.find()
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('userId', 'name ProfilePicURL'),
+      Recipe.countDocuments(),
+    ]);
 
     return res.status(200).json({
       success: true,
       data: latestRecipes,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+      },
     });
   } catch (error) {
-    console.error("Error fetching latest recipes:", error);
+    console.error('Error fetching latest recipes:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve the latest recipes due to server error",
+      message: 'Failed to retrieve the latest recipes due to server error',
     });
   }
 };
 
 export const getRecipesByNameX = async (req, res) => {
   const searchTerm = req.query.recipeTitle;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
   if (!searchTerm) {
     return res.status(400).json({
       success: false,
-      message: "Please provide a search term.",
+      message: 'Please provide a search term.',
     });
   }
 
   try {
-    const recipes = await Recipe.find({
-      recipeTitle: { $regex: new RegExp(searchTerm, "i") },
-    }).populate("userId", "name ProfilePicURL");
+    const [recipes, total] = await Promise.all([
+      Recipe.find({
+        recipeTitle: { $regex: new RegExp(searchTerm, 'i') },
+      })
+        .skip(skip)
+        .limit(limit)
+        .populate('userId', 'name ProfilePicURL'),
+      Recipe.countDocuments({
+        recipeTitle: { $regex: new RegExp(searchTerm, 'i') },
+      }),
+    ]);
 
     if (recipes.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found with that name.",
+        message: 'No recipes found with that name.',
       });
     }
 
     return res.status(200).json({
       success: true,
-      count: recipes.length, // majd added this (wahesh Ya Chbat)
       data: recipes,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        itemsPerPage: limit,
+      },
     });
   } catch (error) {
-    console.error("Error searching for recipes by name:", error);
+    console.error('Error searching for recipes by name:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to search for recipes due to server error",
+      message: 'Failed to search for recipes due to server error',
     });
   }
 };

@@ -31,9 +31,6 @@ app.use(
 
 cron.start();
 
-// Start cron job
-cron.start();
-
 // Middleware
 app.use(express.json());
 app.use(cookieParser()); // Parse cookies for auth

@@ -1,14 +1,14 @@
-import Area from "../models/Area.js";
-import Recipe from "../models/Recipe.js";
-import Ingredient from "../models/Ingredient.js";
+import Area from '../models/Area.js';
+import Recipe from '../models/Recipe.js';
+import Ingredient from '../models/Ingredient.js';
 import {
   ref,
   uploadBytes,
   getDownloadURL,
   deleteObject,
-} from "firebase/storage";
-import { storage } from "../config/firebase.js";
-import mongoose from "mongoose";
+} from 'firebase/storage';
+import { storage } from '../config/firebase.js';
+import mongoose from 'mongoose';
 
 export const createRecipe = async (req, res) => {
   try {
@@ -16,7 +16,7 @@ export const createRecipe = async (req, res) => {
     if (!req.user || !req.user._id) {
       return res.status(401).json({
         success: false,
-        message: "Authentication required. Please log in.",
+        message: 'Authentication required. Please log in.',
       });
     }
 
@@ -24,7 +24,7 @@ export const createRecipe = async (req, res) => {
 
     if (req.file) {
       // Generate filename using userId and timestamp for uniqueness
-      const fileExtension = req.file.originalname.split(".").pop();
+      const fileExtension = req.file.originalname.split('.').pop();
       const fileName = `${req.user._id}_${Date.now()}.${fileExtension}`;
 
       const metadata = {
@@ -59,21 +59,21 @@ export const createRecipe = async (req, res) => {
     if (!newRecipe) {
       return res.status(404).json({
         success: false,
-        message: "Failed to create recipe",
+        message: 'Failed to create recipe',
       });
     }
 
     // Return created recipe info
     res.status(201).json({
       success: true,
-      message: "Recipe created successfully",
+      message: 'Recipe created successfully',
       recipe: newRecipe,
     });
   } catch (error) {
-    console.error("Error creating recipe:", error);
+    console.error('Error creating recipe:', error);
     res.status(500).json({
       success: false,
-      message: "Error creating recipe",
+      message: 'Error creating recipe',
       error: error.message,
     });
   }
@@ -84,7 +84,7 @@ export const getRecipeById = async (req, res) => {
     if (mongoose.Types.ObjectId.isValid(req.params.id) === false) {
       return res.status(400).json({
         success: false,
-        message: "Invalid recipe ID",
+        message: 'Invalid recipe ID',
       });
     }
 
@@ -93,7 +93,7 @@ export const getRecipeById = async (req, res) => {
     if (!recipe) {
       return res.status(404).json({
         success: false,
-        message: "Recipe not found",
+        message: 'Recipe not found',
       });
     }
 
@@ -102,10 +102,10 @@ export const getRecipeById = async (req, res) => {
       data: recipe,
     });
   } catch (error) {
-    console.error("Error fetching recipe by ID:", error);
+    console.error('Error fetching recipe by ID:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve the recipe due to server error",
+      message: 'Failed to retrieve the recipe due to server error',
     });
   }
 };
@@ -115,19 +115,19 @@ export const getRecipesByName = async (req, res) => {
   if (!searchTerm) {
     return res.status(400).json({
       success: false,
-      message: "Please provide a search term.",
+      message: 'Please provide a search term.',
     });
   }
 
   try {
     const recipes = await Recipe.find({
-      recipeTitle: { $regex: new RegExp(searchTerm, "i") },
+      recipeTitle: { $regex: new RegExp(searchTerm, 'i') },
     });
 
     if (recipes.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found with that name.",
+        message: 'No recipes found with that name.',
       });
     }
 
@@ -137,10 +137,10 @@ export const getRecipesByName = async (req, res) => {
       data: recipes,
     });
   } catch (error) {
-    console.error("Error searching for recipes by name:", error);
+    console.error('Error searching for recipes by name:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to search for recipes due to server error",
+      message: 'Failed to search for recipes due to server error',
     });
   }
 };
@@ -150,8 +150,8 @@ export const getAllRecipes = async (req, res) => {
     const recipes = await Recipe.find();
     res.json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
-    console.error("Error in getAllRecipes:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error in getAllRecipes:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -161,12 +161,12 @@ export const updateRecipe = async (req, res) => {
     if (!recipe) {
       return res
         .status(404)
-        .json({ success: false, message: "Recipe not found" });
+        .json({ success: false, message: 'Recipe not found' });
     }
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized to update this recipe",
+        message: 'Unauthorized to update this recipe',
       });
     }
     const updatedRecipe = await Recipe.findByIdAndUpdate(
@@ -176,8 +176,8 @@ export const updateRecipe = async (req, res) => {
     );
     res.json({ success: true, data: updatedRecipe });
   } catch (error) {
-    console.error("Error in updateRecipe:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error in updateRecipe:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -188,14 +188,14 @@ export const deleteRecipe = async (req, res) => {
     if (!recipe) {
       return res
         .status(404)
-        .json({ success: false, message: "Recipe not found" });
+        .json({ success: false, message: 'Recipe not found' });
     }
 
     // Check if the user is authorized to delete the recipe
     if (recipe.userId.toString() !== req.user._id.toString()) {
       return res.status(403).json({
         success: false,
-        message: "Unauthorized to delete this recipe",
+        message: 'Unauthorized to delete this recipe',
       });
     }
 
@@ -205,10 +205,10 @@ export const deleteRecipe = async (req, res) => {
       try {
         await deleteObject(imageRef);
       } catch (error) {
-        console.error("Error deleting image from Firebase Storage:", error);
+        console.error('Error deleting image from Firebase Storage:', error);
         return res.status(500).json({
           success: false,
-          message: "Failed to delete recipe image from storage",
+          message: 'Failed to delete recipe image from storage',
           error: error.message,
         });
       }
@@ -217,12 +217,12 @@ export const deleteRecipe = async (req, res) => {
     // Delete the recipe from the database
     await Recipe.findByIdAndDelete(req.params.id);
 
-    res.json({ success: true, message: "Recipe deleted successfully" });
+    res.json({ success: true, message: 'Recipe deleted successfully' });
   } catch (error) {
-    console.error("Error in deleteRecipe:", error);
+    console.error('Error in deleteRecipe:', error);
     res
       .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
+      .json({ success: false, message: 'Server error', error: error.message });
   }
 };
 
@@ -232,7 +232,7 @@ export const addReview = async (req, res) => {
     if (!recipe) {
       return res
         .status(404)
-        .json({ success: false, message: "Recipe not found" });
+        .json({ success: false, message: 'Recipe not found' });
     }
     const existingReview = recipe.reviews.find(
       (review) => review.user.toString() === req.user._id.toString()
@@ -240,7 +240,7 @@ export const addReview = async (req, res) => {
     if (existingReview) {
       return res.status(400).json({
         success: false,
-        message: "You have already reviewed this recipe",
+        message: 'You have already reviewed this recipe',
       });
     }
     const newReview = {
@@ -254,8 +254,8 @@ export const addReview = async (req, res) => {
     await recipe.save();
     res.status(201).json({ success: true, data: newReview });
   } catch (error) {
-    console.error("Error in addReview:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error in addReview:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -265,7 +265,7 @@ export const editReview = async (req, res) => {
     if (!recipe) {
       return res
         .status(404)
-        .json({ success: false, message: "Recipe not found" });
+        .json({ success: false, message: 'Recipe not found' });
     }
     const review = recipe.reviews.find(
       (review) => review.user.toString() === req.user._id.toString()
@@ -273,15 +273,15 @@ export const editReview = async (req, res) => {
     if (!review) {
       return res
         .status(404)
-        .json({ success: false, message: "Review not found" });
+        .json({ success: false, message: 'Review not found' });
     }
     review.rating = req.body.rating || review.rating;
     review.comment = req.body.comment || review.comment;
     await recipe.save();
     res.json({ success: true, data: review });
   } catch (error) {
-    console.error("Error in editReview:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error in editReview:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -291,7 +291,7 @@ export const deleteReview = async (req, res) => {
     if (!recipe) {
       return res
         .status(404)
-        .json({ success: false, message: "Recipe not found" });
+        .json({ success: false, message: 'Recipe not found' });
     }
     const reviewIndex = recipe.reviews.findIndex(
       (review) => review.user.toString() === req.user._id.toString()
@@ -299,14 +299,14 @@ export const deleteReview = async (req, res) => {
     if (reviewIndex === -1) {
       return res
         .status(404)
-        .json({ success: false, message: "Review not found" });
+        .json({ success: false, message: 'Review not found' });
     }
     recipe.reviews.splice(reviewIndex, 1);
     await recipe.save();
-    res.json({ success: true, message: "Review deleted successfully" });
+    res.json({ success: true, message: 'Review deleted successfully' });
   } catch (error) {
-    console.error("Error in deleteReview:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error in deleteReview:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -314,18 +314,21 @@ export const getLatestRecipe = async (req, res) => {
   const limit = 12;
   try {
     const latestRecipes = await Recipe.find()
+      .select('recipeTitle recipeImage categories _id')
       .sort({ createdAt: -1 })
-      .limit(limit);
+      .limit(limit)
+      .lean()
+      .populate('categories', 'name');
 
     return res.status(200).json({
       success: true,
       data: latestRecipes,
     });
   } catch (error) {
-    console.error("Error fetching latest recipes:", error);
+    console.error('Error fetching latest recipes:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve the latest recipes due to server error",
+      message: 'Failed to retrieve the latest recipes due to server error',
     });
   }
 };
@@ -342,10 +345,10 @@ export const get12RandomRecipes = async (req, res) => {
       data: randomRecipes,
     });
   } catch (error) {
-    console.error("Error fetching random recipes:", error);
+    console.error('Error fetching random recipes:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve random recipes due to server error",
+      message: 'Failed to retrieve random recipes due to server error',
     });
   }
 };
@@ -356,12 +359,12 @@ export const getRandomRecipe = async (req, res) => {
     const randomIndex = Math.floor(Math.random() * count);
     const randomRecipe = await Recipe.findOne()
       .skip(randomIndex)
-      .select("_id recipeTitle recipeImage categories");
+      .select('_id recipeTitle recipeImage categories');
 
     if (!randomRecipe) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found",
+        message: 'No recipes found',
       });
     }
 
@@ -370,10 +373,10 @@ export const getRandomRecipe = async (req, res) => {
       data: randomRecipe,
     });
   } catch (error) {
-    console.error("Error fetching random recipe:", error);
+    console.error('Error fetching random recipe:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve a random recipe due to server error",
+      message: 'Failed to retrieve a random recipe due to server error',
     });
   }
 };
@@ -386,7 +389,7 @@ export const getRecipesByCategory = async (req, res) => {
     if (!recipes.length) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found for this category",
+        message: 'No recipes found for this category',
       });
     }
 
@@ -394,8 +397,8 @@ export const getRecipesByCategory = async (req, res) => {
       .status(200)
       .json({ success: true, count: recipes.length, data: recipes });
   } catch (error) {
-    console.error("Error fetching recipes by category:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error('Error fetching recipes by category:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -407,7 +410,7 @@ export const getRecipesByArea = async (req, res) => {
     if (!areaId) {
       return res.status(400).json({
         success: false,
-        message: "Area ID is required",
+        message: 'Area ID is required',
       });
     }
 
@@ -416,7 +419,7 @@ export const getRecipesByArea = async (req, res) => {
     if (!area) {
       return res.status(404).json({
         success: false,
-        message: "Area not found",
+        message: 'Area not found',
       });
     }
 
@@ -424,29 +427,29 @@ export const getRecipesByArea = async (req, res) => {
     const recipes = await Recipe.find({ area: areaId })
       // .populate("area")
       // .populate("categories")
-      .select("-reviews") // Exclude reviews for better performance
+      .select('-reviews') // Exclude reviews for better performance
       .sort({ createdAt: -1 }); // Sort by newest first
 
     // Return appropriate response based on whether recipes were found
     if (recipes.length === 0) {
       return res.status(200).json({
         success: true,
-        message: "No recipes found for this area",
+        message: 'No recipes found for this area',
         data: [],
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Recipes retrieved successfully",
+      message: 'Recipes retrieved successfully',
       count: recipes.length,
       data: recipes,
     });
   } catch (error) {
-    console.error("Error in getRecipesByArea:", error);
+    console.error('Error in getRecipesByArea:', error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: 'Internal server error',
       error: error.message,
     });
   }
@@ -460,48 +463,48 @@ export const getRecipesByAreaName = async (req, res) => {
     if (!areaName) {
       return res.status(400).json({
         success: false,
-        message: "Area name is required",
+        message: 'Area name is required',
       });
     }
 
     // First find the area by name
     const area = await Area.findOne({
-      name: { $regex: new RegExp(areaName, "i") }, // Case-insensitive search
+      name: { $regex: new RegExp(areaName, 'i') }, // Case-insensitive search
     });
 
     if (!area) {
       return res.status(404).json({
         success: false,
-        message: "Area not found",
+        message: 'Area not found',
       });
     }
 
     // Find all recipes for this area with populated categories
     const recipes = await Recipe.find({ area: area._id })
-      .populate("area")
-      .populate("categories")
-      .select("-reviews")
+      .populate('area')
+      .populate('categories')
+      .select('-reviews')
       .sort({ createdAt: -1 });
 
     if (recipes.length === 0) {
       return res.status(200).json({
         success: true,
-        message: "No recipes found for this area",
+        message: 'No recipes found for this area',
         data: [],
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Recipes retrieved successfully",
+      message: 'Recipes retrieved successfully',
       count: recipes.length,
       data: recipes,
     });
   } catch (error) {
-    console.error("Error in getRecipesByAreaName:", error);
+    console.error('Error in getRecipesByAreaName:', error);
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: 'Internal server error',
       error: error.message,
     });
   }
@@ -514,24 +517,24 @@ export const getRecipesByIngredients = async (req, res) => {
     if (!ingredients || ingredients.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        message: "No ingredients provided for search",
+        message: 'No ingredients provided for search',
       });
     }
 
     const ingredientNames = ingredients
-      .split(",")
+      .split(',')
       .map((ingredient) => ingredient.trim().toLowerCase());
 
     const ingredientIds = await Ingredient.find({
       name: {
-        $in: ingredientNames.map((name) => new RegExp(`^${name}$`, "i")),
+        $in: ingredientNames.map((name) => new RegExp(`^${name}$`, 'i')),
       },
-    }).select("_id");
+    }).select('_id');
 
     if (ingredientIds.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No ingredients found with the provided names",
+        message: 'No ingredients found with the provided names',
       });
     }
 
@@ -542,14 +545,14 @@ export const getRecipesByIngredients = async (req, res) => {
 
     // Find recipes that contain any of the ingredients by matching the ingredient ObjectIds
     const recipes = await Recipe.find({
-      "recipeIngredients.ingredientName": { $in: ingredientObjectIds },
-    }).populate("recipeIngredients.ingredientName"); // Optional: populate ingredient details
+      'recipeIngredients.ingredientName': { $in: ingredientObjectIds },
+    }).populate('recipeIngredients.ingredientName'); // Optional: populate ingredient details
 
     // If no recipes are found that contain the ingredients
     if (recipes.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found with the specified ingredients",
+        message: 'No recipes found with the specified ingredients',
       });
     }
 
@@ -563,10 +566,10 @@ export const getRecipesByIngredients = async (req, res) => {
       data: recipes,
     });
   } catch (error) {
-    console.error("Error fetching recipes by ingredients:", error);
+    console.error('Error fetching recipes by ingredients:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve recipes due to server error",
+      message: 'Failed to retrieve recipes due to server error',
     });
   }
 };
@@ -578,20 +581,20 @@ export const getRecipesByIngredientsId = async (req, res) => {
     if (!ingredientIds || ingredientIds.trim().length === 0) {
       return res.status(400).json({
         success: false,
-        message: "No ingredient IDs provided for search",
+        message: 'No ingredient IDs provided for search',
       });
     }
 
-    const ingredientObjectIds = ingredientIds.split(",").map((id) => id.trim());
+    const ingredientObjectIds = ingredientIds.split(',').map((id) => id.trim());
 
     const recipes = await Recipe.find({
-      "recipeIngredients.ingredientName": { $in: ingredientObjectIds },
-    }).populate("recipeIngredients.ingredientName");
+      'recipeIngredients.ingredientName': { $in: ingredientObjectIds },
+    }).populate('recipeIngredients.ingredientName');
 
     if (recipes.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No recipes found with the specified ingredient IDs",
+        message: 'No recipes found with the specified ingredient IDs',
       });
     }
 
@@ -603,10 +606,10 @@ export const getRecipesByIngredientsId = async (req, res) => {
       data: recipes,
     });
   } catch (error) {
-    console.error("Error fetching recipes by ingredient IDs:", error);
+    console.error('Error fetching recipes by ingredient IDs:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve recipes due to server error",
+      message: 'Failed to retrieve recipes due to server error',
     });
   }
 };
@@ -614,14 +617,14 @@ export const getRecipesByIngredientsId = async (req, res) => {
 export const getReviewsByRecipeId = async (req, res) => {
   try {
     const recipe = await Recipe.findById(req.params.id).populate(
-      "reviews.user",
-      "name ProfilePicURL email"
+      'reviews.user',
+      'name ProfilePicURL email'
     );
 
     if (!recipe) {
       return res.status(404).json({
         success: false,
-        message: "Recipe not found",
+        message: 'Recipe not found',
       });
     }
 
@@ -630,10 +633,10 @@ export const getReviewsByRecipeId = async (req, res) => {
       reviews: recipe.reviews,
     });
   } catch (error) {
-    console.error("Error fetching reviews by recipe ID:", error);
+    console.error('Error fetching reviews by recipe ID:', error);
     return res.status(500).json({
       success: false,
-      message: "Failed to retrieve reviews due to server error",
+      message: 'Failed to retrieve reviews due to server error',
       error: error.message,
     });
   }
