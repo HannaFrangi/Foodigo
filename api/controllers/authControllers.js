@@ -1,20 +1,20 @@
-import User from "../models/Users.js";
-import crypto from "crypto";
+import User from '../models/Users.js';
+import crypto from 'crypto';
 //import bcrypt from "bcryptjs";
-import PasswordResetToken from "../models/PasswordResetToken.js";
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+import PasswordResetToken from '../models/PasswordResetToken.js';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: '7d',
   });
 };
 
 const sendVerificationEmail = async (user) => {
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
+    service: 'gmail',
+    host: 'smtp.gmail.com',
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_PASSWORD,
@@ -25,7 +25,7 @@ const sendVerificationEmail = async (user) => {
     { email: user.email },
     process.env.JWT_SECRET,
     {
-      expiresIn: "24h",
+      expiresIn: '24h',
     }
   );
   const htmlContent = `
@@ -64,7 +64,7 @@ const sendVerificationEmail = async (user) => {
   const message = {
     from: process.env.EMAIL_USER,
     to: user.email,
-    subject: "Welcome To Foodigo! 👩‍🍳",
+    subject: 'Welcome To Foodigo! 👩‍🍳',
     html: htmlContent,
   };
 
@@ -85,7 +85,7 @@ export const signup = async (req, res) => {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: 'All fields are required',
       });
     }
 
@@ -93,7 +93,7 @@ export const signup = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid email format",
+        message: 'Invalid email format',
       });
     }
 
@@ -101,7 +101,7 @@ export const signup = async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters",
+        message: 'Password must be at least 6 characters',
       });
     }
 
@@ -110,7 +110,7 @@ export const signup = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already in use",
+        message: 'Email already in use',
       });
     }
 
@@ -126,21 +126,21 @@ export const signup = async (req, res) => {
     await sendVerificationEmail(newUser);
 
     const token = signToken(newUser._id);
-    res.cookie("jwt", token, {
+    res.cookie('jwt', token, {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
     });
 
     res.status(201).json({
       success: true,
       user: newUser,
-      message: "Welcome to Foodigo! 🍲",
+      message: 'Welcome to Foodigo! 🍲',
     });
   } catch (error) {
-    console.log("Error in signup controller:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.log('Error in signup controller:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -150,48 +150,51 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "All Fields are Required",
+        message: 'All Fields are Required',
       });
     }
 
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "No user Found with this email",
+        message: 'No user Found with this email',
       });
     }
 
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
-        message: "User Not Active!",
+        message: 'User Not Active!',
       });
     }
 
     if (!(await user.matchPassword(password))) {
       return res.status(401).json({
         success: false,
-        message: "Wrong Password 🙁",
+        message: 'Wrong Password 🙁',
       });
     }
 
+    // Remove password from user object before sending response
+    user.password = undefined;
+
     const token = signToken(user._id);
-    res.cookie("jwt", token, {
+    res.cookie('jwt', token, {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
     });
 
     res.status(200).json({
       success: true,
       user,
-      message: "Logged in",
+      message: 'Logged in',
     });
   } catch (error) {
-    console.error("Error in login Controller:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error('Error in login Controller:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
@@ -209,23 +212,23 @@ export const verifyEmail = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired verification token",
+        message: 'Invalid or expired verification token',
       });
     }
 
     res.status(200).json({
       success: true,
-      message: "Email verified successfully",
+      message: 'Email verified successfully',
     });
   } catch (error) {
-    console.error("Error in email verification:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error('Error in email verification:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
 export const logout = async (req, res) => {
-  res.clearCookie("jwt");
-  res.status(200).json({ success: true, message: "Logged out Succesfully" });
+  res.clearCookie('jwt');
+  res.status(200).json({ success: true, message: 'Logged out Succesfully' });
 };
 
 export const CheckerificationEmail = async (req, res) => {
@@ -235,7 +238,7 @@ export const CheckerificationEmail = async (req, res) => {
     if (!token) {
       return res.status(400).json({
         success: false,
-        message: "No verification token provided",
+        message: 'No verification token provided',
       });
     }
 
@@ -245,14 +248,14 @@ export const CheckerificationEmail = async (req, res) => {
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired verification token",
+        message: 'Invalid or expired verification token',
       });
     }
 
     if (user.isVerified) {
       return res.status(200).json({
         success: true,
-        message: "Email already verified",
+        message: 'Email already verified',
       });
     }
 
@@ -260,24 +263,24 @@ export const CheckerificationEmail = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Email verified successfully",
+      message: 'Email verified successfully',
     });
   } catch (error) {
-    console.error("Error in email verification:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error('Error in email verification:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
 
 const generateResetToken = () => {
-  return crypto.randomBytes(20).toString("hex");
+  return crypto.randomBytes(20).toString('hex');
 };
 
 const sendResetEmail = async (user, token) => {
   const resetLink = `${process.env.BASE_URL}reset-password/${token}`;
 
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
+    service: 'gmail',
+    host: 'smtp.gmail.com',
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_PASSWORD,
@@ -318,7 +321,7 @@ const sendResetEmail = async (user, token) => {
   const message = {
     from: process.env.EMAIL_USER,
     to: user.email,
-    subject: "Password Reset Request",
+    subject: 'Password Reset Request',
     html: htmlContent,
   };
 
@@ -330,7 +333,7 @@ export const forgotPassword = async (req, res) => {
   email = email.toLowerCase();
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: 'User not found' });
   }
 
   const resetToken = generateResetToken();
@@ -345,7 +348,7 @@ export const forgotPassword = async (req, res) => {
 
   await sendResetEmail(user, resetToken);
 
-  res.status(200).json({ message: "Password reset email sent" });
+  res.status(200).json({ message: 'Password reset email sent' });
 };
 
 export const resetPassword = async (req, res) => {
@@ -355,7 +358,7 @@ export const resetPassword = async (req, res) => {
     if (!newPassword || newPassword.length < 6) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters long",
+        message: 'Password must be at least 6 characters long',
       });
     }
     const resetTokenEntry = await PasswordResetToken.findOne({ token });
@@ -363,20 +366,20 @@ export const resetPassword = async (req, res) => {
     if (!resetTokenEntry) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired token",
+        message: 'Invalid or expired token',
       });
     }
     if (Date.now() > resetTokenEntry.expiresAt) {
       return res.status(400).json({
         success: false,
-        message: "Token has expired",
+        message: 'Token has expired',
       });
     }
     const user = await User.findById(resetTokenEntry.userId);
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
       });
     }
     user.password = newPassword;
@@ -384,13 +387,13 @@ export const resetPassword = async (req, res) => {
     await PasswordResetToken.findByIdAndDelete(resetTokenEntry._id);
     res.status(200).json({
       success: true,
-      message: "Password has been reset successfully",
+      message: 'Password has been reset successfully',
     });
   } catch (error) {
-    console.error("Error resetting password:", error);
+    console.error('Error resetting password:', error);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: 'Server error',
     });
   }
 };
@@ -402,13 +405,13 @@ export const UpdateFCM = async (req, res) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
 
     await user.updateFcmToken(token);
     res.status(200).json({ success: true, data: user.fcmToken });
   } catch (error) {
-    res.status(500).json({ message: "Error updating FCM token", error });
+    res.status(500).json({ message: 'Error updating FCM token', error });
   }
 };
 
@@ -418,18 +421,18 @@ export const AdminLogin = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "All Fields are Required",
+        message: 'All Fields are Required',
       });
     }
 
     // Search for the user by email and ensure both password and isAdmin fields are available
     const user = await User.findOne({ email, isAdmin: true }).select(
-      "+password"
+      '+password'
     );
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "No admin user found with this email",
+        message: 'No admin user found with this email',
       });
     }
 
@@ -437,7 +440,7 @@ export const AdminLogin = async (req, res) => {
     if (!(await user.matchPassword(password))) {
       return res.status(401).json({
         success: false,
-        message: "Wrong Password 🙁",
+        message: 'Wrong Password 🙁',
       });
     }
 
@@ -445,29 +448,29 @@ export const AdminLogin = async (req, res) => {
     if (!user.isActive) {
       return res.status(401).json({
         success: false,
-        message: "User is not active 🙁",
+        message: 'User is not active 🙁',
       });
     }
 
     // Generate JWT token
+    user.password = undefined; // Remove password from user object before sending response
     const token = signToken(user._id);
 
-    // Set JWT cookie using "Set-Cookie" header
-    res.cookie("jwt", token, {
+    res.cookie('jwt_token', token, {
       maxAge: 60 * 60 * 1000, // 1 hour
-      httpOnly: true,
-      sameSite: "None", // Required for cross-site cookies
-      secure: true, // Must be HTTPS
-      partitioned: true, // Enables cross-site storage in Chrome
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: false, 
+      // partitioned: true, 
     });
 
     res.status(200).json({
       success: true,
       user,
-      message: "Logged in as admin",
-    });
+      message: 'Logged in as admin',
+      });
   } catch (error) {
-    console.error("Error in AdminLogin Controller:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error('Error in AdminLogin Controller:', error);
+    res.status(500).json({ success: false, message: 'Server Error' });
   }
 };

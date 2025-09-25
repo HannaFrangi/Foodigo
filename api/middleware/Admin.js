@@ -4,7 +4,7 @@ import User from "../models/Users.js";
 export const AdminRoute = async (req, res, next) => {
   try {
     // 1. Get the token from cookies
-    const token = req.cookies.jwt;
+    const token = req.cookies.jwt_token;
     if (!token) {
       return res.status(401).json({
         success: false,
