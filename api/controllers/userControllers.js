@@ -166,7 +166,7 @@ export const AddToFavorites = async (req, res) => {
 };
 
 const CONVERSION_FACTORS = {
-  cup: 236.588, // ml per cup
+  cup: 236.588, // ml per cupe
   Tbs: 14.7868, // ml per tablespoon
   tsp: 4.92892, // ml per teaspoon
 };

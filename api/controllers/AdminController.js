@@ -200,8 +200,8 @@ export const modifyUserAccount = async (req, res) => {
 // USers Table
 export const getAllUsersX = async (req, res) => {
   try {
-    const users = await User.find({ isAdmin: { $in: [false, null] } });
-
+    const users = await User.find({ isAdmin: { $in: [false, null] } })
+      .sort({ createdAt: -1 }); // 
     res.status(200).json({
       success: true,
       count: users.length,
@@ -215,6 +215,7 @@ export const getAllUsersX = async (req, res) => {
     });
   }
 };
+
 
 export const NewestRecipesX = async (req, res) => {
   try {

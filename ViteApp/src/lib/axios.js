@@ -5,7 +5,7 @@ const BASE_URL =
 
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // Send cookies for auth validation
+  withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
   },
