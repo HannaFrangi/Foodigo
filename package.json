@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon api/server.js",
-    "build": "npm install && npm install --prefix ViteApp && npm run build --prefix ViteApp && npm install --prefix Dashboard && npm run build --prefix Dashboard",
+    "build": "npm install && npm install --prefix ViteApp --legacy-peer-deps && npm run build --prefix ViteApp && npm install --prefix Dashboard --legacy-peer-deps && npm run build --prefix Dashboard",
     "start": "node api/server.js"
   },
   "keywords": [],

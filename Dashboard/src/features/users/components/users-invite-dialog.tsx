@@ -1,9 +1,4 @@
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { IconMailPlus, IconSend } from '@tabler/icons-react'
-import { showSubmittedData } from '@/utils/show-submitted-data'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -12,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -20,10 +15,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { SelectDropdown } from '@/components/select-dropdown'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { showSubmittedData } from '@/utils/show-submitted-data';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { IconMailPlus, IconSend } from '@tabler/icons-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 // import { userTypes } from '../data/data'
 
 const formSchema = z.object({
@@ -33,34 +32,33 @@ const formSchema = z.object({
   }),
   role: z.string().min(1, 'Role is required.'),
   desc: z.string().optional(),
-})
-type UserInviteForm = z.infer<typeof formSchema>
+});
+type UserInviteForm = z.infer<typeof formSchema>;
 
 interface Props {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function UsersInviteDialog({ open, onOpenChange }: Props) {
   const form = useForm<UserInviteForm>({
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', role: '', desc: '' },
-  })
+  });
 
   const onSubmit = (values: UserInviteForm) => {
-    form.reset()
-    showSubmittedData(values)
-    onOpenChange(false)
-  }
+    form.reset();
+    showSubmittedData(values);
+    onOpenChange(false);
+  };
 
   return (
     <Dialog
       open={open}
       onOpenChange={(state) => {
-        form.reset()
-        onOpenChange(state)
-      }}
-    >
+        form.reset();
+        onOpenChange(state);
+      }}>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader className='text-left'>
           <DialogTitle className='flex items-center gap-2'>
@@ -75,8 +73,7 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
           <form
             id='user-invite-form'
             onSubmit={form.handleSubmit(onSubmit)}
-            className='space-y-4'
-          >
+            className='space-y-4'>
             <FormField
               control={form.control}
               name='email'
@@ -97,7 +94,7 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
             <FormField
               control={form.control}
               name='role'
-              render={({ field }) => (
+              render={() => (
                 <FormItem className='space-y-1'>
                   <FormLabel>Role</FormLabel>
                   {/* <SelectDropdown
@@ -142,5 +139,5 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

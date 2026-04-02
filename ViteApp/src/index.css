@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
 
 .Navmenu::before {
   content: "";
@@ -295,19 +294,23 @@
   }
 }
 .review-modal .ant-modal-content {
-  @apply bg-gradient-to-br from-white to-gray-50;
+  background: linear-gradient(to bottom right, #ffffff, #fafafa);
 }
 
 .review-modal .ant-modal-header {
-  @apply bg-transparent border-b-0 pb-4;
+  background-color: transparent;
+  border-bottom: 0;
+  padding-bottom: 1rem;
 }
 
 .review-modal .ant-modal-body {
-  @apply py-6;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .review-modal .ant-modal-footer {
-  @apply border-t-0 pt-4;
+  border-top: 0;
+  padding-top: 1rem;
 }
 
 .ant-btn-primary:not(.ant-btn-dangerous):hover {

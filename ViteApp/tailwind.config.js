@@ -3,12 +3,9 @@ const { nextui } = require("@nextui-org/react");
 
 module.exports = {
   content: [
-    "../foodigo/**/*.html",
-    "./pages/**/*.{js,jsx}",
-    "./components/**/*.{js,jsx}",
-    "./app/**/*.{js,jsx,html}",
-    "./src/**/*.{js,jsx,html}",
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./index.html",
+    "./node_modules/@nextui-org/react/dist/**/*.{js,ts,jsx,tsx}",
   ],
   prefix: "",
   theme: {

@@ -1,9 +1,9 @@
 // 1. LAZY LOAD MORE COMPONENTS
 import React, { useEffect, lazy, Suspense } from 'react';
-import ReactLenis, { useLenis } from '@studio-freight/react-lenis';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import ChefHatSpinner from './utils/ChefHatSpinner';
+import Lenis from 'lenis';
 
 // Lazy load ALL page components
 const AuthPage = lazy(() => import('./pages/Auth/AuthPage'));
@@ -35,6 +35,12 @@ function App() {
   const authUser = useAuthStore((s) => s.authUser);
   const fetchCategories = useRecipeStore((s) => s.fetchCategories);
 
+
+const lenis = new Lenis({
+  autoRaf: true,
+});
+
+
   useEffect(() => {
     // Lazy load GTM
     import('react-gtm-module').then((TagManager) => {
@@ -65,110 +71,110 @@ function App() {
     <>
       <Toaster />
       <Suspense fallback={<Loading />}>
-        <ReactLenis options={{ duration: 2 }} root>
-          <Suspense fallback={<ChefHatSpinner size={100} />}>
-            <PageLayout>
-              <Routes>
-                <Route
-                  path='/'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <Homepage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/auth'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <AuthPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/recipe'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <RecipePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/favorites'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <Favorites />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/recipe/:id'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <RecipeDetails />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/recipe/:recipeId'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <RecipeHeader />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/edit/:recipeId'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <EditRecipePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/reset-password/:token'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <ResetPassword />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/verify-email/:token'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <VerifyEmail />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/recipes/new'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <AddRecipe />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/groccery'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <GrocceryList />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path='/*'
-                  element={
-                    <Suspense fallback={<Loading />}>
-                      <Error />
-                    </Suspense>
-                  }
-                />
-              </Routes>
-            </PageLayout>
-          </Suspense>
-        </ReactLenis>
+        {/* <ReactLenis options={{ duration: 2 }} root> */}
+        <Suspense fallback={<ChefHatSpinner size={100} />}>
+          <PageLayout>
+            <Routes>
+              <Route
+                path='/'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Homepage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/auth'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <AuthPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/recipe'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <RecipePage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/favorites'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Favorites />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/recipe/:id'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <RecipeDetails />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/recipe/:recipeId'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <RecipeHeader />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/edit/:recipeId'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <EditRecipePage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/reset-password/:token'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <ResetPassword />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/verify-email/:token'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <VerifyEmail />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/recipes/new'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <AddRecipe />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/groccery'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <GrocceryList />
+                  </Suspense>
+                }
+              />
+              <Route
+                path='/*'
+                element={
+                  <Suspense fallback={<Loading />}>
+                    <Error />
+                  </Suspense>
+                }
+              />
+            </Routes>
+          </PageLayout>
+        </Suspense>
+        {/* </ReactLenis> */}
       </Suspense>
     </>
   );

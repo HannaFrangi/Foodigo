@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import logo from '/src/assets/logo.png';
 import { useAuthStore } from '../store/useAuthStore';
 import ProfileModal from '../pages/Profile/ProfileModal';
+import 'lenis/dist/lenis.css';
 
 const NavbarSkeleton = () => {
   return (
@@ -313,8 +314,8 @@ const PageLayout = ({ children, authUser, loading }) => {
   const mainContentRef = useRef(null);
   const { logout } = useAuthStore();
 
-  const particlesInit = async (main) => {
-    await loadFull(main);
+  const particlesInit = (engine) => {
+    loadFull(engine).catch((err) => console.error('Particle init error:', err));
   };
 
   const particlesConfig = {

@@ -1,9 +1,6 @@
 'use client'
 
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { showSubmittedData } from '@/utils/show-submitted-data'
+import { PasswordInput } from '@/components/password-input';
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,8 +19,10 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/password-input'
-import { SelectDropdown } from '@/components/select-dropdown'
+import { showSubmittedData } from '@/utils/show-submitted-data';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 // import { userTypes } from '../data/data'
 import { User } from '../data/schema'
 
@@ -135,10 +134,9 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
     <Dialog
       open={open}
       onOpenChange={(state) => {
-        form.reset()
-        onOpenChange(state)
-      }}
-    >
+        form.reset();
+        onOpenChange(state);
+      }}>
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-left'>
           <DialogTitle>{isEdit ? 'Edit User' : 'Add New User'}</DialogTitle>
@@ -152,8 +150,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
             <form
               id='user-form'
               onSubmit={form.handleSubmit(onSubmit)}
-              className='space-y-4 p-0.5'
-            >
+              className='space-y-4 p-0.5'>
               <FormField
                 control={form.control}
                 name='firstName'
@@ -254,7 +251,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               <FormField
                 control={form.control}
                 name='role'
-                render={({ field }) => (
+                render={() => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
                       Role
@@ -322,5 +319,5 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
